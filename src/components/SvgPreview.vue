@@ -208,7 +208,7 @@ const ellipse_preview = computed(() => {
         g.ellipse_plot_layer(
             v-if="tool === 'ellipse'"
         )
-            rect(fill="red" opacity="0.1" x="0" y="0" width="1920" height="1080"
+            rect(fill="orange" opacity="0.1" x="0" y="0" width="1920" height="1080"
                 @pointerdown="start_plot"
                 @pointerup="end_plot_ellipse"
                 @pointerleave="cancel_plot"
