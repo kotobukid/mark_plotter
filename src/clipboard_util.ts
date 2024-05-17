@@ -22,7 +22,7 @@ const blobToDataURL = (blob: Blob): Promise<string> => {
     });
 }
 
-const addImageToSvg = (dataUrl: string) => {
+const prepareImage = (dataUrl: string) => {
     const svg = document.querySelector('svg');
     if (svg) {
         getDataUrlDimensions(dataUrl).then(dimensions => {
@@ -41,7 +41,6 @@ const addImageToSvg = (dataUrl: string) => {
         }).catch(error => {
             console.error('Error while getting dimensions from Data URL:', error);
         });
-
     } else {
         console.error('SVG element not found');
     }
@@ -58,9 +57,27 @@ const getDataUrlDimensions = (dataUrl: string): Promise<{ width: number, height:
     });
 };
 
+const getDataUrlAndDimensions = (dataUrl: string): Promise<{ dataUrl: string, width: number, height: number }> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            resolve({ width: img.width, height: img.height });
+        };
+        img.onerror = reject;
+        img.src = dataUrl;
+
+        resolve({
+            dataUrl: dataUrl,
+            width: img.width,
+            height: img.height
+        });
+    });
+};
+
 export {
     getClipboardImage,
     blobToDataURL,
-    addImageToSvg
+    addImageToSvg,
+    getDataUrlAndDimensions
 }
 
