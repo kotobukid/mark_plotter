@@ -142,7 +142,7 @@ const circle_preview = computed(() => {
         defs
             marker#marker-1(viewBox="0 0 100 78.542" overflow="visible" orient="auto" refX="19.39" refY="19.39")
                 path(d="M -28.08 4.983 L 300 -207.988 L 300 217.954 L -28.08 4.983 Z" style="fill: rgb(248, 0, 0); transform-origin: -27.973px 5.758px;")
-        image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
+        image.main_image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
         g.rects
             rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="1")
         g.circles

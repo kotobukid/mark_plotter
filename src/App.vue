@@ -28,13 +28,70 @@ const handle_file_change = (event) => {
         const readFileContent = (file) => {
 
             const parseSvgContent = (content) => {
-                console.log('Parsed SVG content:', content);
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(content, "image/svg+xml");
+
+                // Image
+                const elements = doc.querySelectorAll('image.main_image'); // ここで必要なクラス名を指定するにゃ
+
+                elements.forEach(element => {
+                    const dataUrl = element.getAttribute('href');
+                    const width = element.getAttribute('width');
+                    const height = element.getAttribute('height');
+
+                    image.value = {
+                        dataUrl,
+                        width,
+                        height
+                    };
+                });
+
+                // Rect
+                const g_rects = doc.querySelector('g.rects'); // 必要に応じてクラス名を変更するにゃ
+                if (g_rects) {
+                    const _rects = g_rects.querySelectorAll('rect');
+                    rects.value = Array.from(_rects).map(rect => {
+                        return {
+                            x: rect.getAttribute('x'),
+                            y: rect.getAttribute('y'),
+                            width: rect.getAttribute('width'),
+                            height: rect.getAttribute('height')
+                        };
+                    });
+                }
+
+                // Circle
+                const g_circles = doc.querySelector('g.circles');
+                if (g_circles) {
+                    const _circles = g_circles.querySelectorAll('circle');
+                    circles.value = Array.from(_circles).map(circle => {
+                        return {
+                            cx: circle.getAttribute('cx'),
+                            cy: circle.getAttribute('cy'),
+                            r: circle.getAttribute('r'),
+                        };
+                    });
+                }
+
+                // Lines
+                const g_lines = doc.querySelector('g.lines');
+                if (g_lines) {
+                    const _lines = g_lines.querySelectorAll('line');
+                    lines.value = Array.from(_lines).map(line => {
+                        return {
+                            x1: line.getAttribute('x1'),
+                            y1: line.getAttribute('y1'),
+                            x2: line.getAttribute('x2'),
+                            y2: line.getAttribute('y2'),
+                        };
+                    });
+                }
             };
 
             const reader = new FileReader();
             reader.onload = (event) => {
                 const fileContent = event.target.result;
-                console.log('SVG file content:', fileContent);
+                // console.log('SVG file content:', fileContent);
                 parseSvgContent(fileContent);
             };
             reader.readAsText(file);
