@@ -15,17 +15,19 @@ const getClipboardImage = async (): Promise<Blob | null> => {
 
 const blobToDataURL = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
-        debugger
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
+        if (!blob) {
+            reject();
+        } else {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        }
     });
 }
 
 const getDataUrlDimensions = (dataUrl: string): Promise<{ width: number, height: number }> => {
     return new Promise((resolve, reject) => {
-        debugger
         const img = new Image();
         img.onload = () => {
             resolve({width: img.width, height: img.height});
@@ -37,7 +39,6 @@ const getDataUrlDimensions = (dataUrl: string): Promise<{ width: number, height:
 
 const getDataUrlAndDimensions = (dataUrl: string): Promise<{ dataUrl: string, width: number, height: number }> => {
     return new Promise((resolve, reject) => {
-        debugger
         const img = new Image();
         img.onload = () => {
             resolve({

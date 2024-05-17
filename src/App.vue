@@ -22,9 +22,11 @@ const lines = ref<Line[]>([]);
 const capture_clipboard = async () => {
     tool.value = '';
     const data: Blob = await getClipboardImage();
-    const dataUrl = await blobToDataURL(data);
-    // addImageToSvg(dataUrl);
-    image.value = await getDataUrlAndDimensions(dataUrl);
+    blobToDataURL(data).then(async (dataUrl) => {
+        image.value = await getDataUrlAndDimensions(dataUrl);
+    }).catch(() => {
+        alert('PrintScreenができていません');
+    });
 };
 
 const save_as_svg = () => {
