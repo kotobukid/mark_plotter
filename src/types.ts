@@ -1,4 +1,4 @@
-export type Tool = "" | "circle" | "rect";
+export type Tool = "" | "circle" | "rect" | "line";
 
 export type ImageAndDimensions = {
     dataUrl: string,
@@ -17,6 +17,13 @@ export type Rect = {
     y: number,
     width: number,
     height: number,
+};
+
+export type Line = {
+    x1: number,
+    y1: number
+    x2: number,
+    y2: number
 };
 
 export type Point2D = {

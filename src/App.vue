@@ -5,7 +5,7 @@ import ToolRibbon from "./components/ToolRibbon.vue";
 import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
 import {ref} from "vue";
 
-import {type Tool, type ImageAndDimensions, type Circle, type Rect} from "./types.ts";
+import {type Tool, type ImageAndDimensions, type Circle, type Rect, type Line} from "./types.ts";
 
 const tool = ref<Tool>("");
 const image = ref<ImageAndDimensions>({
@@ -16,6 +16,7 @@ const image = ref<ImageAndDimensions>({
 
 const circles = ref<Circle[]>([]);
 const rects = ref<Rect[]>([]);
+const lines = ref<Line[]>([]);
 
 
 const capture_clipboard = async () => {
@@ -77,9 +78,14 @@ const add_circle = (c: Circle) => {
     circles.value.push(c);
 };
 
+const add_line = (l: Line) => {
+    lines.value.push(l);
+};
+
 const wipe = () => {
     rects.value = [];
     circles.value = [];
+    lines.value = [];
 };
 </script>
 
@@ -90,15 +96,18 @@ const wipe = () => {
             button(@click="wipe") Wipe
             button(@click="switch_tool('rect')") Rect tool
             button(@click="switch_tool('circle')") Circle tool
+            button(@click="switch_tool('line')") Line tool
             button(@click="save_as_svg") Save as SVG
         SvgPreview(
             :image="image"
             :tool="tool"
             :circles="circles"
             :rects="rects"
+            :lines="lines"
             @switch-tool="switch_tool"
             @add-rect="add_rect"
             @add-circle="add_circle"
+            @add-line="add_line"
         )
 </template>
 

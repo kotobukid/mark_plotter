@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
-import {type Tool, type Rect, type Circle, type Point2D} from "../types.ts";
+import {type Tool, type Rect, type Circle, type Point2D, type Line} from "../types.ts";
 
 const props = defineProps<{
     tool: Tool,
@@ -10,13 +10,15 @@ const props = defineProps<{
         height: number
     },
     circles: Circle[],
-    rects: Rect[]
+    rects: Rect[],
+    lines: Line[],
 }>();
 
 const emits = defineEmits<{
     (e: 'switch-tool', value: Tool): void,
     (e: 'add-circle', value: Circle): void,
     (e: 'add-rect', value: Rect): void,
+    (e: 'add-line', value: Line): void,
 }>();
 
 const viewBox = computed(() => {
@@ -64,6 +66,18 @@ const end_plot_circle = (e: PointerEvent) => {
     });
 };
 
+const end_plot_line = (e: PointerEvent) => {
+    end.value = {x: e.offsetX, y: e.offsetY};
+    emits('switch-tool', '');
+
+    emits("add-line", {
+        x1: start.value.x,
+        y1: start.value.y,
+        x2: end.value.x,
+        y2: end.value.y,
+    });
+};
+
 const move_end = (e: PointerEvent) => {
     end.value = {
         x: e.offsetX,
@@ -74,11 +88,16 @@ const move_end = (e: PointerEvent) => {
 
 <template lang="pug">
     svg#svg_main(xmlns="http://www.w3.org/2000/svg" version="1.1" :viewBox="viewBox" @click="clicked" :width="props.image.width" :height="props.image.height")
+        defs
+            marker#marker-1(viewBox="0 0 100 78.542" overflow="visible" orient="auto" refX="19.39" refY="19.39")
+                path(d="M -28.08 4.983 L 300 -207.988 L 300 217.954 L -28.08 4.983 Z" style="fill: rgb(248, 0, 0); transform-origin: -27.973px 5.758px;")
         image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
         g.rects
             rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="1")
         g.circles
             circle(v-for="c in circles" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="1")
+        g.lines
+            line(v-for="l in lines" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="1" style="marker-start: url(\"#marker-1\");")
         g.rect_plot_layer(
             v-if="tool === 'rect'"
         )
@@ -99,6 +118,15 @@ const move_end = (e: PointerEvent) => {
             )
             circle.preview(:cx="start.x" :cy="start.y")
             line.preview(:x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="black" stroke-width="1" fill="none")
+        g.line_plot_layer(
+            v-if="tool === 'line'"
+        )
+            rect(fill="green" opacity="0.1" x="0" y="0" width="1920" height="1080"
+                @pointerdown="start_plot"
+                @pointerup="end_plot_line"
+                @pointerleave="end_plot_line"
+                @pointermove="move_end"
+            )
         rect.frame(v-if="props.image.dataUrl" x="1" y="1" :width="props.image.width - 2" :height="props.image.height - 2" fill="transparent" stroke-width="1" stroke="black")
 </template>
 
