@@ -18,6 +18,31 @@ const circles = ref<Circle[]>([]);
 const rects = ref<Rect[]>([]);
 const lines = ref<Line[]>([]);
 
+const fileInput = ref(null);
+const open_svg = () => {
+    fileInput.value.click();
+}
+const handle_file_change = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const readFileContent = (file) => {
+
+            const parseSvgContent = (content) => {
+                console.log('Parsed SVG content:', content);
+            };
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const fileContent = event.target.result;
+                console.log('SVG file content:', fileContent);
+                parseSvgContent(fileContent);
+            };
+            reader.readAsText(file);
+        };
+
+        readFileContent(file);
+    }
+}
 
 const capture_clipboard = async () => {
     tool.value = '';
@@ -94,6 +119,8 @@ const wipe = () => {
 <template lang="pug">
     .container
         ToolRibbon(style="margin-bottom: 5px;")
+            button(@click="open_svg") Open SVG
+            input(type="file" ref="fileInput" accept=".svg" @change="handle_file_change" style="display:none")
             button(@click="capture_clipboard") Paste from Screenshot
             button(@click="wipe") Wipe
             button(@click="switch_tool('rect')" :data-active="tool === 'rect'") Rect tool
