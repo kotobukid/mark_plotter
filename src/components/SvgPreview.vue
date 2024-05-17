@@ -97,7 +97,7 @@ const move_end = (e: PointerEvent) => {
         g.circles
             circle(v-for="c in circles" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="1")
         g.lines
-            line(v-for="l in lines" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="1" style="marker-start: url(\"#marker-1\");")
+            line.line_arrow(v-for="l in lines" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");")
         g.rect_plot_layer(
             v-if="tool === 'rect'"
         )
@@ -127,6 +127,7 @@ const move_end = (e: PointerEvent) => {
                 @pointerleave="end_plot_line"
                 @pointermove="move_end"
             )
+            line.preview(:x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
         rect.frame(v-if="props.image.dataUrl" x="1" y="1" :width="props.image.width - 2" :height="props.image.height - 2" fill="transparent" stroke-width="1" stroke="black")
 </template>
 
