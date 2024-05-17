@@ -11,14 +11,16 @@ const props = defineProps<{
     }
 }>();
 
+const emits = defineEmits<{(e: 'switch-tool', value: Tool): void}>();
+
 const clicked = (e: MouseEvent) => {
-    if (props.tool === "circle") {
-        circles.value.push({
-            cx: e.offsetX,
-            cy: e.offsetY,
-            r: 16
-        });
-    }
+    // if (props.tool === "circle") {
+    //     circles.value.push({
+    //         cx: e.offsetX,
+    //         cy: e.offsetY,
+    //         r: 16
+    //     });
+    // }
 };
 
 type Circle = {
@@ -35,18 +37,71 @@ const viewBox = computed(() => {
     }
 })
 
-const circles = ref<Circle[]>([])
+const circles = ref<Circle[]>([]);
+
+type Point2D = {
+    x: number,
+    y: number
+}
+const start = ref<Point2D>({x: 0, y: 0});
+const end = ref<Point2D>({x: 0, y: 0});
+
+const start_plot = (e: PointerEvent) => {
+    start.value = {x: e.offsetX, y: e.offsetY}
+};
+
+const end_plot_circle = (e: PointerEvent) => {
+    end.value = {x: e.offsetX, y: e.offsetY};
+    emits('switch-tool', '');
+
+    const r = Math.floor(Math.sqrt(
+            Math.pow(end.value.x - start.value.x, 2)
+        + Math.pow(end.value.y - start.value.y, 2)));
+    circles.value.push({
+        cx: start.value.x,
+        cy: start.value.y,
+        r
+    });
+};
+
+const move_end = (e: PointerEvent) => {
+    end.value = {
+        x: e.offsetX,
+        y: e.offsetY
+    };
+}
 </script>
 
 <template lang="pug">
-    svg#svg_main(:viewBox="viewBox" @click="clicked" :width="props.image.width" :height="props.image.height")
+    svg#svg_main(xmlns="http://www.w3.org/2000/svg" version="1.1" :viewBox="viewBox" @click="clicked" :width="props.image.width" :height="props.image.height")
         image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
         g.circles
             circle(v-for="c in circles" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="1")
+        g.circle_plot_layer(
+            v-if="tool === 'circle'"
+        )
+            rect(fill="red" opacity="0.1" x="0" y="0" width="1920" height="1080"
+                @pointerdown="start_plot"
+                @pointerup="end_plot_circle"
+                @pointerleave="end_plot_circle"
+                @pointermove="move_end"
+            )
+            circle.preview(:cx="start.x" :cy="start.y")
+            line.preview(:x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="black" stroke-width="1" fill="none")
+        rect.frame(v-if="props.image.dataUrl" x="1" y="1" :width="props.image.width - 2" :height="props.image.height - 2" fill="transparent" stroke-width="1" stroke="black")
 </template>
 
 <style scoped>
 svg {
     outline: 1px solid grey;
+    user-select: none;
+}
+
+.preview {
+    pointer-events: none;
+}
+
+rect.frame {
+    pointer-events: none;
 }
 </style>

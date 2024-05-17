@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {nextTick} from "vue";
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import SvgPreview from "./components/SvgPreview.vue";
@@ -34,23 +35,48 @@ const switch_to_circle_tool = () => {
 };
 
 const save_as_svg = () => {
-    const $svg = document.getElementById("svg_main");
-    const text = $svg.outerHTML;
+    tool.value = '';
+    nextTick(() => {
+        const $svg = document.getElementById("svg_main").cloneNode(true);
 
-    const download_text_as_file = (text) => {
-        const blob = new Blob([text], {type: 'image/svg+xml'});
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.target = '_blank';
-        link.download = `download.svg`;
-        link.click();
-        URL.revokeObjectURL(link.href);
-        setTimeout(() => {
-            link.remove();
-        });
-    };
-    download_text_as_file(text);
-}
+        const remove_data_custom_attrs = (elem, attrToRemove) => {
+            // 指定した属性を削除します。
+            elem.removeAttribute(attrToRemove);
+
+            // 全ての子要素に対して同じ操作を行います。
+            for (let i = 0; i < elem.children.length; i++) {
+                remove_data_custom_attrs(elem.children[i], attrToRemove);
+            }
+        };
+
+        for (let attr of $svg.attributes) {
+            if (attr.name.startsWith('data-')) {
+                remove_data_custom_attrs($svg, attr.name);
+            }
+        }
+
+        const text = $svg.outerHTML;
+
+        const download_text_as_file = (text) => {
+            const blob = new Blob([`<?xml version="1.0" encoding="UTF-8" standalone="no"?>${text}`], {type: 'image/svg+xml'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.target = '_blank';
+            link.download = `download.svg`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            setTimeout(() => {
+                link.remove();
+            });
+        };
+        download_text_as_file(text);
+    });
+};
+
+const switch_tool = (_tool: Tool) => {
+    tool.value = _tool;
+};
+
 </script>
 
 <template lang="pug">
@@ -62,6 +88,7 @@ const save_as_svg = () => {
         SvgPreview(
             :image="image"
             :tool="tool"
+            @switch-tool="switch_tool"
         )
 </template>
 
