@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
 
-type Tool = "" | "circle"
+type Tool = "" | "circle" | "rect";
 const props = defineProps<{
     tool: Tool,
     image: {
@@ -11,23 +11,20 @@ const props = defineProps<{
     }
 }>();
 
-const emits = defineEmits<{(e: 'switch-tool', value: Tool): void}>();
-
-const clicked = (e: MouseEvent) => {
-    // if (props.tool === "circle") {
-    //     circles.value.push({
-    //         cx: e.offsetX,
-    //         cy: e.offsetY,
-    //         r: 16
-    //     });
-    // }
-};
+const emits = defineEmits<{ (e: 'switch-tool', value: Tool): void }>();
 
 type Circle = {
     cx: number,
     cy: number,
     r: number
-}
+};
+
+type Rect = {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+};
 
 const viewBox = computed(() => {
     if (props.image.dataUrl) {
@@ -38,6 +35,7 @@ const viewBox = computed(() => {
 })
 
 const circles = ref<Circle[]>([]);
+const rects = ref<Rect[]>([]);
 
 type Point2D = {
     x: number,
@@ -50,12 +48,28 @@ const start_plot = (e: PointerEvent) => {
     start.value = {x: e.offsetX, y: e.offsetY}
 };
 
+const end_plot_rect = (e: PointerEvent) => {
+    end.value = {x: e.offsetX, y: e.offsetY};
+    emits('switch-tool', '');
+    const s_gte_x: boolean = start.value.x - end.value.x > 0;
+    const s_gte_y: boolean = start.value.y - end.value.y > 0;
+
+    const width = (start.value.x - end.value.x) * (s_gte_x ? 1 : -1);
+    const height = (start.value.y - end.value.y) * (s_gte_y ? 1 : -1);
+    const x = s_gte_x ? end.value.x : start.value.x;
+    const y = s_gte_y ? end.value.y : start.value.y;
+
+    rects.value.push({
+        x, y, width, height
+    });
+};
+
 const end_plot_circle = (e: PointerEvent) => {
     end.value = {x: e.offsetX, y: e.offsetY};
     emits('switch-tool', '');
 
     const r = Math.floor(Math.sqrt(
-            Math.pow(end.value.x - start.value.x, 2)
+        Math.pow(end.value.x - start.value.x, 2)
         + Math.pow(end.value.y - start.value.y, 2)));
     circles.value.push({
         cx: start.value.x,
@@ -75,8 +89,19 @@ const move_end = (e: PointerEvent) => {
 <template lang="pug">
     svg#svg_main(xmlns="http://www.w3.org/2000/svg" version="1.1" :viewBox="viewBox" @click="clicked" :width="props.image.width" :height="props.image.height")
         image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
+        g.rects
+            rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="1")
         g.circles
             circle(v-for="c in circles" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="1")
+        g.rect_plot_layer(
+            v-if="tool === 'rect'"
+        )
+            rect(fill="blue" opacity="0.1" x="0" y="0" width="1920" height="1080"
+                @pointerdown="start_plot"
+                @pointerup="end_plot_rect"
+                @pointerleave="end_plot_rect"
+                @pointermove="move_end"
+            )
         g.circle_plot_layer(
             v-if="tool === 'circle'"
         )

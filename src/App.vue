@@ -5,7 +5,7 @@ import {nextTick} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 
-type Tool = "" | "circle";
+type Tool = "" | "circle" | "rect";
 type ImageAndDimensions = {
     dataUrl: string,
     width: number,
@@ -28,10 +28,6 @@ const capture_clipboard = async () => {
     const dataUrl = await blobToDataURL(data);
     // addImageToSvg(dataUrl);
     image.value = await getDataUrlAndDimensions(dataUrl);
-};
-
-const switch_to_circle_tool = () => {
-    tool.value = 'circle';
 };
 
 const save_as_svg = () => {
@@ -83,7 +79,8 @@ const switch_tool = (_tool: Tool) => {
     .container
         ToolRibbon(style="margin-bottom: 5px;")
             button(@click="capture_clipboard") Paste from Screenshot
-            button(@click="switch_to_circle_tool") Circle tool
+            button(@click="switch_tool('rect')") Rect tool
+            button(@click="switch_tool('circle')") Circle tool
             button(@click="save_as_svg") Save as SVG
         SvgPreview(
             :image="image"
