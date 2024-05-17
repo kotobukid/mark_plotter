@@ -297,7 +297,7 @@ const commit_crop = (rect: Rect) => {
 
 <template lang="pug">
     .container
-        ToolRibbon(style="margin-bottom: 16px;")
+        ToolRibbon(style="margin-right: 16px; width: 200px; float: left;")
             a.button(href="#" @click.prevent="open_svg" draggable="false")
                 img.tool_icon(src="/public/open.svg" draggable="false")
                 span SVGを開く
@@ -310,7 +310,7 @@ const commit_crop = (rect: Rect) => {
                 span 全消去
             a.button(href="#" @click.prevent="load_last_snapshot" draggable="false" :class="snapshots.length > 0 ? '' : 'disabled'")
                 img.tool_icon(src="/public/undo.svg" draggable="false")
-                span やり直し
+                span 元に戻す
             a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool === 'crop'" draggable="false")
                 img.tool_icon(src="/public/crop.svg" draggable="false")
                 span 切り抜きツール
@@ -330,6 +330,7 @@ const commit_crop = (rect: Rect) => {
                 img.tool_icon(src="/public/save.svg" draggable="false")
                 span SVGを保存
         SvgPreview(
+            style="float: left;"
             :image="image"
             :tool="tool"
             :circles="circles"
@@ -347,6 +348,10 @@ const commit_crop = (rect: Rect) => {
 
 <style scoped>
 a.button {
+    display: block;
+    width: 190px;
+    min-width: 190px;
+
     &.disabled {
         background-color: grey;
         color: black;
@@ -367,6 +372,7 @@ a.button {
     }
 
     &:hover {
+        background-image: url('button_hover.png');
         background-color: lightblue;
     }
 
@@ -379,13 +385,13 @@ a.button {
 
     text-decoration: none;
     user-select: none;
-    margin: 2px 10px;
+    margin: 0 10px 5px 0;
 
     &[data-active="true"] {
-        background-color: pink;
+        background-image: url('button_active.png');
     }
 
-    display: inline-block;
+    //display: inline-block;
     background-color: white;
     border: 1px solid black;
     border-radius: 3px;
