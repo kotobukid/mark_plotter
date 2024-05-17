@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
+import {type Tool, type Rect, type Circle, type Point2D} from "../types.ts";
 
-type Tool = "" | "circle" | "rect";
 const props = defineProps<{
     tool: Tool,
     image: {
@@ -12,19 +12,6 @@ const props = defineProps<{
 }>();
 
 const emits = defineEmits<{ (e: 'switch-tool', value: Tool): void }>();
-
-type Circle = {
-    cx: number,
-    cy: number,
-    r: number
-};
-
-type Rect = {
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-};
 
 const viewBox = computed(() => {
     if (props.image.dataUrl) {
@@ -37,10 +24,6 @@ const viewBox = computed(() => {
 const circles = ref<Circle[]>([]);
 const rects = ref<Rect[]>([]);
 
-type Point2D = {
-    x: number,
-    y: number
-}
 const start = ref<Point2D>({x: 0, y: 0});
 const end = ref<Point2D>({x: 0, y: 0});
 

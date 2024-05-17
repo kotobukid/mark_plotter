@@ -5,12 +5,7 @@ import {nextTick} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 
-type Tool = "" | "circle" | "rect";
-type ImageAndDimensions = {
-    dataUrl: string,
-    width: number,
-    height: number
-};
+import {type Tool, type ImageAndDimensions} from "./types.ts";
 
 const tool = ref<Tool>("");
 const image = ref<ImageAndDimensions>({
