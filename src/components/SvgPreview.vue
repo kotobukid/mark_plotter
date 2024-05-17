@@ -39,7 +39,7 @@ const circles = ref<Circle[]>([])
 </script>
 
 <template lang="pug">
-    svg(:viewBox="viewBox" @click="clicked" :width="props.image.width" :height="props.image.height")
+    svg#svg_main(:viewBox="viewBox" @click="clicked" :width="props.image.width" :height="props.image.height")
         image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
         g.circles
             circle(v-for="c in circles" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="1")
