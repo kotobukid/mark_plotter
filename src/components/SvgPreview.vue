@@ -84,6 +84,31 @@ const move_end = (e: PointerEvent) => {
         y: e.offsetY
     };
 };
+
+const rect_preview = computed(() => {
+    const s_gte_x: boolean = start.value.x - end.value.x > 0;
+    const s_gte_y: boolean = start.value.y - end.value.y > 0;
+
+    const width = (start.value.x - end.value.x) * (s_gte_x ? 1 : -1);
+    const height = (start.value.y - end.value.y) * (s_gte_y ? 1 : -1);
+    const x = s_gte_x ? end.value.x : start.value.x;
+    const y = s_gte_y ? end.value.y : start.value.y;
+
+    return  {
+        x, y, width, height
+    };
+});
+
+const circle_preview = computed(() => {
+    const r = Math.floor(Math.sqrt(
+        Math.pow(end.value.x - start.value.x, 2)
+        + Math.pow(end.value.y - start.value.y, 2)));
+    return {
+        cx: start.value.x,
+        cy: start.value.y,
+        r
+    };
+});
 </script>
 
 <template lang="pug">
@@ -107,6 +132,7 @@ const move_end = (e: PointerEvent) => {
                 @pointerleave="end_plot_rect"
                 @pointermove="move_end"
             )
+            rect.preview(:x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
         g.circle_plot_layer(
             v-if="tool === 'circle'"
         )
@@ -116,8 +142,8 @@ const move_end = (e: PointerEvent) => {
                 @pointerleave="end_plot_circle"
                 @pointermove="move_end"
             )
-            circle.preview(:cx="start.x" :cy="start.y")
-            line.preview(:x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="black" stroke-width="1" fill="none")
+            circle.preview(:cx="circle_preview.cx" :cy="circle_preview.cy" :r="circle_preview.r" fill="transparent" stroke="red" stroke-width="1")
+            //line.preview(:x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="black" stroke-width="1" fill="none")
         g.line_plot_layer(
             v-if="tool === 'line'"
         )
