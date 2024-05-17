@@ -5,7 +5,7 @@ import ToolRibbon from "./components/ToolRibbon.vue";
 import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
 import {ref} from "vue";
 
-import {type Tool, type ImageAndDimensions, type Circle, type Rect, type Line} from "./types.ts";
+import {type Tool, type ImageAndDimensions, type Circle, type Rect, type Line, type Ellipse} from "./types.ts";
 
 const tool = ref<Tool>("");
 const image = ref<ImageAndDimensions>({
@@ -17,6 +17,7 @@ const image = ref<ImageAndDimensions>({
 const circles = ref<Circle[]>([]);
 const rects = ref<Rect[]>([]);
 const lines = ref<Line[]>([]);
+const ellipses = ref<Ellipse[]>([]);
 
 const fileInput = ref(null);
 const open_svg = () => {
@@ -69,6 +70,20 @@ const handle_file_change = (event) => {
                             cx: circle.getAttribute('cx'),
                             cy: circle.getAttribute('cy'),
                             r: circle.getAttribute('r'),
+                        };
+                    });
+                }
+
+                // Ellipse
+                const g_ellipses = doc.querySelector('g.ellipses');
+                if (g_ellipses) {
+                    const _ellipses = g_ellipses.querySelectorAll('ellipse');
+                    ellipses.value = Array.from(_ellipses).map(ellipse => {
+                        return {
+                            cx: ellipse.getAttribute('cx'),
+                            cy: ellipse.getAttribute('cy'),
+                            rx: ellipse.getAttribute('rx'),
+                            ry: ellipse.getAttribute('ry'),
                         };
                     });
                 }
@@ -166,43 +181,97 @@ const add_line = (l: Line) => {
     lines.value.push(l);
 };
 
+const add_ellipse = (e: Ellipse) => {
+    ellipses.value.push(e);
+};
+
 const wipe = () => {
     rects.value = [];
     circles.value = [];
     lines.value = [];
+    ellipses.value = [];
 };
 </script>
 
 <template lang="pug">
     .container
-        ToolRibbon(style="margin-bottom: 5px;")
-            button(@click="open_svg") Open SVG
+        ToolRibbon(style="margin-bottom: 16px;")
+            a.button(href="#" @click.prevent="open_svg" draggable="false")
+                img.tool_icon(src="/public/open.svg")
+                span SVGを開く
             input(type="file" ref="fileInput" accept=".svg" @change="handle_file_change" style="display:none")
-            button(@click="capture_clipboard") Paste from Screenshot
-            button(@click="wipe") Wipe
-            button(@click="switch_tool('rect')" :data-active="tool === 'rect'") Rect tool
-            button(@click="switch_tool('circle')" :data-active="tool === 'circle'") Circle tool
-            button(@click="switch_tool('line')" :data-active="tool === 'line'") Line tool
-            button(@click="save_as_svg") Save as SVG
+            a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
+                img.tool_icon(src="/public/paste.svg")
+                span Printscreenから読み込む
+            a.button(href="#" @click.prevent="wipe" draggable="false")
+                img.tool_icon(src="/public/wipe.svg")
+                span 全消去
+            a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool === 'rect'" draggable="false")
+                img.tool_icon(src="/public/rect.svg")
+                span 矩形ツール
+            a.button(href="#" @click.prevent="switch_tool('circle')" :data-active="tool === 'circle'" draggable="false")
+                img.tool_icon(src="/public/circle.svg")
+                span 円ツール
+            a.button(href="#" @click.prevent="switch_tool('ellipse')" :data-active="tool === 'ellipse'" draggable="false")
+                img.tool_icon(src="/public/ellipse.svg")
+                span 楕円ツール
+            a.button(href="#" @click.prevent="switch_tool('line')" :data-active="tool === 'line'" draggable="false")
+                img.tool_icon(src="/public/line.svg")
+                span 矢印ツール
+            a.button(href="#" @click.prevent="save_as_svg" draggable="false")
+                img.tool_icon(src="/public/save.svg")
+                span SVGを保存
         SvgPreview(
             :image="image"
             :tool="tool"
             :circles="circles"
             :rects="rects"
             :lines="lines"
+            :ellipses="ellipses"
             @switch-tool="switch_tool"
             @add-rect="add_rect"
             @add-circle="add_circle"
             @add-line="add_line"
+            @add-ellipse="add_ellipse"
         )
 </template>
 
 <style scoped>
-button {
-    margin: 2px;
+a.button {
+    &:active {
+        color: blue;
+        position: relative;
+        top: 1px;
+    }
+
+    &:hover {
+        background-color: lightblue;
+    }
+
+    span {
+        position: relative;
+        top: -8px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    text-decoration: none;
+    user-select: none;
+    margin: 2px 10px;
 
     &[data-active="true"] {
         background-color: pink;
     }
+
+    display: inline-block;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 3px;
+    padding: 3px;
+}
+
+img.tool_icon {
+    width: 2rem;
+    height: 2rem;
 }
 </style>

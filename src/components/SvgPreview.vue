@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, nextTick, ref} from "vue";
-import {type Tool, type Rect, type Circle, type Point2D, type Line} from "../types.ts";
+import {type Tool, type Rect, type Circle, type Point2D, type Line, type Ellipse} from "../types.ts";
 
 const props = defineProps<{
     tool: Tool,
@@ -12,6 +12,7 @@ const props = defineProps<{
     circles: Circle[],
     rects: Rect[],
     lines: Line[],
+    ellipses: Ellipse[],
 }>();
 
 const emits = defineEmits<{
@@ -19,6 +20,7 @@ const emits = defineEmits<{
     (e: 'add-circle', value: Circle): void,
     (e: 'add-rect', value: Rect): void,
     (e: 'add-line', value: Line): void,
+    (e: 'add-ellipse', value: Ellipse): void,
 }>();
 
 const viewBox = computed(() => {
@@ -85,6 +87,25 @@ const end_plot_circle = (e: PointerEvent) => {
     plotting.value = false;
 };
 
+const end_plot_ellipse = (e: PointerEvent) => {
+    end.value = {x: e.offsetX, y: e.offsetY};
+    emits('switch-tool', '');
+
+    const cx = (start.value.x + end.value.x) / 2;
+    const cy = (start.value.y + end.value.y) / 2;
+    const rx = Math.abs(start.value.x - end.value.x) / 2;
+    const ry = Math.abs(start.value.y - end.value.y) / 2;
+    emits('add-ellipse', {
+        cx,
+        cy,
+        rx,
+        ry
+    });
+
+    show_preview.value = false;
+    plotting.value = false;
+};
+
 const end_plot_line = (e: PointerEvent) => {
     end.value = {x: e.offsetX, y: e.offsetY};
     emits('switch-tool', '');
@@ -120,7 +141,7 @@ const rect_preview = computed(() => {
     const x = s_gte_x ? end.value.x : start.value.x;
     const y = s_gte_y ? end.value.y : start.value.y;
 
-    return  {
+    return {
         x, y, width, height
     };
 });
@@ -135,6 +156,19 @@ const circle_preview = computed(() => {
         r
     };
 });
+
+const ellipse_preview = computed(() => {
+    const cx = (start.value.x + end.value.x) / 2;
+    const cy = (start.value.y + end.value.y) / 2;
+    const rx = Math.abs(start.value.x - end.value.x) / 2;
+    const ry = Math.abs(start.value.y - end.value.y) / 2;
+    return {
+        cx,
+        cy,
+        rx,
+        ry
+    };
+});
 </script>
 
 <template lang="pug">
@@ -147,6 +181,8 @@ const circle_preview = computed(() => {
             rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="1")
         g.circles
             circle(v-for="c in circles" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="1")
+        g.ellipses
+            ellipse(v-for="e in ellipses" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="1")
         g.lines
             line.line_arrow(v-for="l in lines" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");")
         g.rect_plot_layer(
@@ -169,6 +205,16 @@ const circle_preview = computed(() => {
                 @pointermove="move_end"
             )
             circle.preview(v-if="show_preview" :cx="circle_preview.cx" :cy="circle_preview.cy" :r="circle_preview.r" fill="transparent" stroke="red" stroke-width="1")
+        g.ellipse_plot_layer(
+            v-if="tool === 'ellipse'"
+        )
+            rect(fill="red" opacity="0.1" x="0" y="0" width="1920" height="1080"
+                @pointerdown="start_plot"
+                @pointerup="end_plot_ellipse"
+                @pointerleave="cancel_plot"
+                @pointermove="move_end"
+            )
+            ellipse.preview(v-if="show_preview" :cx="ellipse_preview.cx" :cy="ellipse_preview.cy" :rx="ellipse_preview.rx" :ry="ellipse_preview.ry" fill="transparent" stroke="red" stroke-width="1")
         g.line_plot_layer(
             v-if="tool === 'line'"
         )
