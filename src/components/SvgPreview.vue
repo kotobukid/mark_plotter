@@ -21,6 +21,7 @@ const emits = defineEmits<{
     (e: 'add-rect', value: Rect): void,
     (e: 'add-line', value: Line): void,
     (e: 'add-ellipse', value: Ellipse): void,
+    (e: 'commit-crop', value: Rect): void,
 }>();
 
 const viewBox = computed(() => {
@@ -63,6 +64,25 @@ const end_plot_rect = (e: PointerEvent) => {
     const y = s_gte_y ? end.value.y : start.value.y;
 
     emits('add-rect', {
+        x, y, width, height
+    });
+
+    show_preview.value = false;
+    plotting.value = false;
+};
+
+const end_crop = (e: PointerEvent) => {
+    end.value = {x: e.offsetX, y: e.offsetY};
+    emits('switch-tool', '');
+    const s_gte_x: boolean = start.value.x - end.value.x > 0;
+    const s_gte_y: boolean = start.value.y - end.value.y > 0;
+
+    const width = (start.value.x - end.value.x) * (s_gte_x ? 1 : -1);
+    const height = (start.value.y - end.value.y) * (s_gte_y ? 1 : -1);
+    const x = s_gte_x ? end.value.x : start.value.x;
+    const y = s_gte_y ? end.value.y : start.value.y;
+
+    emits('commit-crop', {
         x, y, width, height
     });
 
@@ -225,6 +245,17 @@ const ellipse_preview = computed(() => {
                 @pointermove="move_end"
             )
             line.preview(v-if="show_preview" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
+        g.crop_layer(
+            v-if="tool === 'crop'"
+        )
+            rect(fill="black" opacity="0.1" x="0" y="0" width="1920" height="1080"
+                @pointerdown="start_plot"
+                @pointerup="end_crop"
+                @pointerleave="cancel_plot"
+                @pointermove="move_end"
+            )
+            rect.preview(v-if="show_preview" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
+
         rect.frame(v-if="props.image.dataUrl" x="1" y="1" :width="props.image.width - 2" :height="props.image.height - 2" fill="transparent" stroke-width="1" stroke="black")
 </template>
 

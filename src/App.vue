@@ -191,6 +191,70 @@ const wipe = () => {
     lines.value = [];
     ellipses.value = [];
 };
+
+const trimImage = (dataUrl: string, {x, y, width, height}: Rect, callback) => {
+    let img = new Image();
+    img.src = dataUrl;
+
+    img.onload = function() {
+        let canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        let ctx = canvas.getContext('2d');
+
+        // Draw the image onto the canvas, but only the desired section
+        ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
+
+        // Get the dataURL of the trimmed section
+        let trimmedDataUrl = canvas.toDataURL();
+
+        callback(trimmedDataUrl);
+    };
+}
+
+const commit_crop = (rect: Rect) => {
+    trimImage(image.value.dataUrl, rect, (dataUrl: string) => {
+        image.value.dataUrl = dataUrl;
+        image.value.width = rect.width;
+        image.value.height = rect.height;
+
+        circles.value = circles.value.map(c => {
+            return {
+                cx : c.cx - rect.x,
+                cy : c.cy - rect.y,
+                r: c.r
+            };
+        });
+
+        ellipses.value = ellipses.value.map(e => {
+            return {
+                cx : e.cx - rect.x,
+                cy : e.cy - rect.y,
+                rx: e.rx,
+                ry: e.ry
+            };
+        });
+
+        rects.value = rects.value.map(r => {
+            return {
+                x : r.x - rect.x,
+                y : r.y - rect.y,
+                width: r.width,
+                height: r.height
+            };
+        });
+
+        lines.value = lines.value.map(l => {
+            return {
+                x1 : l.x1 - rect.x,
+                y1 : l.y1 - rect.y,
+                x2 : l.x2 - rect.x,
+                y2 : l.y2 - rect.y,
+            };
+        });
+
+    });
+}
 </script>
 
 <template lang="pug">
@@ -206,6 +270,9 @@ const wipe = () => {
             a.button(href="#" @click.prevent="wipe" draggable="false")
                 img.tool_icon(src="/public/wipe.svg")
                 span 全消去
+            a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool === 'crop'" draggable="false")
+                img.tool_icon(src="/public/crop.svg")
+                span 切り抜きツール
             a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool === 'rect'" draggable="false")
                 img.tool_icon(src="/public/rect.svg")
                 span 矩形ツール
@@ -233,6 +300,7 @@ const wipe = () => {
             @add-circle="add_circle"
             @add-line="add_line"
             @add-ellipse="add_ellipse"
+            @commit-crop="commit_crop"
         )
 </template>
 

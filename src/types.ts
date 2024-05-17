@@ -1,4 +1,4 @@
-export type Tool = "" | "circle" | "rect" | "line" | "ellipse";
+export type Tool = "" | "circle" | "rect" | "line" | "ellipse" | "crop";
 
 export type ImageAndDimensions = {
     dataUrl: string,

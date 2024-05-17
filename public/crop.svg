@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="32" y1="8.913" x2="32" y2="55.087" id="gradient-0" gradientTransform="matrix(0.713284, -0.700875, 0.810514, 0.824864, -15.91524, 28.878651)">
+      <stop offset="0" style="stop-color: rgb(84.706% 84.706% 84.706%)"/>
+      <stop offset="1" style="stop-color: rgb(48.42% 48.42% 48.42%)"/>
+    </linearGradient>
+  </defs>
+  <rect x="7.844" y="8.913" width="48.312" height="46.174" style="fill: url('#gradient-0');"/>
+  <polyline style="stroke-width: 8px; fill: none; stroke: rgb(0, 0, 0);" points="20.904 8.913 7.844 8.913 7.844 21.501"/>
+  <polyline style="stroke-width: 8px; fill: none; stroke: rgb(0, 0, 0); transform-box: fill-box; transform-origin: 50% 50%;" points="56.156 21.501 43.096 21.501 43.096 8.913" transform="matrix(-1, 0, 0, -1, -0.000002, 0.000001)"/>
+  <polyline style="stroke-width: 8px; fill: none; stroke: rgb(0, 0, 0); transform-box: fill-box; transform-origin: 50% 50%;" points="56.156 42.499 43.096 42.499 43.096 55.087" transform="matrix(-1, 0, 0, -1, -0.000002, 0.000001)"/>
+  <polyline style="stroke-width: 8px; fill: none; stroke: rgb(0, 0, 0); transform-origin: 14.375px 48.793px;" points="20.904 55.087 7.844 55.087 7.844 42.499"/>
+</svg>
