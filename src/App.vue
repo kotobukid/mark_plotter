@@ -94,9 +94,9 @@ const wipe = () => {
         ToolRibbon(style="margin-bottom: 5px;")
             button(@click="capture_clipboard") Paste from Screenshot
             button(@click="wipe") Wipe
-            button(@click="switch_tool('rect')") Rect tool
-            button(@click="switch_tool('circle')") Circle tool
-            button(@click="switch_tool('line')") Line tool
+            button(@click="switch_tool('rect')" :data-active="tool === 'rect'") Rect tool
+            button(@click="switch_tool('circle')" :data-active="tool === 'circle'") Circle tool
+            button(@click="switch_tool('line')" :data-active="tool === 'line'") Line tool
             button(@click="save_as_svg") Save as SVG
         SvgPreview(
             :image="image"
@@ -114,5 +114,9 @@ const wipe = () => {
 <style scoped>
 button {
     margin: 2px;
+
+    &[data-active="true"] {
+        background-color: pink;
+    }
 }
 </style>
