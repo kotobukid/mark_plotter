@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import {nextTick} from "vue";
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
+import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
+import {ref} from "vue";
 
 import {type Tool, type ImageAndDimensions, type Circle, type Rect} from "./types.ts";
 
@@ -17,8 +17,6 @@ const image = ref<ImageAndDimensions>({
 const circles = ref<Circle[]>([]);
 const rects = ref<Rect[]>([]);
 
-import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
-import {ref} from "vue";
 
 const capture_clipboard = async () => {
     tool.value = '';
@@ -78,12 +76,18 @@ const add_rect = (r: Rect) => {
 const add_circle = (c: Circle) => {
     circles.value.push(c);
 };
+
+const wipe = () => {
+    rects.value = [];
+    circles.value = [];
+};
 </script>
 
 <template lang="pug">
     .container
         ToolRibbon(style="margin-bottom: 5px;")
             button(@click="capture_clipboard") Paste from Screenshot
+            button(@click="wipe") Wipe
             button(@click="switch_tool('rect')") Rect tool
             button(@click="switch_tool('circle')") Circle tool
             button(@click="save_as_svg") Save as SVG

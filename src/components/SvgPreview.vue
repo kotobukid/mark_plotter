@@ -69,7 +69,7 @@ const move_end = (e: PointerEvent) => {
         x: e.offsetX,
         y: e.offsetY
     };
-}
+};
 </script>
 
 <template lang="pug">
