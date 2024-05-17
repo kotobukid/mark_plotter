@@ -37,3 +37,10 @@ export type Point2D = {
     x: number,
     y: number
 };
+
+export type Snapshot = {
+    rects: Rect[],
+    circles: Circle[],
+    ellipses: Ellipse[],
+    Lines: Line[]
+};

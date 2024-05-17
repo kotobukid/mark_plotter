@@ -5,7 +5,7 @@ import ToolRibbon from "./components/ToolRibbon.vue";
 import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
 import {ref} from "vue";
 
-import {type Tool, type ImageAndDimensions, type Circle, type Rect, type Line, type Ellipse} from "./types.ts";
+import {type Tool, type ImageAndDimensions, type Circle, type Rect, type Line, type Ellipse, type Snapshot} from "./types.ts";
 
 const tool = ref<Tool>("");
 const image = ref<ImageAndDimensions>({
@@ -19,10 +19,40 @@ const rects = ref<Rect[]>([]);
 const lines = ref<Line[]>([]);
 const ellipses = ref<Ellipse[]>([]);
 
+const snapshots = ref<Snapshot>([]);
+
+const commit_snapshot = () => {
+    const ss = {
+        circles: [...circles.value],
+        rects: [...rects.value],
+        ellipses: [...ellipses.value],
+        lines: [...lines.value],
+    };
+    snapshots.value = [...snapshots.value, ss];
+};
+
+const wipe_snapshots = () => {
+    snapshots.value = [];
+};
+
+const load_last_snapshot = () => {
+    const ss = snapshots.value.pop();
+
+    if (ss) {
+        rects.value = ss.rects;
+        lines.value = ss.lines;
+        circles.value = ss.circles;
+        ellipses.value = ss.ellipses;
+    }
+};
+
+
 const fileInput = ref(null);
 const open_svg = () => {
     fileInput.value.click();
-}
+    wipe_snapshots();
+};
+
 const handle_file_change = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -121,6 +151,7 @@ const capture_clipboard = async () => {
     const data: Blob = await getClipboardImage();
     blobToDataURL(data).then(async (dataUrl) => {
         image.value = await getDataUrlAndDimensions(dataUrl);
+        wipe_snapshots();
     }).catch(() => {
         alert('PrintScreenができていません');
     });
@@ -170,22 +201,27 @@ const switch_tool = (_tool: Tool) => {
 };
 
 const add_rect = (r: Rect) => {
+    commit_snapshot();
     rects.value.push(r);
 };
 
 const add_circle = (c: Circle) => {
+    commit_snapshot();
     circles.value.push(c);
 };
 
 const add_line = (l: Line) => {
+    commit_snapshot();
     lines.value.push(l);
 };
 
 const add_ellipse = (e: Ellipse) => {
+    commit_snapshot();
     ellipses.value.push(e);
 };
 
 const wipe = () => {
+    commit_snapshot();
     rects.value = [];
     circles.value = [];
     lines.value = [];
@@ -252,7 +288,6 @@ const commit_crop = (rect: Rect) => {
                 y2 : l.y2 - rect.y,
             };
         });
-
     });
 }
 </script>
@@ -261,32 +296,35 @@ const commit_crop = (rect: Rect) => {
     .container
         ToolRibbon(style="margin-bottom: 16px;")
             a.button(href="#" @click.prevent="open_svg" draggable="false")
-                img.tool_icon(src="/public/open.svg")
+                img.tool_icon(src="/public/open.svg" draggable="false")
                 span SVGを開く
             input(type="file" ref="fileInput" accept=".svg" @change="handle_file_change" style="display:none")
             a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
-                img.tool_icon(src="/public/paste.svg")
-                span Printscreenから読み込む
+                img.tool_icon(src="/public/paste.svg" draggable="false")
+                span 貼り付け
             a.button(href="#" @click.prevent="wipe" draggable="false")
-                img.tool_icon(src="/public/wipe.svg")
+                img.tool_icon(src="/public/wipe.svg" draggable="false")
                 span 全消去
+            a.button(href="#" @click.prevent="load_last_snapshot" draggable="false" :class="snapshots.length > 0 ? '' : 'disabled'")
+                img.tool_icon(src="/public/undo.svg" draggable="false")
+                span やり直し
             a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool === 'crop'" draggable="false")
-                img.tool_icon(src="/public/crop.svg")
+                img.tool_icon(src="/public/crop.svg" draggable="false")
                 span 切り抜きツール
             a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool === 'rect'" draggable="false")
-                img.tool_icon(src="/public/rect.svg")
+                img.tool_icon(src="/public/rect.svg" draggable="false")
                 span 矩形ツール
             a.button(href="#" @click.prevent="switch_tool('circle')" :data-active="tool === 'circle'" draggable="false")
-                img.tool_icon(src="/public/circle.svg")
+                img.tool_icon(src="/public/circle.svg" draggable="false")
                 span 円ツール
             a.button(href="#" @click.prevent="switch_tool('ellipse')" :data-active="tool === 'ellipse'" draggable="false")
-                img.tool_icon(src="/public/ellipse.svg")
+                img.tool_icon(src="/public/ellipse.svg" draggable="false")
                 span 楕円ツール
             a.button(href="#" @click.prevent="switch_tool('line')" :data-active="tool === 'line'" draggable="false")
-                img.tool_icon(src="/public/line.svg")
+                img.tool_icon(src="/public/line.svg" draggable="false")
                 span 矢印ツール
             a.button(href="#" @click.prevent="save_as_svg" draggable="false")
-                img.tool_icon(src="/public/save.svg")
+                img.tool_icon(src="/public/save.svg" draggable="false")
                 span SVGを保存
         SvgPreview(
             :image="image"
@@ -306,6 +344,19 @@ const commit_crop = (rect: Rect) => {
 
 <style scoped>
 a.button {
+    &.disabled {
+        background-color: grey;
+        color: black;
+        cursor: not-allowed;
+        &:active {
+            position: relative;
+            top: 0;
+        }
+        &:hover {
+           background-color: grey;
+        }
+    }
+
     &:active {
         color: blue;
         position: relative;
