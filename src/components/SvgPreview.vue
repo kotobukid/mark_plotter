@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from "vue";
+import {computed, nextTick, ref} from "vue";
 import {type Tool, type Rect, type Circle, type Point2D, type Line} from "../types.ts";
 
 const props = defineProps<{
@@ -32,8 +32,21 @@ const viewBox = computed(() => {
 const start = ref<Point2D>({x: 0, y: 0});
 const end = ref<Point2D>({x: 0, y: 0});
 
+const show_preview = ref<boolean>(false);
+const plotting = ref<boolean>(false);
+
 const start_plot = (e: PointerEvent) => {
-    start.value = {x: e.offsetX, y: e.offsetY}
+    start.value = {x: e.offsetX, y: e.offsetY};
+    nextTick(() => {
+        show_preview.value = true;
+        plotting.value = true;
+    });
+};
+
+const cancel_plot = () => {
+    show_preview.value = false;
+    plotting.value = false;
+    emits('switch-tool', '');
 };
 
 const end_plot_rect = (e: PointerEvent) => {
@@ -50,6 +63,9 @@ const end_plot_rect = (e: PointerEvent) => {
     emits('add-rect', {
         x, y, width, height
     });
+
+    show_preview.value = false;
+    plotting.value = false;
 };
 
 const end_plot_circle = (e: PointerEvent) => {
@@ -64,6 +80,9 @@ const end_plot_circle = (e: PointerEvent) => {
         cy: start.value.y,
         r
     });
+
+    show_preview.value = false;
+    plotting.value = false;
 };
 
 const end_plot_line = (e: PointerEvent) => {
@@ -76,13 +95,20 @@ const end_plot_line = (e: PointerEvent) => {
         x2: end.value.x,
         y2: end.value.y,
     });
+
+    show_preview.value = false;
+    plotting.value = false;
 };
 
 const move_end = (e: PointerEvent) => {
-    end.value = {
-        x: e.offsetX,
-        y: e.offsetY
-    };
+    if (plotting) {
+        end.value = {
+            x: e.offsetX,
+            y: e.offsetY
+        };
+
+        show_preview.value = true;
+    }
 };
 
 const rect_preview = computed(() => {
@@ -129,31 +155,30 @@ const circle_preview = computed(() => {
             rect(fill="blue" opacity="0.1" x="0" y="0" width="1920" height="1080"
                 @pointerdown="start_plot"
                 @pointerup="end_plot_rect"
-                @pointerleave="end_plot_rect"
+                @pointerleave="cancel_plot"
                 @pointermove="move_end"
             )
-            rect.preview(:x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
+            rect.preview(v-if="show_preview" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
         g.circle_plot_layer(
             v-if="tool === 'circle'"
         )
             rect(fill="red" opacity="0.1" x="0" y="0" width="1920" height="1080"
                 @pointerdown="start_plot"
                 @pointerup="end_plot_circle"
-                @pointerleave="end_plot_circle"
+                @pointerleave="cancel_plot"
                 @pointermove="move_end"
             )
-            circle.preview(:cx="circle_preview.cx" :cy="circle_preview.cy" :r="circle_preview.r" fill="transparent" stroke="red" stroke-width="1")
-            //line.preview(:x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="black" stroke-width="1" fill="none")
+            circle.preview(v-if="show_preview" :cx="circle_preview.cx" :cy="circle_preview.cy" :r="circle_preview.r" fill="transparent" stroke="red" stroke-width="1")
         g.line_plot_layer(
             v-if="tool === 'line'"
         )
             rect(fill="green" opacity="0.1" x="0" y="0" width="1920" height="1080"
                 @pointerdown="start_plot"
                 @pointerup="end_plot_line"
-                @pointerleave="end_plot_line"
+                @pointerleave="cancel_plot"
                 @pointermove="move_end"
             )
-            line.preview(:x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
+            line.preview(v-if="show_preview" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
         rect.frame(v-if="props.image.dataUrl" x="1" y="1" :width="props.image.width - 2" :height="props.image.height - 2" fill="transparent" stroke-width="1" stroke="black")
 </template>
 
