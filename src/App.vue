@@ -5,7 +5,7 @@ import {nextTick} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 
-import {type Tool, type ImageAndDimensions} from "./types.ts";
+import {type Tool, type ImageAndDimensions, type Circle, type Rect} from "./types.ts";
 
 const tool = ref<Tool>("");
 const image = ref<ImageAndDimensions>({
@@ -13,6 +13,9 @@ const image = ref<ImageAndDimensions>({
     width: 0,
     height: 0
 });
+
+const circles = ref<Circle[]>([]);
+const rects = ref<Rect[]>([]);
 
 import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
 import {ref} from "vue";
@@ -68,6 +71,13 @@ const switch_tool = (_tool: Tool) => {
     tool.value = _tool;
 };
 
+const add_rect = (r: Rect) => {
+    rects.value.push(r);
+};
+
+const add_circle = (c: Circle) => {
+    circles.value.push(c);
+};
 </script>
 
 <template lang="pug">
@@ -80,7 +90,11 @@ const switch_tool = (_tool: Tool) => {
         SvgPreview(
             :image="image"
             :tool="tool"
+            :circles="circles"
+            :rects="rects"
             @switch-tool="switch_tool"
+            @add-rect="add_rect"
+            @add-circle="add_circle"
         )
 </template>
 

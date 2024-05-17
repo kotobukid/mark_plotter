@@ -8,10 +8,16 @@ const props = defineProps<{
         dataUrl: string,
         width: number,
         height: number
-    }
+    },
+    circles: Circle[],
+    rects: Rect[]
 }>();
 
-const emits = defineEmits<{ (e: 'switch-tool', value: Tool): void }>();
+const emits = defineEmits<{
+    (e: 'switch-tool', value: Tool): void,
+    (e: 'add-circle', value: Circle): void,
+    (e: 'add-rect', value: Rect): void,
+}>();
 
 const viewBox = computed(() => {
     if (props.image.dataUrl) {
@@ -19,10 +25,7 @@ const viewBox = computed(() => {
     } else {
         return '0 0 480 360';
     }
-})
-
-const circles = ref<Circle[]>([]);
-const rects = ref<Rect[]>([]);
+});
 
 const start = ref<Point2D>({x: 0, y: 0});
 const end = ref<Point2D>({x: 0, y: 0});
@@ -42,7 +45,7 @@ const end_plot_rect = (e: PointerEvent) => {
     const x = s_gte_x ? end.value.x : start.value.x;
     const y = s_gte_y ? end.value.y : start.value.y;
 
-    rects.value.push({
+    emits('add-rect', {
         x, y, width, height
     });
 };
@@ -54,7 +57,7 @@ const end_plot_circle = (e: PointerEvent) => {
     const r = Math.floor(Math.sqrt(
         Math.pow(end.value.x - start.value.x, 2)
         + Math.pow(end.value.y - start.value.y, 2)));
-    circles.value.push({
+    emits("add-circle", {
         cx: start.value.x,
         cy: start.value.y,
         r
