@@ -178,11 +178,11 @@ const ellipse_preview = computed(() => {
                 path(d="M -28.08 4.983 L 300 -207.988 L 300 217.954 L -28.08 4.983 Z" style="fill: rgb(248, 0, 0); transform-origin: -27.973px 5.758px;")
         image.main_image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
         g.rects
-            rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="1")
+            rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2")
         g.circles
-            circle(v-for="c in circles" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="1")
+            circle(v-for="c in circles" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="2")
         g.ellipses
-            ellipse(v-for="e in ellipses" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="1")
+            ellipse(v-for="e in ellipses" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="2")
         g.lines
             line.line_arrow(v-for="l in lines" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");")
         g.rect_plot_layer(
