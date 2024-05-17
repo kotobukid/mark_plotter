@@ -221,11 +221,14 @@ const add_ellipse = (e: Ellipse) => {
 };
 
 const wipe = () => {
-    commit_snapshot();
-    rects.value = [];
-    circles.value = [];
-    lines.value = [];
-    ellipses.value = [];
+    const do_wipe = confirm("画像以外の全要素を削除しますか？", "");
+    if (do_wipe) {
+        commit_snapshot();
+        rects.value = [];
+        circles.value = [];
+        lines.value = [];
+        ellipses.value = [];
+    }
 };
 
 const trimImage = (dataUrl: string, {x, y, width, height}: Rect, callback) => {
