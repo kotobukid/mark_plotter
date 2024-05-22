@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {nextTick} from "vue";
+import {computed, nextTick} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
@@ -292,11 +292,16 @@ const commit_crop = (rect: Rect) => {
             };
         });
     });
-}
+};
+
+const container_style = computed(() => {
+    return `width: ${220 + (image.value.width || 0)}px;`;
+});
+
 </script>
 
 <template lang="pug">
-    .container
+    .container(:style="container_style")
         ToolRibbon(style="margin-right: 16px; width: 200px; float: left;")
             a.button(href="#" @click.prevent="open_svg" draggable="false")
                 img.tool_icon(src="/public/open.svg" draggable="false")
@@ -346,7 +351,7 @@ const commit_crop = (rect: Rect) => {
         )
 </template>
 
-<style scoped>
+<style scoped lang="less">
 a.button {
     display: block;
     width: 190px;
@@ -401,5 +406,10 @@ a.button {
 img.tool_icon {
     width: 2rem;
     height: 2rem;
+}
+
+
+.container {
+    float: left;
 }
 </style>
