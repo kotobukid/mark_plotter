@@ -295,7 +295,7 @@ const commit_crop = (rect: Rect) => {
 };
 
 const container_style = computed(() => {
-    return `width: ${220 + (image.value.width || 0)}px;`;
+    return `width: ${220 + (image.value.width || 0) + 20}px;`;
 });
 
 </script>
