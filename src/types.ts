@@ -42,5 +42,5 @@ export type Snapshot = {
     rects: Rect[],
     circles: Circle[],
     ellipses: Ellipse[],
-    Lines: Line[]
+    lines: Line[]
 };

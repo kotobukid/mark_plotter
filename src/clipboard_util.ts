@@ -55,7 +55,6 @@ const getDataUrlAndDimensions = (dataUrl: string): Promise<{ dataUrl: string, wi
 export {
     getClipboardImage,
     blobToDataURL,
-    addImageToSvg,
     getDataUrlAndDimensions
 }
 

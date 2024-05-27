@@ -19,10 +19,11 @@ const rects = ref<Rect[]>([]);
 const lines = ref<Line[]>([]);
 const ellipses = ref<Ellipse[]>([]);
 
-const snapshots = ref<Snapshot>([]);
+const snapshots = ref<Snapshot[]>([] as Snapshot[]);
 
 const commit_snapshot = () => {
-    const ss = {
+  // @ts-ignore
+    const ss: Snapshot = {
         circles: [...circles.value],
         rects: [...rects.value],
         ellipses: [...ellipses.value],
@@ -67,8 +68,8 @@ const handle_file_change = (event) => {
 
                 elements.forEach(element => {
                     const dataUrl = element.getAttribute('href');
-                    const width = element.getAttribute('width');
-                    const height = element.getAttribute('height');
+                    const width = Number(element.getAttribute('width'));
+                    const height = Number(element.getAttribute('height'));
 
                     image.value = {
                         dataUrl,
@@ -83,10 +84,10 @@ const handle_file_change = (event) => {
                     const _rects = g_rects.querySelectorAll('rect');
                     rects.value = Array.from(_rects).map(rect => {
                         return {
-                            x: rect.getAttribute('x'),
-                            y: rect.getAttribute('y'),
-                            width: rect.getAttribute('width'),
-                            height: rect.getAttribute('height')
+                            x: Number(rect.getAttribute('x')),
+                            y: Number(rect.getAttribute('y')),
+                            width: Number(rect.getAttribute('width')),
+                            height: Number(rect.getAttribute('height'))
                         };
                     });
                 }
@@ -95,11 +96,12 @@ const handle_file_change = (event) => {
                 const g_circles = doc.querySelector('g.circles');
                 if (g_circles) {
                     const _circles = g_circles.querySelectorAll('circle');
+
                     circles.value = Array.from(_circles).map(circle => {
                         return {
-                            cx: circle.getAttribute('cx'),
-                            cy: circle.getAttribute('cy'),
-                            r: circle.getAttribute('r'),
+                            cx: Number(circle.getAttribute('cx')),
+                            cy: Number(circle.getAttribute('cy')),
+                            r: Number(circle.getAttribute('r')),
                         };
                     });
                 }
@@ -110,10 +112,10 @@ const handle_file_change = (event) => {
                     const _ellipses = g_ellipses.querySelectorAll('ellipse');
                     ellipses.value = Array.from(_ellipses).map(ellipse => {
                         return {
-                            cx: ellipse.getAttribute('cx'),
-                            cy: ellipse.getAttribute('cy'),
-                            rx: ellipse.getAttribute('rx'),
-                            ry: ellipse.getAttribute('ry'),
+                            cx: Number(ellipse.getAttribute('cx')),
+                            cy: Number(ellipse.getAttribute('cy')),
+                            rx: Number(ellipse.getAttribute('rx')),
+                            ry: Number(ellipse.getAttribute('ry')),
                         };
                     });
                 }
@@ -124,10 +126,10 @@ const handle_file_change = (event) => {
                     const _lines = g_lines.querySelectorAll('line');
                     lines.value = Array.from(_lines).map(line => {
                         return {
-                            x1: line.getAttribute('x1'),
-                            y1: line.getAttribute('y1'),
-                            x2: line.getAttribute('x2'),
-                            y2: line.getAttribute('y2'),
+                            x1: Number(line.getAttribute('x1')),
+                            y1: Number(line.getAttribute('y1')),
+                            x2: Number(line.getAttribute('x2')),
+                            y2: Number(line.getAttribute('y2')),
                         };
                     });
                 }
@@ -172,13 +174,15 @@ const save_as_svg = () => {
             }
         };
 
+      // @ts-ignore
         for (let attr of $svg.attributes) {
             if (attr.name.startsWith('data-')) {
                 remove_data_custom_attrs($svg, attr.name);
             }
         }
 
-        const text = $svg.outerHTML;
+        // @ts-ignore
+        const text = $svg.outerHTML!;
 
         const download_text_as_file = (text) => {
             const blob = new Blob([`<?xml version="1.0" encoding="UTF-8" standalone="no"?>${text}`], {type: 'image/svg+xml'});
@@ -221,7 +225,7 @@ const add_ellipse = (e: Ellipse) => {
 };
 
 const wipe = () => {
-    const do_wipe = confirm("画像以外の全要素を削除しますか？", "");
+    const do_wipe = confirm("画像以外の全要素を削除しますか？");
     if (do_wipe) {
         commit_snapshot();
         rects.value = [];
