@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import {computed, nextTick, ref} from "vue";
-import {type Tool, type MyRect, type MyCircle, type Point2D, type MyLine, type MyEllipse, type LabelText} from "../types.ts";
+import {
+  type Tool,
+  type MyRect,
+  type MyCircle,
+  type Point2D,
+  type MyLine,
+  type MyEllipse,
+  type LabelText
+} from "../types.ts";
 import BoxedText from "./BoxedText.vue";
 
 const props = defineProps<{
@@ -150,6 +158,7 @@ const end_plot_line = (e: PointerEvent) => {
 const end_plot_text = (e: PointerEvent) => {
   const text: string = (prompt('') || '').trim();
   if (text) {
+    emits('switch-tool', '');
     emits('add-text', {
       text,
       x: e.offsetX - tr_x,
