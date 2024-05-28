@@ -80,6 +80,7 @@ const handle_file_change = (event) => {
           ellipses.value = result.ellipses;
           lines.value = result.lines;
           filename.value = result.filename;
+          document.title = filename.value;
         });
       } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
         parse_binary_image(file, (result) => {
@@ -90,6 +91,7 @@ const handle_file_change = (event) => {
           ellipses.value = [];
           lines.value = [];
           filename.value = result.filename;
+          document.title = filename.value;
         });
       }
     };
