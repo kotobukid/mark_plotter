@@ -227,7 +227,7 @@ const ellipse_preview = computed(() => {
                     @pointerleave="cancel_plot"
                     @pointermove="move_end"
                 )
-                rect.preview(v-if="show_preview" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
+                rect.preview(v-if="show_preview && plotting" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
             g.circle_plot_layer(
                 v-if="tool === 'circle'"
             )
@@ -237,7 +237,7 @@ const ellipse_preview = computed(() => {
                     @pointerleave="cancel_plot"
                     @pointermove="move_end"
                 )
-                circle.preview(v-if="show_preview" :cx="circle_preview.cx" :cy="circle_preview.cy" :r="circle_preview.r" fill="transparent" stroke="red" stroke-width="1")
+                circle.preview(v-if="show_preview && plotting" :cx="circle_preview.cx" :cy="circle_preview.cy" :r="circle_preview.r" fill="transparent" stroke="red" stroke-width="1")
             g.ellipse_plot_layer(
                 v-if="tool === 'ellipse'"
             )
@@ -247,7 +247,7 @@ const ellipse_preview = computed(() => {
                     @pointerleave="cancel_plot"
                     @pointermove="move_end"
                 )
-                ellipse.preview(v-if="show_preview" :cx="ellipse_preview.cx" :cy="ellipse_preview.cy" :rx="ellipse_preview.rx" :ry="ellipse_preview.ry" fill="transparent" stroke="red" stroke-width="1")
+                ellipse.preview(v-if="show_preview && plotting" :cx="ellipse_preview.cx" :cy="ellipse_preview.cy" :rx="ellipse_preview.rx" :ry="ellipse_preview.ry" fill="transparent" stroke="red" stroke-width="1")
             g.line_plot_layer(
                 v-if="tool === 'line'"
             )
@@ -257,7 +257,7 @@ const ellipse_preview = computed(() => {
                     @pointerleave="cancel_plot"
                     @pointermove="move_end"
                 )
-                line.preview(v-if="show_preview" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
+                line.preview(v-if="show_preview && plotting" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
             g.crop_layer(
                 v-if="tool === 'crop'"
             )
@@ -267,7 +267,7 @@ const ellipse_preview = computed(() => {
                     @pointerleave="cancel_plot"
                     @pointermove="move_end"
                 )
-                rect.preview(v-if="show_preview" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
+                rect.preview(v-if="show_preview && plotting" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
 
             rect.frame(v-if="props.image.dataUrl" x="1" y="1" :width="props.image.width - 2" :height="props.image.height - 2" fill="transparent" stroke-width="1" stroke="black")
 </template>
