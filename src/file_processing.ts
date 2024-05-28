@@ -1,4 +1,4 @@
-import type {Circle, Ellipse, ImageAndDimensions, LabelText, Line, Rect} from "./types.ts";
+import type {MyCircle, MyEllipse, ImageAndDimensions, LabelText, MyLine, MyRect} from "./types.ts";
 
 export const parse_my_svg = (file: File, next: Function) => {
     const parseSvgContent = (content) => {
@@ -29,7 +29,7 @@ export const parse_my_svg = (file: File, next: Function) => {
                 };
             });
 
-            let rects: Rect[] = [];
+            let rects: MyRect[] = [];
 
             // Rect
             const g_rects = doc.querySelector('g.rects'); // 必要に応じてクラス名を変更するにゃ
@@ -61,7 +61,7 @@ export const parse_my_svg = (file: File, next: Function) => {
                 });
             }
 
-            let circles: Circle[] = [];
+            let circles: MyCircle[] = [];
 
             // Circle
             const g_circles = doc.querySelector('g.circles');
@@ -77,7 +77,7 @@ export const parse_my_svg = (file: File, next: Function) => {
                 });
             }
 
-            let ellipses: Ellipse[] = [];
+            let ellipses: MyEllipse[] = [];
 
             // Ellipse
             const g_ellipses = doc.querySelector('g.ellipses');
@@ -93,7 +93,7 @@ export const parse_my_svg = (file: File, next: Function) => {
                 });
             }
 
-            let lines: Line[] = [];
+            let lines: MyLine[] = [];
 
             // Lines
             const g_lines = doc.querySelector('g.lines');

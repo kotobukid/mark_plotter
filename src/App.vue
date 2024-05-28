@@ -8,10 +8,10 @@ import {ref} from "vue";
 import {
   type Tool,
   type ImageAndDimensions,
-  type Circle,
-  type Rect,
-  type Line,
-  type Ellipse,
+  type MyCircle,
+  type MyRect,
+  type MyLine,
+  type MyEllipse,
   type Snapshot,
   type LabelText
 } from "./types.ts";
@@ -24,11 +24,11 @@ const image = ref<ImageAndDimensions>({
   height: 0
 });
 
-const circles = ref<Circle[]>([]);
-const rects = ref<Rect[]>([]);
+const circles = ref<MyCircle[]>([]);
+const rects = ref<MyRect[]>([]);
 const texts = ref<LabelText[]>([]);
-const lines = ref<Line[]>([]);
-const ellipses = ref<Ellipse[]>([]);
+const lines = ref<MyLine[]>([]);
+const ellipses = ref<MyEllipse[]>([]);
 
 const image_map_manager = (() => {
   const image_map = new Map<number, ImageAndDimensions>();
@@ -247,7 +247,7 @@ const switch_tool = (_tool: Tool) => {
   tool.value = _tool;
 };
 
-const add_rect = (r: Rect) => {
+const add_rect = (r: MyRect) => {
   commit_snapshot(-1);
   rects.value.push(r);
 };
@@ -257,17 +257,17 @@ const add_text = (t: LabelText) => {
   texts.value.push(t);
 };
 
-const add_circle = (c: Circle) => {
+const add_circle = (c: MyCircle) => {
   commit_snapshot(-1);
   circles.value.push(c);
 };
 
-const add_line = (l: Line) => {
+const add_line = (l: MyLine) => {
   commit_snapshot(-1);
   lines.value.push(l);
 };
 
-const add_ellipse = (e: Ellipse) => {
+const add_ellipse = (e: MyEllipse) => {
   commit_snapshot(-1);
   ellipses.value.push(e);
 };
@@ -284,7 +284,7 @@ const wipe = () => {
   }
 };
 
-const trimImage = (dataUrl: string, {x, y, width, height}: Rect, callback) => {
+const trimImage = (dataUrl: string, {x, y, width, height}: MyRect, callback) => {
   let img = new Image();
   img.src = dataUrl;
 
@@ -304,7 +304,7 @@ const trimImage = (dataUrl: string, {x, y, width, height}: Rect, callback) => {
   };
 }
 
-const commit_crop = (rect: Rect) => {
+const commit_crop = (rect: MyRect) => {
   trimImage(image.value.dataUrl, rect, (dataUrl: string) => {
     image.value.dataUrl = dataUrl;
     image.value.width = rect.width;

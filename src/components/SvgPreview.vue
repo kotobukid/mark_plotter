@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {computed, nextTick, ref} from "vue";
-import {type Tool, type Rect, type Circle, type Point2D, type Line, type Ellipse, type LabelText} from "../types.ts";
+import {type Tool, type MyRect, type MyCircle, type Point2D, type MyLine, type MyEllipse, type LabelText} from "../types.ts";
 import BoxedText from "./BoxedText.vue";
 
 const props = defineProps<{
@@ -10,21 +10,21 @@ const props = defineProps<{
     width: number,
     height: number
   },
-  circles: Circle[],
-  rects: Rect[],
+  circles: MyCircle[],
+  rects: MyRect[],
   texts: LabelText[],
-  lines: Line[],
-  ellipses: Ellipse[],
+  lines: MyLine[],
+  ellipses: MyEllipse[],
 }>();
 
 const emits = defineEmits<{
   (e: 'switch-tool', value: Tool): void,
   (e: 'add-text', value: LabelText): void,
-  (e: 'add-circle', value: Circle): void,
-  (e: 'add-rect', value: Rect): void,
-  (e: 'add-line', value: Line): void,
-  (e: 'add-ellipse', value: Ellipse): void,
-  (e: 'commit-crop', value: Rect): void,
+  (e: 'add-circle', value: MyCircle): void,
+  (e: 'add-rect', value: MyRect): void,
+  (e: 'add-line', value: MyLine): void,
+  (e: 'add-ellipse', value: MyEllipse): void,
+  (e: 'commit-crop', value: MyRect): void,
 }>();
 
 const viewBox = computed(() => {
@@ -353,7 +353,6 @@ const hide_cursor = (hide: boolean) => {
           @pointermove="move_end"
         )
         rect.preview(v-if="show_preview && plotting" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
-
       rect.frame(v-if="props.image.dataUrl" x="1" y="1" :width="props.image.width - 2" :height="props.image.height - 2" fill="transparent" stroke-width="1" stroke="black")
     g.cursor_pos(:style="cursor_transform" v-if="show_cursor")
       line(x1="0" y1="30" x2="0" y2="15")

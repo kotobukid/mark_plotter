@@ -6,20 +6,20 @@ export type ImageAndDimensions = {
     height: number
 };
 
-export type Circle = {
+export type MyCircle = {
     cx: number,
     cy: number,
     r: number
 };
 
-export type Ellipse = {
+export type MyEllipse = {
     cx: number,
     cy: number,
     rx: number
     ry: number
 };
 
-export type Rect = {
+export type MyRect = {
     x: number,
     y: number,
     width: number,
@@ -32,7 +32,7 @@ export type LabelText = {
     text: string,
 };
 
-export type Line = {
+export type MyLine = {
     x1: number,
     y1: number
     x2: number,
@@ -45,10 +45,10 @@ export type Point2D = {
 };
 
 export type Snapshot = {
-    rects: Rect[],
-    circles: Circle[],
-    ellipses: Ellipse[],
-    lines: Line[]
+    rects: MyRect[],
+    circles: MyCircle[],
+    ellipses: MyEllipse[],
+    lines: MyLine[]
     texts: LabelText[],
     image_index: number
 };
