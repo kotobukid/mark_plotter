@@ -37,6 +37,8 @@ const viewBox = computed(() => {
 
 const start = ref<Point2D>({x: 0, y: 0});
 const end = ref<Point2D>({x: 0, y: 0});
+const circle_center = ref<Point2D>({x: 0, y: 0});
+const circle_r = ref<number>(0);
 
 const show_preview = ref<boolean>(false);
 const plotting = ref<boolean>(false);
@@ -98,13 +100,10 @@ const end_plot_circle = (e: PointerEvent) => {
   end.value = {x: e.offsetX, y: e.offsetY};
   emits('switch-tool', '');
 
-  const r = Math.floor(Math.sqrt(
-      Math.pow(end.value.x - start.value.x, 2)
-      + Math.pow(end.value.y - start.value.y, 2)));
   emits("add-circle", {
-    cx: start.value.x,
-    cy: start.value.y,
-    r
+    cx: circle_center.value.x,
+    cy: circle_center.value.y,
+    r: circle_r.value
   });
 
   show_preview.value = false;
@@ -165,6 +164,24 @@ const move_end = (e: PointerEvent) => {
       x: e.offsetX,
       y: e.offsetY
     };
+    show_preview.value = true;
+  }
+};
+
+const move_end_circle = (e: PointerEvent) => {
+  if (plotting.value) {
+    end.value = {
+      x: e.offsetX,
+      y: e.offsetY
+    };
+
+    const bb_edge: number = Math.max(Math.abs(start.value.x - end.value.x), Math.abs(start.value.y - end.value.y));
+    circle_center.value = {
+      x: (start.value.x + end.value.x) / 2,
+      y: (start.value.y + end.value.y) / 2,
+    };
+    circle_r.value = bb_edge / 2;
+
     show_preview.value = true;
   }
 };
@@ -263,9 +280,12 @@ const ellipse_preview = computed(() => {
           @pointerdown="start_plot"
           @pointerup="end_plot_circle"
           @pointerleave="cancel_plot"
-          @pointermove="move_end"
+          @pointermove="move_end_circle"
         )
-        circle.preview(v-if="show_preview && plotting" :cx="circle_preview.cx" :cy="circle_preview.cy" :r="circle_preview.r" fill="transparent" stroke="red" stroke-width="1")
+        circle.preview(v-if="show_preview && plotting" :cx="circle_center.x" :cy="circle_center.y" :r="circle_r" fill="transparent" stroke="red" stroke-width="1")
+        circle.preview(v-if="show_preview && plotting" :cx="circle_center.x" :cy="circle_center.y" r="2" fill="black" stroke="transparent" stroke-width="0")
+        circle.preview(v-if="show_preview && plotting" :cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+        circle.preview(v-if="show_preview && plotting" :cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
       g.ellipse_plot_layer(
         v-if="tool === 'ellipse'"
       )
@@ -276,6 +296,9 @@ const ellipse_preview = computed(() => {
           @pointermove="move_end"
         )
         ellipse.preview(v-if="show_preview && plotting" :cx="ellipse_preview.cx" :cy="ellipse_preview.cy" :rx="ellipse_preview.rx" :ry="ellipse_preview.ry" fill="transparent" stroke="red" stroke-width="1")
+        circle.preview(v-if="show_preview && plotting" :cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+        circle.preview(v-if="show_preview && plotting" :cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+
       g.line_plot_layer(
         v-if="tool === 'line'"
       )
