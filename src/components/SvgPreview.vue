@@ -159,14 +159,21 @@ const end_plot_text = (e: PointerEvent) => {
 };
 
 const move_end = (e: PointerEvent) => {
-    if (plotting) {
+    if (plotting.value) {
         end.value = {
             x: e.offsetX,
             y: e.offsetY
         };
-
         show_preview.value = true;
     }
+};
+
+const shift_text_preview = (e: PointerEvent) => {
+    start.value = {
+        x: e.offsetX,
+        y: e.offsetY
+    };
+    // show_preview.value = true;
 };
 
 const rect_preview = computed(() => {
@@ -284,9 +291,9 @@ const ellipse_preview = computed(() => {
                     @pointerdown="start_plot"
                     @pointerup="end_plot_text"
                     @pointerleave="cancel_plot"
-                    @pointermove="move_end"
+                    @pointermove="shift_text_preview"
                 )
-                text.preview(v-if="show_preview && plotting" :x="start.x" :y="start.y" stroke="red" stroke-width="2" fill="none"  style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 28px;")
+                rect.preview(:x="start.x - 10" :y="start.y - 33" width="120" height="42" stroke="red" border-width="1" fill="white" opacity="0.5")
             g.crop_layer(
                 v-if="tool === 'crop'"
             )
