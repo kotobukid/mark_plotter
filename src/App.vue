@@ -30,19 +30,70 @@ const texts = ref<LabelText[]>([]);
 const lines = ref<Line[]>([]);
 const ellipses = ref<Ellipse[]>([]);
 
+const image_map_manager = (() => {
+  const image_map = new Map<number, ImageAndDimensions>();
+  let index: number = 0;
+
+  const push = (image: ImageAndDimensions): number => {
+    index = index + 1;
+    image_map.set(index, image);
+    return index;
+  };
+
+  const get = (_index: number): ImageAndDimensions | null => {
+    if (image_map.has(_index)) {
+      const a = image_map.get(_index);
+      console.log(`${a.width} ${a.height}`)
+
+      return image_map.get(_index);
+    } else {
+      return null;
+    }
+  };
+
+  const wipe = (): void => {
+    image_map.clear();
+    index = 0;
+  };
+
+  const dump = () => {
+    console.log('dump start');
+    for (let key: number of image_map.keys()) {
+      const im = image_map.get(key);
+      console.log(key)
+      console.log({
+        width: im.width,
+        height: im.height
+      });
+    }
+    console.log('dump end');
+  }
+
+  return {
+    image_map,
+    get,
+    push,
+    wipe,
+    dump
+  };
+})();
+
 const filename = ref('');
 
 const snapshots = ref<Snapshot[]>([] as Snapshot[]);
 
-const commit_snapshot = () => {
-  // @ts-ignore
+const commit_snapshot = (image_changed: number | -1) => {
   const ss: Snapshot = {
     circles: [...circles.value],
     rects: [...rects.value],
     ellipses: [...ellipses.value],
     lines: [...lines.value],
-    texts: [...texts.value]
+    texts: [...texts.value],
+    image_index: image_changed
   };
+
+  // image_map_manager.dump();
+
   snapshots.value = [...snapshots.value, ss];
 };
 
@@ -59,6 +110,10 @@ const load_last_snapshot = () => {
     circles.value = ss.circles;
     ellipses.value = ss.ellipses;
     texts.value = ss.texts;
+
+    if (ss.image_index !== -1) {
+      image.value = image_map_manager.get(ss.image_index);
+    }
   }
 };
 
@@ -83,6 +138,16 @@ const handle_file_change = (event) => {
           lines.value = result.lines;
           filename.value = result.filename;
           document.title = filename.value;
+
+
+          const image_cloned: ImageAndDimensions = {
+            width: result.image.width,
+            height: result.image.height,
+            dataUrl: result.image.dataUrl
+          };
+
+          let new_image_index: number = image_map_manager.push(image_cloned);
+          commit_snapshot(new_image_index);
         });
       } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
         parse_binary_image(file, (result) => {
@@ -94,6 +159,15 @@ const handle_file_change = (event) => {
           lines.value = [];
           filename.value = result.filename;
           document.title = filename.value;
+
+          const image_cloned: ImageAndDimensions = {
+            width: result.image.width,
+            height: result.image.height,
+            dataUrl: result.image.dataUrl
+          };
+
+          let new_image_index: number = image_map_manager.push(image_cloned);
+          commit_snapshot(new_image_index);
         });
       }
     };
@@ -116,6 +190,16 @@ const capture_clipboard = async () => {
     filename.value = `clipboard_${current_timestamp()}.svg`;
     document.title = filename.value;
     wipe_snapshots();
+
+    const image_cloned: ImageAndDimensions = {
+      width: image.value.width,
+      height: image.value.height,
+      dataUrl
+    };
+
+    let new_image_index: number = image_map_manager.push(image_cloned);
+    commit_snapshot(new_image_index);
+
   }).catch(() => {
     alert('PrintScreenができていません');
   });
@@ -167,34 +251,34 @@ const switch_tool = (_tool: Tool) => {
 };
 
 const add_rect = (r: Rect) => {
-  commit_snapshot();
+  commit_snapshot(-1);
   rects.value.push(r);
 };
 
 const add_text = (t: LabelText) => {
-  commit_snapshot();
+  commit_snapshot(-1);
   texts.value.push(t);
 };
 
 const add_circle = (c: Circle) => {
-  commit_snapshot();
+  commit_snapshot(-1);
   circles.value.push(c);
 };
 
 const add_line = (l: Line) => {
-  commit_snapshot();
+  commit_snapshot(-1);
   lines.value.push(l);
 };
 
 const add_ellipse = (e: Ellipse) => {
-  commit_snapshot();
+  commit_snapshot(-1);
   ellipses.value.push(e);
 };
 
 const wipe = () => {
   const do_wipe = confirm("画像以外の全要素を削除しますか？");
   if (do_wipe) {
-    commit_snapshot();
+    commit_snapshot(-1);
     rects.value = [];
     circles.value = [];
     lines.value = [];
@@ -263,6 +347,15 @@ const commit_crop = (rect: Rect) => {
         y2: l.y2 - rect.y,
       };
     });
+
+    const image_cloned: ImageAndDimensions = {
+      width: rect.width,
+      height: rect.height,
+      dataUrl
+    };
+
+    let new_image_index: number = image_map_manager.push(image_cloned);
+    commit_snapshot(new_image_index);
   });
 };
 

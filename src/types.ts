@@ -49,5 +49,6 @@ export type Snapshot = {
     circles: Circle[],
     ellipses: Ellipse[],
     lines: Line[]
-    texts: LabelText[]
+    texts: LabelText[],
+    image_index: number
 };
