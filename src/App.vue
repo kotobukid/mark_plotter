@@ -41,6 +41,7 @@ const commit_snapshot = () => {
     rects: [...rects.value],
     ellipses: [...ellipses.value],
     lines: [...lines.value],
+    texts: [...texts.value]
   };
   snapshots.value = [...snapshots.value, ss];
 };
@@ -57,6 +58,7 @@ const load_last_snapshot = () => {
     lines.value = ss.lines;
     circles.value = ss.circles;
     ellipses.value = ss.ellipses;
+    texts.value = ss.texts;
   }
 };
 
