@@ -273,6 +273,7 @@ const wipe = () => {
         circles.value = [];
         lines.value = [];
         ellipses.value = [];
+        texts.value = [];
     }
 };
 
