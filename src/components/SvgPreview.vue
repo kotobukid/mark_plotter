@@ -43,6 +43,7 @@ const plotting = ref<boolean>(false);
 
 const start_plot = (e: PointerEvent) => {
   start.value = {x: e.offsetX, y: e.offsetY};
+  end.value = {x: e.offsetX, y: e.offsetY};
   nextTick(() => {
     show_preview.value = true;
     plotting.value = true;
