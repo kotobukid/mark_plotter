@@ -5,7 +5,16 @@ import ToolRibbon from "./components/ToolRibbon.vue";
 import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
 import {ref} from "vue";
 
-import {type Tool, type ImageAndDimensions, type Circle, type Rect, type Line, type Ellipse, type Snapshot} from "./types.ts";
+import {
+  type Tool,
+  type ImageAndDimensions,
+  type Circle,
+  type Rect,
+  type Line,
+  type Ellipse,
+  type Snapshot,
+  type LabelText
+} from "./types.ts";
 
 const tool = ref<Tool>("");
 const image = ref<ImageAndDimensions>({
@@ -16,6 +25,7 @@ const image = ref<ImageAndDimensions>({
 
 const circles = ref<Circle[]>([]);
 const rects = ref<Rect[]>([]);
+const texts = ref<LabelText[]>([]);
 const lines = ref<Line[]>([]);
 const ellipses = ref<Ellipse[]>([]);
 
@@ -91,6 +101,20 @@ const handle_file_change = (event) => {
                             width: Number(rect.getAttribute('width')),
                             height: Number(rect.getAttribute('height'))
                         };
+                    });
+                }
+
+                // LabelText
+                const g_texts = doc.querySelector('g.texts'); // 必要に応じてクラス名を変更するにゃ
+                if (g_texts) {
+                    const _texts = g_texts.querySelectorAll('text.label_text');
+                    texts.value = Array.from(_texts).map(text => {
+                        const label_text: LabelText = {
+                            x: Number(text.getAttribute('x')),
+                            y: Number(text.getAttribute('y')),
+                            text: text.innerHTML,
+                        };
+                        return label_text;
                     });
                 }
 
@@ -221,6 +245,11 @@ const add_rect = (r: Rect) => {
     rects.value.push(r);
 };
 
+const add_text = (t: LabelText) => {
+    commit_snapshot();
+    texts.value.push(t);
+};
+
 const add_circle = (c: Circle) => {
     commit_snapshot();
     circles.value.push(c);
@@ -347,6 +376,9 @@ const container_style = computed(() => {
             a.button(href="#" @click.prevent="switch_tool('line')" :data-active="tool === 'line'" draggable="false")
                 img.tool_icon(src="/line.svg" draggable="false")
                 span 矢印ツール
+            a.button(href="#" @click.prevent="switch_tool('text')" :data-active="tool === 'text'" draggable="false")
+                img.tool_icon(src="/text.svg" draggable="false")
+                span テキストツール
             a.button(href="#" @click.prevent="save_as_svg" draggable="false")
                 img.tool_icon(src="/save.svg" draggable="false")
                 span SVGを保存
@@ -356,10 +388,12 @@ const container_style = computed(() => {
             :tool="tool"
             :circles="circles"
             :rects="rects"
+            :texts="texts"
             :lines="lines"
             :ellipses="ellipses"
             @switch-tool="switch_tool"
             @add-rect="add_rect"
+            @add-text="add_text"
             @add-circle="add_circle"
             @add-line="add_line"
             @add-ellipse="add_ellipse"

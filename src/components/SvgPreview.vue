@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {computed, nextTick, ref} from "vue";
-import {type Tool, type Rect, type Circle, type Point2D, type Line, type Ellipse} from "../types.ts";
+import {type Tool, type Rect, type Circle, type Point2D, type Line, type Ellipse, type LabelText} from "../types.ts";
+import BoxedText from "./BoxedText.vue";
 
 const props = defineProps<{
     tool: Tool,
@@ -11,12 +12,14 @@ const props = defineProps<{
     },
     circles: Circle[],
     rects: Rect[],
+    texts: LabelText[],
     lines: Line[],
     ellipses: Ellipse[],
 }>();
 
 const emits = defineEmits<{
     (e: 'switch-tool', value: Tool): void,
+    (e: 'add-text', value: LabelText): void,
     (e: 'add-circle', value: Circle): void,
     (e: 'add-rect', value: Rect): void,
     (e: 'add-line', value: Line): void,
@@ -141,6 +144,20 @@ const end_plot_line = (e: PointerEvent) => {
     plotting.value = false;
 };
 
+const end_plot_text = (e: PointerEvent) => {
+    const text: string = (prompt('') || '').trim();
+    if (text) {
+        emits('add-text', {
+            text,
+            x: e.offsetX,
+            y: e.offsetY
+        });
+    }
+
+    show_preview.value = false;
+    plotting.value = false;
+};
+
 const move_end = (e: PointerEvent) => {
     if (plotting) {
         end.value = {
@@ -218,6 +235,8 @@ const ellipse_preview = computed(() => {
                 ellipse(v-for="e in ellipses" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="2")
             g.lines
                 line.line_arrow(v-for="l in lines" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");")
+            g.texts
+                BoxedText(v-for="t in texts" :label_text="t")
             g.rect_plot_layer(
                 v-if="tool === 'rect'"
             )
@@ -258,6 +277,16 @@ const ellipse_preview = computed(() => {
                     @pointermove="move_end"
                 )
                 line.preview(v-if="show_preview && plotting" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
+            g.text_plot_layer(
+                v-if="tool === 'text'"
+            )
+                rect(fill="orange" opacity="0.1" x="0" y="0" width="1920" height="1080"
+                    @pointerdown="start_plot"
+                    @pointerup="end_plot_text"
+                    @pointerleave="cancel_plot"
+                    @pointermove="move_end"
+                )
+                text.preview(v-if="show_preview && plotting" :x="start.x" :y="start.y" stroke="red" stroke-width="2" fill="none"  style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 28px;")
             g.crop_layer(
                 v-if="tool === 'crop'"
             )
