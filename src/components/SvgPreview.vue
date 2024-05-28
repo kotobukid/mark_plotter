@@ -43,9 +43,12 @@ const circle_r = ref<number>(0);
 const show_preview = ref<boolean>(false);
 const plotting = ref<boolean>(false);
 
+const tr_x = 5;
+const tr_y = 5;
+
 const start_plot = (e: PointerEvent) => {
-  start.value = {x: e.offsetX, y: e.offsetY};
-  end.value = {x: e.offsetX, y: e.offsetY};
+  start.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
+  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
   nextTick(() => {
     show_preview.value = true;
     plotting.value = true;
@@ -59,7 +62,7 @@ const cancel_plot = () => {
 };
 
 const end_plot_rect = (e: PointerEvent) => {
-  end.value = {x: e.offsetX, y: e.offsetY};
+  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_x};
   emits('switch-tool', '');
   const s_gte_x: boolean = start.value.x - end.value.x > 0;
   const s_gte_y: boolean = start.value.y - end.value.y > 0;
@@ -78,7 +81,7 @@ const end_plot_rect = (e: PointerEvent) => {
 };
 
 const end_crop = (e: PointerEvent) => {
-  end.value = {x: e.offsetX, y: e.offsetY};
+  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
   emits('switch-tool', '');
   const s_gte_x: boolean = start.value.x - end.value.x > 0;
   const s_gte_y: boolean = start.value.y - end.value.y > 0;
@@ -97,7 +100,7 @@ const end_crop = (e: PointerEvent) => {
 };
 
 const end_plot_circle = (e: PointerEvent) => {
-  end.value = {x: e.offsetX, y: e.offsetY};
+  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
   emits('switch-tool', '');
 
   emits("add-circle", {
@@ -111,7 +114,7 @@ const end_plot_circle = (e: PointerEvent) => {
 };
 
 const end_plot_ellipse = (e: PointerEvent) => {
-  end.value = {x: e.offsetX, y: e.offsetY};
+  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
   emits('switch-tool', '');
 
   const cx = (start.value.x + end.value.x) / 2;
@@ -130,7 +133,7 @@ const end_plot_ellipse = (e: PointerEvent) => {
 };
 
 const end_plot_line = (e: PointerEvent) => {
-  end.value = {x: e.offsetX, y: e.offsetY};
+  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
   emits('switch-tool', '');
 
   emits("add-line", {
@@ -149,8 +152,8 @@ const end_plot_text = (e: PointerEvent) => {
   if (text) {
     emits('add-text', {
       text,
-      x: e.offsetX,
-      y: e.offsetY
+      x: e.offsetX - tr_x,
+      y: e.offsetY - tr_y
     });
   }
 
@@ -161,8 +164,8 @@ const end_plot_text = (e: PointerEvent) => {
 const move_end = (e: PointerEvent) => {
   if (plotting.value) {
     end.value = {
-      x: e.offsetX,
-      y: e.offsetY
+      x: e.offsetX - tr_x,
+      y: e.offsetY - tr_y
     };
     show_preview.value = true;
   }
@@ -171,8 +174,8 @@ const move_end = (e: PointerEvent) => {
 const move_end_circle = (e: PointerEvent) => {
   if (plotting.value) {
     end.value = {
-      x: e.offsetX,
-      y: e.offsetY
+      x: e.offsetX - tr_x,
+      y: e.offsetY - tr_y
     };
 
     const bb_edge: number = Math.max(Math.abs(start.value.x - end.value.x), Math.abs(start.value.y - end.value.y));
@@ -188,8 +191,8 @@ const move_end_circle = (e: PointerEvent) => {
 
 const shift_text_preview = (e: PointerEvent) => {
   start.value = {
-    x: e.offsetX,
-    y: e.offsetY
+    x: e.offsetX - tr_x,
+    y: e.offsetY - tr_y
   };
   // show_preview.value = true;
 };
@@ -231,10 +234,34 @@ const ellipse_preview = computed(() => {
     ry
   };
 });
+
+const cursor_pos = ref<Point2D>({x: -1, y: -1});
+
+const cursor_move = (e: PointerEvent) => {
+  cursor_pos.value = {
+    x: e.offsetX,
+    y: e.offsetY
+  };
+};
+
+const show_cursor = ref(false);
+
+const cursor_transform = computed(() => {
+  return `transform: translate(${cursor_pos.value.x}px, ${cursor_pos.value.y}px);`;
+});
+
+const hide_cursor = (hide: boolean) => {
+  show_cursor.value = !hide;
+};
+
 </script>
 
 <template lang="pug">
-  svg#svg_main(xmlns="http://www.w3.org/2000/svg" version="1.1" :viewBox="viewBox" :width="props.image.width + 10" :height="props.image.height + 10")
+  svg#svg_main(xmlns="http://www.w3.org/2000/svg" version="1.1" :viewBox="viewBox" :width="props.image.width + 10" :height="props.image.height + 10"
+    @pointermove="cursor_move"
+    @pointerleave="hide_cursor(true)"
+    @pointerenter="hide_cursor(false)"
+  )
     defs
       marker#marker-1(viewBox="0 0 100 78.542" overflow="visible" orient="auto" refX="19.39" refY="19.39")
         path(d="M -28.08 4.983 L 300 -207.988 L 300 217.954 L -28.08 4.983 Z" style="fill: rgb(248, 0, 0); transform-origin: -27.973px 5.758px;")
@@ -251,7 +278,15 @@ const ellipse_preview = computed(() => {
           feMergeNode(in="composite-0")
           feMergeNode(in="SourceGraphic")
     g(style="transform: translate(5px, 5px);")
-      rect.background(fill="white" stroke="transparent" x="0" y="0" :width="props.image.width" :height="props.image.height" style="filter: url('#box-shadow1');")
+      rect.background(
+        fill="red"
+        stroke="transparent"
+        x="0"
+        y="0"
+        :width="props.image.width"
+        :height="props.image.height"
+        style="filter: url('#box-shadow1');"
+      )
       image.main_image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
       g.rects
         rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2")
@@ -331,6 +366,11 @@ const ellipse_preview = computed(() => {
         rect.preview(v-if="show_preview && plotting" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
 
       rect.frame(v-if="props.image.dataUrl" x="1" y="1" :width="props.image.width - 2" :height="props.image.height - 2" fill="transparent" stroke-width="1" stroke="black")
+    g.cursor_pos(:style="cursor_transform" v-if="show_cursor")
+      line(x1="0" y1="30" x2="0" y2="15")
+      line(x1="0" y1="-30" x2="0" y2="-15")
+      line(x1="30" y1="0" x2="15" y2="0")
+      line(x1="-30" y1="0" x2="-15" y2="0")
 </template>
 
 <style scoped>
@@ -345,5 +385,15 @@ svg {
 
 rect.frame {
   pointer-events: none;
+}
+
+g.cursor_pos {
+  pointer-events: none;
+
+  line {
+    fill: none;
+    stroke-width: 1px;
+    stroke: grey;
+  }
 }
 </style>
