@@ -234,7 +234,8 @@ const ellipse_preview = computed(() => {
           feMergeNode(in="composite-0")
           feMergeNode(in="SourceGraphic")
     g(style="transform: translate(5px, 5px);")
-      image.main_image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height" style="filter: url('#box-shadow1');")
+      rect.background(fill="white" stroke="transparent" x="0" y="0" :width="props.image.width" :height="props.image.height" style="filter: url('#box-shadow1');")
+      image.main_image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
       g.rects
         rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2")
       g.circles
