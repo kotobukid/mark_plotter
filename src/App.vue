@@ -43,7 +43,6 @@ const image_map_manager = (() => {
   const get = (_index: number): ImageAndDimensions | null => {
     if (image_map.has(_index)) {
       const a = image_map.get(_index);
-      console.log(`${a.width} ${a.height}`)
 
       return image_map.get(_index);
     } else {
