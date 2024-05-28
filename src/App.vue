@@ -15,6 +15,7 @@ import {
   type Snapshot,
   type LabelText
 } from "./types.ts";
+import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
 
 const tool = ref<Tool>("");
 const image = ref<ImageAndDimensions>({
@@ -67,109 +68,30 @@ const open_svg = () => {
 };
 
 const handle_file_change = (event) => {
-    const file = event.target.files[0];
+    const file: File = event.target.files[0];
     if (file) {
         const readFileContent = (file) => {
-
-            const parseSvgContent = (content) => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(content, "image/svg+xml");
-
-                // Image
-                const elements = doc.querySelectorAll('image.main_image'); // ここで必要なクラス名を指定するにゃ
-
-                elements.forEach(element => {
-                    const dataUrl = element.getAttribute('href');
-                    const width = Number(element.getAttribute('width'));
-                    const height = Number(element.getAttribute('height'));
-
-                    image.value = {
-                        dataUrl,
-                        width,
-                        height
-                    };
+            if (file.type === 'image/svg+xml') {
+                parse_my_svg(file, (result) => {
+                    image.value = result.image;
+                    rects.value = result.rects;
+                    texts.value = result.texts;
+                    circles.value = result.circles;
+                    ellipses.value = result.ellipses;
+                    lines.value = result.lines;
+                    filename.value = result.filename;
                 });
-
-                // Rect
-                const g_rects = doc.querySelector('g.rects'); // 必要に応じてクラス名を変更するにゃ
-                if (g_rects) {
-                    const _rects = g_rects.querySelectorAll('rect');
-                    rects.value = Array.from(_rects).map(rect => {
-                        return {
-                            x: Number(rect.getAttribute('x')),
-                            y: Number(rect.getAttribute('y')),
-                            width: Number(rect.getAttribute('width')),
-                            height: Number(rect.getAttribute('height'))
-                        };
-                    });
-                }
-
-                // LabelText
-                const g_texts = doc.querySelector('g.texts'); // 必要に応じてクラス名を変更するにゃ
-                if (g_texts) {
-                    const _texts = g_texts.querySelectorAll('text.label_text');
-                    texts.value = Array.from(_texts).map(text => {
-                        const label_text: LabelText = {
-                            x: Number(text.getAttribute('x')),
-                            y: Number(text.getAttribute('y')),
-                            text: text.innerHTML,
-                        };
-                        return label_text;
-                    });
-                }
-
-                // Circle
-                const g_circles = doc.querySelector('g.circles');
-                if (g_circles) {
-                    const _circles = g_circles.querySelectorAll('circle');
-
-                    circles.value = Array.from(_circles).map(circle => {
-                        return {
-                            cx: Number(circle.getAttribute('cx')),
-                            cy: Number(circle.getAttribute('cy')),
-                            r: Number(circle.getAttribute('r')),
-                        };
-                    });
-                }
-
-                // Ellipse
-                const g_ellipses = doc.querySelector('g.ellipses');
-                if (g_ellipses) {
-                    const _ellipses = g_ellipses.querySelectorAll('ellipse');
-                    ellipses.value = Array.from(_ellipses).map(ellipse => {
-                        return {
-                            cx: Number(ellipse.getAttribute('cx')),
-                            cy: Number(ellipse.getAttribute('cy')),
-                            rx: Number(ellipse.getAttribute('rx')),
-                            ry: Number(ellipse.getAttribute('ry')),
-                        };
-                    });
-                }
-
-                // Lines
-                const g_lines = doc.querySelector('g.lines');
-                if (g_lines) {
-                    const _lines = g_lines.querySelectorAll('line');
-                    lines.value = Array.from(_lines).map(line => {
-                        return {
-                            x1: Number(line.getAttribute('x1')),
-                            y1: Number(line.getAttribute('y1')),
-                            x2: Number(line.getAttribute('x2')),
-                            y2: Number(line.getAttribute('y2')),
-                        };
-                    });
-                }
-
-                filename.value = file.name;
-            };
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const fileContent = event.target.result;
-                // console.log('SVG file content:', fileContent);
-                parseSvgContent(fileContent);
-            };
-            reader.readAsText(file);
+            } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
+                parse_binary_image(file, (result) => {
+                    image.value = result.image;
+                    rects.value = [];
+                    texts.value = [];
+                    circles.value = [];
+                    ellipses.value = [];
+                    lines.value = [];
+                    filename.value = result.filename;
+                });
+            }
         };
 
         readFileContent(file);
@@ -352,7 +274,7 @@ const container_style = computed(() => {
             a.button(href="#" @click.prevent="open_svg" draggable="false")
                 img.tool_icon(src="/open.svg" draggable="false")
                 span SVGを開く
-            input(type="file" ref="fileInput" accept=".svg" @change="handle_file_change" style="display:none")
+            input(type="file" ref="fileInput" accept=".svg, .png, .jpg, .jpeg, .bmp" @change="handle_file_change" style="display:none")
             a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
                 img.tool_icon(src="/paste.svg" draggable="false")
                 span 貼り付け
