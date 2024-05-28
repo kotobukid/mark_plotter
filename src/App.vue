@@ -273,11 +273,11 @@ const container_style = computed(() => {
     ToolRibbon(style="margin-right: 16px; width: 200px; float: left;")
       a.button(href="#" @click.prevent="open_svg" draggable="false")
         img.tool_icon(src="/open.svg" draggable="false")
-        span SVGを開く
+        span 画像を開く
       input(type="file" ref="fileInput" accept=".svg, .png, .jpg, .jpeg, .bmp" @change="handle_file_change" style="display:none")
       a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
         img.tool_icon(src="/paste.svg" draggable="false")
-        span 貼り付け
+        span 新規貼り付け
       a.button(href="#" @click.prevent="wipe" draggable="false")
         img.tool_icon(src="/wipe.svg" draggable="false")
         span 全消去
