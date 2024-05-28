@@ -1,9 +1,5 @@
 import type {Circle, Ellipse, ImageAndDimensions, LabelText, Line, Rect} from "./types.ts";
 
-export const parse_generic_svg = (file: File, next: Function) => {
-
-};
-
 export const parse_my_svg = (file: File, next: Function) => {
     const parseSvgContent = (content) => {
         const parser = new DOMParser();

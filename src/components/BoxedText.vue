@@ -31,7 +31,7 @@ onMounted(() => {
       stroke-width="1"
       :width="text_width + 20"
       :height="text_height + 10")
-    text.label_text(ref="textRef" :x="label_text.x" :y="label_text.y" fill="red" stroke="none" stroke-width="0" style="white-space: pre; font-family: Arial, sans-serif; font-size: 28px;") {{ label_text.text }}
+    text.label_text(ref="textRef" :x="label_text.x" :y="label_text.y" fill="red" stroke="none" stroke-width="0" style="white-space: pre; font-family: Arial, sans-serif; font-size: 28px;") {{ props.label_text.text }}
 </template>
 
 <style scoped lang="less">

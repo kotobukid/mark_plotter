@@ -211,17 +211,6 @@ const rect_preview = computed(() => {
   };
 });
 
-const circle_preview = computed(() => {
-  const r = Math.floor(Math.sqrt(
-      Math.pow(end.value.x - start.value.x, 2)
-      + Math.pow(end.value.y - start.value.y, 2)));
-  return {
-    cx: start.value.x,
-    cy: start.value.y,
-    r
-  };
-});
-
 const ellipse_preview = computed(() => {
   const cx = (start.value.x + end.value.x) / 2;
   const cy = (start.value.y + end.value.y) / 2;
@@ -257,7 +246,7 @@ const hide_cursor = (hide: boolean) => {
 </script>
 
 <template lang="pug">
-  svg#svg_main(xmlns="http://www.w3.org/2000/svg" version="1.1" :viewBox="viewBox" :width="props.image.width + 10" :height="props.image.height + 10"
+  svg#svg_main(xmlns="http://www.w3.org/2000/svg" :viewBox="viewBox" :width="props.image.width + 10" :height="props.image.height + 10"
     @pointermove="cursor_move"
     @pointerleave="hide_cursor(true)"
     @pointerenter="hide_cursor(false)"

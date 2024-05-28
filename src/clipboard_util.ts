@@ -3,8 +3,7 @@ const getClipboardImage = async (): Promise<Blob | null> => {
         const clipboardItems = await navigator.clipboard.read();
         for (const clipboardItem of clipboardItems) {
             if (clipboardItem.types.includes('image/png')) {
-                const blob = await clipboardItem.getType('image/png');
-                return blob;
+                return await clipboardItem.getType('image/png');
             }
         }
     } catch (err) {
