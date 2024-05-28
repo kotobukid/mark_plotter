@@ -19,6 +19,8 @@ const rects = ref<Rect[]>([]);
 const lines = ref<Line[]>([]);
 const ellipses = ref<Ellipse[]>([]);
 
+const filename = ref('');
+
 const snapshots = ref<Snapshot[]>([] as Snapshot[]);
 
 const commit_snapshot = () => {
@@ -133,6 +135,8 @@ const handle_file_change = (event) => {
                         };
                     });
                 }
+
+                filename.value = file.name;
             };
 
             const reader = new FileReader();
@@ -146,13 +150,21 @@ const handle_file_change = (event) => {
 
         readFileContent(file);
     }
-}
+};
+
+const current_timestamp = () => {
+    const now = new Date();
+
+    return `${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}`;
+};
 
 const capture_clipboard = async () => {
     tool.value = '';
     const data: Blob = await getClipboardImage();
     blobToDataURL(data).then(async (dataUrl) => {
         image.value = await getDataUrlAndDimensions(dataUrl);
+        filename.value = `clipboard_${current_timestamp()}.svg`;
+        document.title = filename.value;
         wipe_snapshots();
     }).catch(() => {
         alert('PrintScreenができていません');
@@ -189,7 +201,7 @@ const save_as_svg = () => {
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.target = '_blank';
-            link.download = `download.svg`;
+            link.download = filename.value || `download.svg`;
             link.click();
             URL.revokeObjectURL(link.href);
             setTimeout(() => {
