@@ -266,18 +266,20 @@ const hide_cursor = (hide: boolean) => {
         path(d="M -28.08 4.983 L 300 -207.988 L 300 217.954 L -28.08 4.983 Z" style="fill: rgb(248, 0, 0); transform-origin: -27.973px 5.758px;")
 
       filter#box-shadow1(color-interpolation-filters="sRGB" x="-50%" y="-50%" width="200%" height="200%")
-        title Drop shadow
-        feGaussianBlur(in="SourceAlpha" stdDeviation="5" result="gaussian-blur-0")
-        feOffset(dx="4" dy="4" in="gaussian-blur-0" result="offset-0")
-        feComponentTransfer(result="offsetblur" in="offset-0")
-          feFuncA#spread-ctrl(type="linear" slope="0.66")
-        feFlood(flood-color="rgba(0,0,0,1)" result="flood-0")
-        feComposite(in2="offsetblur" operator="in" in="flood-0" result="composite-0")
-        feMerge(result="merge-0")
-          feMergeNode(in="composite-0")
+        feGaussianBlur(in="SourceAlpha" stdDeviation="4")
+        feOffset(dx="1" dy="1")
+        feComponentTransfer(result="offsetblur")
+          feFuncA#spread-ctrl(type="linear" slope="1")
+        feFlood(flood-color="#000")
+        feComposite(in2="offsetblur" operator="in")
+        feMerge
+          feMergeNode
           feMergeNode(in="SourceGraphic")
     g(style="transform: translate(5px, 5px);")
-      image.main_image(:xlink:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
+      image.main_image(
+        :xlink:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height"
+        style="filter: url(#box-shadow1);"
+      )
       g.rects
         rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
       g.circles
