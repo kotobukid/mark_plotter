@@ -224,7 +224,8 @@ const save_as_svg = () => {
       }
     }
 
-    $svg.removeAttribute('style');
+    // @ts-ignore
+    $svg.removeAttribute!('style');
     // $svg.addAttribute('xmlns:xlink', "http://www.w3.org/1999/xlink")
 
     // @ts-ignore
@@ -232,7 +233,7 @@ const save_as_svg = () => {
 
     const download_text_as_file = (text) => {
       const blob = new Blob([`<?xml version="1.0" encoding="utf-8" ?>
-      ${text}`], {type: 'image/svg+xml'});
+${text}`], {type: 'image/svg+xml'});
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.target = '_blank';

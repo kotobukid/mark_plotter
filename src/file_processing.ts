@@ -4,7 +4,6 @@ export const parse_my_svg = (file: File, next: Function) => {
     const parseSvgContent = (content) => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(content, "image/svg+xml");
-
         const elements = doc.querySelectorAll('image.main_image');
 
         let is_my_svg: boolean = elements.length === 1;
