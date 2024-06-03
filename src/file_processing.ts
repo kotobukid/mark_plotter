@@ -18,7 +18,8 @@ export const parse_my_svg = (file: File, next: Function) => {
             };
 
             elements.forEach(element => {
-                const dataUrl = element.getAttribute('href');
+                const href = element.getAttribute('href');
+                const dataUrl = href ? href : element.getAttribute('xlink:href');
                 const width = Number(element.getAttribute('width'));
                 const height = Number(element.getAttribute('height'));
 
