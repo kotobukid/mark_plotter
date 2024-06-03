@@ -1,6 +1,6 @@
 import type {MyCircle, MyEllipse, ImageAndDimensions, LabelText, MyLine, MyRect} from "./types.ts";
 
-export const parse_my_svg = (file: File, next: Function) => {
+export const parse_my_svg = (file: File, next: Function, gen_id: () => number) => {
     const parseSvgContent = (content) => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(content, "image/svg+xml");
@@ -13,7 +13,8 @@ export const parse_my_svg = (file: File, next: Function) => {
             let image: ImageAndDimensions = {
                 dataUrl: '',
                 width: 0,
-                height: 0
+                height: 0,
+                id: gen_id()
             };
 
             elements.forEach(element => {
@@ -25,7 +26,8 @@ export const parse_my_svg = (file: File, next: Function) => {
                 image = {
                     dataUrl,
                     width,
-                    height
+                    height,
+                    id: gen_id()
                 };
             });
 
@@ -40,7 +42,8 @@ export const parse_my_svg = (file: File, next: Function) => {
                         x: Number(rect.getAttribute('x')),
                         y: Number(rect.getAttribute('y')),
                         width: Number(rect.getAttribute('width')),
-                        height: Number(rect.getAttribute('height'))
+                        height: Number(rect.getAttribute('height')),
+                        id: gen_id()
                     };
                 });
             }
@@ -56,6 +59,7 @@ export const parse_my_svg = (file: File, next: Function) => {
                         x: Number(text.getAttribute('x')),
                         y: Number(text.getAttribute('y')),
                         text: text.innerHTML,
+                        id: gen_id()
                     };
                     return label_text;
                 });
@@ -73,6 +77,7 @@ export const parse_my_svg = (file: File, next: Function) => {
                         cx: Number(circle.getAttribute('cx')),
                         cy: Number(circle.getAttribute('cy')),
                         r: Number(circle.getAttribute('r')),
+                        id: gen_id()
                     };
                 });
             }
@@ -89,6 +94,7 @@ export const parse_my_svg = (file: File, next: Function) => {
                         cy: Number(ellipse.getAttribute('cy')),
                         rx: Number(ellipse.getAttribute('rx')),
                         ry: Number(ellipse.getAttribute('ry')),
+                        id: gen_id()
                     };
                 });
             }
@@ -105,6 +111,7 @@ export const parse_my_svg = (file: File, next: Function) => {
                         y1: Number(line.getAttribute('y1')),
                         x2: Number(line.getAttribute('x2')),
                         y2: Number(line.getAttribute('y2')),
+                        id: gen_id()
                     };
                 });
             }
@@ -139,7 +146,8 @@ export const parse_my_svg = (file: File, next: Function) => {
                         image: {
                             dataUrl,
                             width: $img.width,
-                            height: $img.height
+                            height: $img.height,
+                            id: gen_id()
                         },
                         rects: [],
                         texts: [],
@@ -164,14 +172,15 @@ export const parse_my_svg = (file: File, next: Function) => {
     reader.readAsText(file);
 };
 
-export const parse_binary_image = (file: File, next: Function) => {
+export const parse_binary_image = (file: File, next: Function, gen_id: () => number) => {
     const parseImageContent = (dataUrl: string) => {
         const $img = new Image();
         $img.onload = () => {
             let image: ImageAndDimensions = {
                 dataUrl,
                 width: $img.width,
-                height: $img.height
+                height: $img.height,
+                id: gen_id()
             };
 
             const filename = file.name.replace(/\.(png|jpg|bmp)$/, '.svg');

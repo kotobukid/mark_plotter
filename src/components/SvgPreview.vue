@@ -16,7 +16,8 @@ const props = defineProps<{
   image: {
     dataUrl: string,
     width: number,
-    height: number
+    height: number,
+    id: number
   },
   circles: MyCircle[],
   rects: MyRect[],
@@ -81,7 +82,7 @@ const end_plot_rect = (e: PointerEvent) => {
   const y = s_gte_y ? end.value.y : start.value.y;
 
   emits('add-rect', {
-    x, y, width, height
+    x, y, width, height, id: -1
   });
 
   show_preview.value = false;
@@ -100,7 +101,7 @@ const end_crop = (e: PointerEvent) => {
   const y = s_gte_y ? end.value.y : start.value.y;
 
   emits('commit-crop', {
-    x, y, width, height
+    x, y, width, height, id: -1
   });
 
   show_preview.value = false;
@@ -114,7 +115,8 @@ const end_plot_circle = (e: PointerEvent) => {
   emits("add-circle", {
     cx: circle_center.value.x,
     cy: circle_center.value.y,
-    r: circle_r.value
+    r: circle_r.value,
+    id: -1
   });
 
   show_preview.value = false;
@@ -133,7 +135,8 @@ const end_plot_ellipse = (e: PointerEvent) => {
     cx,
     cy,
     rx,
-    ry
+    ry,
+    id: -1
   });
 
   show_preview.value = false;
@@ -149,6 +152,7 @@ const end_plot_line = (e: PointerEvent) => {
     y1: start.value.y,
     x2: end.value.x,
     y2: end.value.y,
+    id: -1
   });
 
   show_preview.value = false;
@@ -162,7 +166,8 @@ const end_plot_text = (e: PointerEvent) => {
     emits('add-text', {
       text,
       x: e.offsetX - tr_x,
-      y: e.offsetY - tr_y
+      y: e.offsetY - tr_y,
+      id: -1
     });
   }
 
@@ -279,17 +284,19 @@ const hide_cursor = (hide: boolean) => {
       image.main_image(
         :xlink:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height"
         style="filter: url(#box-shadow1);"
+        :key="props.image.id"
       )
       g.rects
-        rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
+        rect(v-for="r in rects" :key="r.id" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
       g.circles
-        circle(v-for="c in circles" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
+        circle(v-for="c in circles" :key="c.id" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
       g.ellipses
-        ellipse(v-for="e in ellipses" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
+        ellipse(v-for="e in ellipses" :key="e.id" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
       g.lines
-        line.line_arrow(v-for="l in lines" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");")
+        line.line_arrow(v-for="l in lines" :key="l.id" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");")
       g.texts
-        BoxedText(v-for="t in texts" :label_text="t")
+        BoxedText(v-for="t in texts" :key="t.id" :label_text="t")
+
       g.rect_plot_layer(
         v-if="tool === 'rect'"
       )

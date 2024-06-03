@@ -21,7 +21,8 @@ const tool = ref<Tool>("");
 const image = ref<ImageAndDimensions>({
   dataUrl: '',
   width: 0,
-  height: 0
+  height: 0,
+  id: 0
 });
 
 const circles = ref<MyCircle[]>([]);
@@ -29,6 +30,16 @@ const rects = ref<MyRect[]>([]);
 const texts = ref<LabelText[]>([]);
 const lines = ref<MyLine[]>([]);
 const ellipses = ref<MyEllipse[]>([]);
+
+let {gen_id} = (() => {
+  let id: number = 0;
+  return {
+    gen_id: (): number => {
+      id = id + 1;
+      return id;
+    }
+  };
+})();
 
 const image_map_manager = (() => {
   const image_map = new Map<number, ImageAndDimensions>();
@@ -140,12 +151,13 @@ const handle_file_change = (event) => {
           const image_cloned: ImageAndDimensions = {
             width: result.image.width,
             height: result.image.height,
-            dataUrl: result.image.dataUrl
+            dataUrl: result.image.dataUrl,
+            id: gen_id()
           };
 
           let new_image_index: number = image_map_manager.push(image_cloned);
           commit_snapshot(new_image_index);
-        });
+        }, gen_id);
       } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
         parse_binary_image(file, (result) => {
           image.value = result.image;
@@ -160,12 +172,13 @@ const handle_file_change = (event) => {
           const image_cloned: ImageAndDimensions = {
             width: result.image.width,
             height: result.image.height,
-            dataUrl: result.image.dataUrl
+            dataUrl: result.image.dataUrl,
+            id: gen_id()
           };
 
           let new_image_index: number = image_map_manager.push(image_cloned);
           commit_snapshot(new_image_index);
-        });
+        }, gen_id);
       }
     };
 
@@ -183,7 +196,7 @@ const capture_clipboard = async () => {
   tool.value = '';
   const data: Blob = await getClipboardImage();
   blobToDataURL(data).then(async (dataUrl) => {
-    image.value = await getDataUrlAndDimensions(dataUrl);
+    image.value = await getDataUrlAndDimensions(dataUrl, gen_id);
     filename.value = `clipboard_${current_timestamp()}.svg`;
     document.title = filename.value;
     wipe_snapshots();
@@ -191,7 +204,8 @@ const capture_clipboard = async () => {
     const image_cloned: ImageAndDimensions = {
       width: image.value.width,
       height: image.value.height,
-      dataUrl
+      dataUrl,
+      id: gen_id()
     };
 
     let new_image_index: number = image_map_manager.push(image_cloned);
@@ -253,6 +267,7 @@ const switch_tool = (_tool: Tool) => {
 };
 
 const add_rect = (r: MyRect) => {
+  r.id = gen_id();
   commit_snapshot(-1);
   rects.value.push(r);
 };
@@ -262,21 +277,25 @@ const add_text = (t: LabelText) => {
   t.text = t
       .text.replace(/\</, '＜')
       .replace(/\>/, '＞')
+  t.id = gen_id();
   texts.value.push(t);
 };
 
 const add_circle = (c: MyCircle) => {
   commit_snapshot(-1);
+  c.id = gen_id();
   circles.value.push(c);
 };
 
 const add_line = (l: MyLine) => {
   commit_snapshot(-1);
+  l.id = gen_id();
   lines.value.push(l);
 };
 
 const add_ellipse = (e: MyEllipse) => {
   commit_snapshot(-1);
+  e.id = gen_id();
   ellipses.value.push(e);
 };
 
@@ -322,7 +341,8 @@ const commit_crop = (rect: MyRect) => {
       return {
         cx: c.cx - rect.x,
         cy: c.cy - rect.y,
-        r: c.r
+        r: c.r,
+        id: gen_id()
       };
     });
 
@@ -331,7 +351,8 @@ const commit_crop = (rect: MyRect) => {
         cx: e.cx - rect.x,
         cy: e.cy - rect.y,
         rx: e.rx,
-        ry: e.ry
+        ry: e.ry,
+        id: gen_id()
       };
     });
 
@@ -340,7 +361,8 @@ const commit_crop = (rect: MyRect) => {
         x: r.x - rect.x,
         y: r.y - rect.y,
         width: r.width,
-        height: r.height
+        height: r.height,
+        id: gen_id()
       };
     });
 
@@ -350,13 +372,15 @@ const commit_crop = (rect: MyRect) => {
         y1: l.y1 - rect.y,
         x2: l.x2 - rect.x,
         y2: l.y2 - rect.y,
+        id: gen_id()
       };
     });
 
     const image_cloned: ImageAndDimensions = {
       width: rect.width,
       height: rect.height,
-      dataUrl
+      dataUrl,
+      id: gen_id()
     };
 
     let new_image_index: number = image_map_manager.push(image_cloned);
