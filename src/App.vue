@@ -55,7 +55,7 @@ const image_map_manager = (() => {
 
   const dump = () => {
     console.log('dump start');
-    for (let key: number of image_map.keys()) {
+    for (let key of image_map.keys()) {
       const im = image_map.get(key);
       console.log(key)
       console.log({
@@ -224,11 +224,15 @@ const save_as_svg = () => {
       }
     }
 
+    $svg.removeAttribute('style');
+    // $svg.addAttribute('xmlns:xlink', "http://www.w3.org/1999/xlink")
+
     // @ts-ignore
     const text = $svg.outerHTML!;
 
     const download_text_as_file = (text) => {
-      const blob = new Blob([`<?xml version="1.0" encoding="UTF-8" standalone="no"?>${text}`], {type: 'image/svg+xml'});
+      const blob = new Blob([`<?xml version="1.0" encoding="utf-8" ?>
+      ${text}`], {type: 'image/svg+xml'});
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.target = '_blank';

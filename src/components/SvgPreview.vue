@@ -256,6 +256,7 @@ const hide_cursor = (hide: boolean) => {
 
 <template lang="pug">
   svg#svg_main(xmlns="http://www.w3.org/2000/svg" :viewBox="viewBox" :width="props.image.width + 10" :height="props.image.height + 10"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
     @pointermove="cursor_move"
     @pointerleave="hide_cursor(true)"
     @pointerenter="hide_cursor(false)"
@@ -276,16 +277,7 @@ const hide_cursor = (hide: boolean) => {
           feMergeNode(in="composite-0")
           feMergeNode(in="SourceGraphic")
     g(style="transform: translate(5px, 5px);")
-      rect.background(
-        fill="red"
-        stroke="transparent"
-        x="0"
-        y="0"
-        :width="props.image.width"
-        :height="props.image.height"
-        style="filter: url('#box-shadow1');"
-      )
-      image.main_image(:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
+      image.main_image(:xlink:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height")
       g.rects
         rect(v-for="r in rects" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2")
       g.circles
@@ -362,7 +354,6 @@ const hide_cursor = (hide: boolean) => {
           @pointermove="move_end"
         )
         rect.preview(v-if="show_preview && plotting" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
-      rect.frame(v-if="props.image.dataUrl" x="1" y="1" :width="props.image.width - 2" :height="props.image.height - 2" fill="transparent" stroke-width="1" stroke="black")
     g.cursor_pos(:style="cursor_transform" v-if="show_cursor")
       line(x1="0" y1="30" x2="0" y2="15")
       line(x1="0" y1="-30" x2="0" y2="-15")
