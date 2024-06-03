@@ -259,6 +259,9 @@ const add_rect = (r: MyRect) => {
 
 const add_text = (t: LabelText) => {
   commit_snapshot(-1);
+  t.text = t
+      .text.replace(/\</, '＜')
+      .replace(/\>/, '＞')
   texts.value.push(t);
 };
 
