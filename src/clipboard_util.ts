@@ -36,7 +36,12 @@ const getDataUrlDimensions = (dataUrl: string): Promise<{ width: number, height:
     });
 };
 
-const getDataUrlAndDimensions = (dataUrl: string, gen_id: () => number): Promise<{ dataUrl: string, width: number, height: number, id: number }> => {
+const getDataUrlAndDimensions = (dataUrl: string, gen_id: () => number): Promise<{
+    dataUrl: string,
+    width: number,
+    height: number,
+    id: number
+}> => {
     return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => {

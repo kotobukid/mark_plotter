@@ -3,17 +3,17 @@
 </script>
 
 <template>
-    <div class="ribbon">
-        <slot></slot>
-    </div>
+  <div class="ribbon">
+    <slot></slot>
+  </div>
 </template>
 
 <style scoped lang="less">
 .ribbon {
-    height: 46px;
-    width: 100%;
+  height: 46px;
+  width: 100%;
 
-    display: block;
+  display: block;
 }
 
 </style>
