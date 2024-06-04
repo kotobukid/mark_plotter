@@ -376,6 +376,15 @@ const commit_crop = (rect: MyRect) => {
       };
     });
 
+    texts.value = texts.value.map(t => {
+      return {
+        x: t.x - rect.x,
+        y: t.y - rect.y,
+        text: t.text,
+        id: gen_id()
+      };
+    });
+
     const image_cloned: ImageAndDimensions = {
       width: rect.width,
       height: rect.height,
