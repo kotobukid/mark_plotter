@@ -447,6 +447,7 @@ const handle_file_change_direct = (event: Event): void => {
     // @ts-ignore
     const file: File = event.target.files[0]!;
     handle_file_change(file);
+    target_files.value = Array.from(event.target.files! || []);
   }
 };
 </script>
@@ -458,7 +459,7 @@ const handle_file_change_direct = (event: Event): void => {
         a.button(href="#" @click.prevent="open_svg" draggable="false")
           img.tool_icon(src="/open.svg" draggable="false")
           span 画像を開く
-        input(type="file" ref="fileInput" accept=".svg, .png, .jpg, .jpeg, .bmp" @change="handle_file_change_direct" style="display:none")
+        input(:multiple="true" type="file" ref="fileInput" accept=".svg, .png, .jpg, .jpeg, .bmp" @change="handle_file_change_direct" style="display:none")
         a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
           img.tool_icon(src="/paste.svg" draggable="false")
           span 新規貼り付け
