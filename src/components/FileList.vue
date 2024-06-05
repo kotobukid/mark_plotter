@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import {ref} from "vue";
 
-const props = defineProps<{ files: File[] }>();
+const props = defineProps<{
+  files: File[],
+  opened_file: string
+}>();
 const emits = defineEmits<{
   (e: 'open-file', value: File): void
   (e: 'clear-files'): void
 }>();
 
-const last_opened = ref('');
-
 const handle_file = (f: File): void => {
-  last_opened.value = f.name;
   emits('open-file', f);
 };
 
@@ -32,7 +32,7 @@ const minimized = ref(false);
             v-for="f in files"
             :key="f.name"
             @click="handle_file(f)"
-            :data-last-opened="last_opened === f.name"
+            :data-opened="opened_file === f.name"
             :title="f.name"
           )
             td(v-text="f.name")
@@ -109,7 +109,7 @@ tr {
     }
   }
 
-  &[data-last-opened="true"] td {
+  &[data-opened="true"] td {
     background-color: pink;
   }
 }

@@ -88,6 +88,7 @@ const image_map_manager = (() => {
 })();
 
 const filename = ref('');
+const original_filename = ref('');
 
 const snapshots = ref<Snapshot[]>([] as Snapshot[]);
 
@@ -146,6 +147,7 @@ const handle_file_change = (file: File) => {
           lines.value = result.lines;
           filename.value = result.filename;
           document.title = filename.value;
+          original_filename.value = file.name;
 
 
           const image_cloned: ImageAndDimensions = {
@@ -168,6 +170,8 @@ const handle_file_change = (file: File) => {
           lines.value = [];
           filename.value = result.filename;
           document.title = filename.value;
+          original_filename.value = file.name;
+
 
           const image_cloned: ImageAndDimensions = {
             width: result.image.width,
@@ -510,6 +514,7 @@ const handle_file_change_direct = (event: Event): void => {
     file-list(
       v-if="target_files.length > 0"
       :files="target_files"
+      :opened_file="original_filename"
       @open-file="open_file"
       @clear-files="clear_files"
     )
