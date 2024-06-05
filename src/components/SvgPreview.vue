@@ -260,7 +260,7 @@ const hide_cursor = (hide: boolean) => {
 </script>
 
 <template lang="pug">
-  svg#svg_main(xmlns="http://www.w3.org/2000/svg" :viewBox="viewBox" :width="props.image.width + 10" :height="props.image.height + 10"
+  svg#svg_main(xmlns="http://www.w3.org/2000/svg" v-if="props.image.dataUrl" :viewBox="viewBox" :width="props.image.width + 10" :height="props.image.height + 10"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     @pointermove="cursor_move"
     @pointerleave="hide_cursor(true)"
