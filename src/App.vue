@@ -275,8 +275,8 @@ const add_rect = (r: MyRect) => {
 const add_text = (t: LabelText) => {
   commit_snapshot(-1);
   t.text = t
-      .text.replace(/\</, '＜')
-      .replace(/\>/, '＞')
+    .text.replace(/\</, '＜')
+    .replace(/\>/, '＞')
   t.id = gen_id();
   texts.value.push(t);
 };
@@ -404,59 +404,61 @@ const container_style = computed(() => {
 </script>
 
 <template lang="pug">
-  .container(:style="container_style")
-    ToolRibbon(style="margin-right: 16px; width: 200px; float: left;")
-      a.button(href="#" @click.prevent="open_svg" draggable="false")
-        img.tool_icon(src="/open.svg" draggable="false")
-        span 画像を開く
-      input(type="file" ref="fileInput" accept=".svg, .png, .jpg, .jpeg, .bmp" @change="handle_file_change" style="display:none")
-      a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
-        img.tool_icon(src="/paste.svg" draggable="false")
-        span 新規貼り付け
-      a.button(href="#" @click.prevent="wipe" draggable="false")
-        img.tool_icon(src="/wipe.svg" draggable="false")
-        span 全消去
-      a.button(href="#" @click.prevent="load_last_snapshot" draggable="false" :class="snapshots.length > 0 ? '' : 'disabled'")
-        img.tool_icon(src="/undo.svg" draggable="false")
-        span 元に戻す
-      a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool === 'crop'" draggable="false")
-        img.tool_icon(src="/crop.svg" draggable="false")
-        span 切り抜きツール
-      a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool === 'rect'" draggable="false")
-        img.tool_icon(src="/rect.svg" draggable="false")
-        span 矩形ツール
-      a.button(href="#" @click.prevent="switch_tool('circle')" :data-active="tool === 'circle'" draggable="false")
-        img.tool_icon(src="/circle.svg" draggable="false")
-        span 円ツール
-      a.button(href="#" @click.prevent="switch_tool('ellipse')" :data-active="tool === 'ellipse'" draggable="false")
-        img.tool_icon(src="/ellipse.svg" draggable="false")
-        span 楕円ツール
-      a.button(href="#" @click.prevent="switch_tool('line')" :data-active="tool === 'line'" draggable="false")
-        img.tool_icon(src="/line.svg" draggable="false")
-        span 矢印ツール
-      a.button(href="#" @click.prevent="switch_tool('text')" :data-active="tool === 'text'" draggable="false")
-        img.tool_icon(src="/text.svg" draggable="false")
-        span テキストツール
-      a.button(href="#" @click.prevent="save_as_svg" draggable="false")
-        img.tool_icon(src="/save.svg" draggable="false")
-        span SVGを保存
-    SvgPreview(
-      style="float: left;"
-      :image="image"
-      :tool="tool"
-      :circles="circles"
-      :rects="rects"
-      :texts="texts"
-      :lines="lines"
-      :ellipses="ellipses"
-      @switch-tool="switch_tool"
-      @add-rect="add_rect"
-      @add-text="add_text"
-      @add-circle="add_circle"
-      @add-line="add_line"
-      @add-ellipse="add_ellipse"
-      @commit-crop="commit_crop"
-    )
+  .outer_frame
+    .container(:style="container_style")
+      ToolRibbon(style="margin-right: 16px; width: 200px; float: left;")
+        a.button(href="#" @click.prevent="open_svg" draggable="false")
+          img.tool_icon(src="/open.svg" draggable="false")
+          span 画像を開く
+        input(type="file" ref="fileInput" accept=".svg, .png, .jpg, .jpeg, .bmp" @change="handle_file_change" style="display:none")
+        a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
+          img.tool_icon(src="/paste.svg" draggable="false")
+          span 新規貼り付け
+        a.button(href="#" @click.prevent="wipe" draggable="false")
+          img.tool_icon(src="/wipe.svg" draggable="false")
+          span 全消去
+        a.button(href="#" @click.prevent="load_last_snapshot" draggable="false" :class="snapshots.length > 0 ? '' : 'disabled'")
+          img.tool_icon(src="/undo.svg" draggable="false")
+          span 元に戻す
+        a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool === 'crop'" draggable="false")
+          img.tool_icon(src="/crop.svg" draggable="false")
+          span 切り抜きツール
+        a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool === 'rect'" draggable="false")
+          img.tool_icon(src="/rect.svg" draggable="false")
+          span 矩形ツール
+        a.button(href="#" @click.prevent="switch_tool('circle')" :data-active="tool === 'circle'" draggable="false")
+          img.tool_icon(src="/circle.svg" draggable="false")
+          span 円ツール
+        a.button(href="#" @click.prevent="switch_tool('ellipse')" :data-active="tool === 'ellipse'" draggable="false")
+          img.tool_icon(src="/ellipse.svg" draggable="false")
+          span 楕円ツール
+        a.button(href="#" @click.prevent="switch_tool('line')" :data-active="tool === 'line'" draggable="false")
+          img.tool_icon(src="/line.svg" draggable="false")
+          span 矢印ツール
+        a.button(href="#" @click.prevent="switch_tool('text')" :data-active="tool === 'text'" draggable="false")
+          img.tool_icon(src="/text.svg" draggable="false")
+          span テキストツール
+        a.button(href="#" @click.prevent="save_as_svg" draggable="false")
+          img.tool_icon(src="/save.svg" draggable="false")
+          span SVGを保存
+      SvgPreview(
+        style="float: left;"
+        :image="image"
+        :tool="tool"
+        :circles="circles"
+        :rects="rects"
+        :texts="texts"
+        :lines="lines"
+        :ellipses="ellipses"
+        @switch-tool="switch_tool"
+        @add-rect="add_rect"
+        @add-text="add_text"
+        @add-circle="add_circle"
+        @add-line="add_line"
+        @add-ellipse="add_ellipse"
+        @commit-crop="commit_crop"
+      )
+    br.clearfix
 </template>
 
 <style scoped lang="less">
@@ -518,8 +520,16 @@ img.tool_icon {
   height: 2rem;
 }
 
-
 .container {
   float: left;
+}
+
+.outer_frame {
+  padding: 8px;
+  height: 100%;
+}
+
+.clearfix {
+  clear: both;
 }
 </style>
