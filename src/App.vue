@@ -15,7 +15,6 @@ import type {
   MyEllipse,
   Snapshot,
   LabelText,
-  TargetFile
 } from "./types.ts";
 import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
 
@@ -447,6 +446,7 @@ const handle_file_change_direct = (event: Event): void => {
     // @ts-ignore
     const file: File = event.target.files[0]!;
     handle_file_change(file);
+    // @ts-ignore
     target_files.value = Array.from(event.target.files! || []);
   }
 };
