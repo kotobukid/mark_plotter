@@ -22,14 +22,21 @@ const minimized = ref(false);
     .actions
       button(@click="emits('clear-files')") clear list
       button.min(@click="minimized = !minimized") -
-    table.file_list
-      colgroup
-        col(style="width: 200px;")
-        col(style="width: 120px;")
-      tbody
-        tr(v-for="f in files" :key="f.name" @click="handle_file(f)" :data-last-opened="last_opened === f.name")
-          td(v-text="f.name")
-          td(v-text="f.type")
+    .table_wrapper
+      table.file_list
+        colgroup
+          col(style="width: 200px;")
+          col(style="width: 120px;")
+        tbody
+          tr(
+            v-for="f in files"
+            :key="f.name"
+            @click="handle_file(f)"
+            :data-last-opened="last_opened === f.name"
+            :title="f.name"
+          )
+            td(v-text="f.name")
+            td(v-text="f.type")
 
 </template>
 
@@ -57,7 +64,7 @@ const minimized = ref(false);
       }
     }
 
-    table.file_list {
+    .table_wrapper {
       display: none;
     }
   }
@@ -102,4 +109,10 @@ td {
   color: black;
 }
 
+.table_wrapper {
+  max-height: 800px;
+  width: 336px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 </style>
