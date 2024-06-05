@@ -582,7 +582,7 @@ img.tool_icon {
 .outer_frame {
   padding: 8px;
   height: 100%;
-  background-color: pink;
+  background-color: white;
 
   &[data-accept-drop="true"] {
     background-color: lightgreen;
