@@ -72,8 +72,22 @@ const minimized = ref(false);
 
 .actions {
   margin-bottom: 5px;
+
   button {
+    cursor: pointer;
     margin-right: 5px;
+    border: 1px solid grey;
+    border-radius: 3px;
+
+    &:active {
+      position: relative;
+      top: 1px;
+    }
+
+    &:hover {
+      background-color: lightgreen;
+    }
+
     &:last-child {
       margin-right: 0;
     }
