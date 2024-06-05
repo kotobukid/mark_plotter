@@ -2,18 +2,20 @@
 import {computed, nextTick} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
+import FileList from "./components/FileList.vue";
 import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
 import {ref} from "vue";
 
-import {
-  type Tool,
-  type ImageAndDimensions,
-  type MyCircle,
-  type MyRect,
-  type MyLine,
-  type MyEllipse,
-  type Snapshot,
-  type LabelText
+import type {
+  Tool,
+  ImageAndDimensions,
+  MyCircle,
+  MyRect,
+  MyLine,
+  MyEllipse,
+  Snapshot,
+  LabelText,
+  TargetFile
 } from "./types.ts";
 import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
 
@@ -132,8 +134,7 @@ const open_svg = () => {
   wipe_snapshots();
 };
 
-const handle_file_change = (event) => {
-  const file: File = event.target.files[0];
+const handle_file_change = (file: File) => {
   if (file) {
     const readFileContent = (file) => {
       if (file.type === 'image/svg+xml') {
@@ -401,16 +402,63 @@ const container_style = computed(() => {
   return `width: ${220 + (image.value.width || 0) + 20}px;`;
 });
 
+
+const target_files = ref<File[]>([]);
+const can_accept_drop = ref(false);
+
+const dragenter = (e: DragEvent): void => {
+  can_accept_drop.value = true;
+  // if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) {
+  //   console.log('ドラッグ行為がローカルファイルシステム上のファイルを抱えています');
+  // }
+};
+
+const dragleave = (): void => {
+  can_accept_drop.value = false;
+};
+
+const files_dropped = (e: DragEvent): void => {
+  if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) {
+    const _files: File[] = Array.from(e.dataTransfer.files)
+    if (_files.length === 1) {
+      handle_file_change(_files[0]);
+    } else {
+      // @ts-ignore
+      target_files.value = _files;
+    }
+  }
+  can_accept_drop.value = false;
+};
+
+const noop = (e: DragEvent): void => {
+};
+
+const open_file = (f: File): void => {
+  handle_file_change(f);
+};
+
+const clear_files = (): void => {
+  target_files.value = [];
+};
+
+const handle_file_change_direct = (event: Event): void => {
+  // @ts-ignore
+  if (event.target.files && event.target.files.length > 0) {
+    // @ts-ignore
+    const file: File = event.target.files[0]!;
+    handle_file_change(file);
+  }
+};
 </script>
 
 <template lang="pug">
-  .outer_frame
+  .outer_frame(@dragenter="dragenter" @dragleave="dragleave" @dragover.prevent.stop="noop" @drop.prevent.stop="files_dropped" :data-accept-drop="can_accept_drop")
     .container(:style="container_style")
-      ToolRibbon(style="margin-right: 16px; width: 200px; float: left;")
+      ToolRibbon(style="margin-right: 16px; width: 200px; height: 600px; float: left;")
         a.button(href="#" @click.prevent="open_svg" draggable="false")
           img.tool_icon(src="/open.svg" draggable="false")
           span 画像を開く
-        input(type="file" ref="fileInput" accept=".svg, .png, .jpg, .jpeg, .bmp" @change="handle_file_change" style="display:none")
+        input(type="file" ref="fileInput" accept=".svg, .png, .jpg, .jpeg, .bmp" @change="handle_file_change_direct" style="display:none")
         a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
           img.tool_icon(src="/paste.svg" draggable="false")
           span 新規貼り付け
@@ -458,6 +506,12 @@ const container_style = computed(() => {
         @add-ellipse="add_ellipse"
         @commit-crop="commit_crop"
       )
+    file-list(
+      v-if="target_files.length > 0"
+      :files="target_files"
+      @open-file="open_file"
+      @clear-files="clear_files"
+    )
     br.clearfix
 </template>
 
@@ -527,6 +581,12 @@ img.tool_icon {
 .outer_frame {
   padding: 8px;
   height: 100%;
+  background-color: pink;
+
+  &[data-accept-drop="true"] {
+    background-color: lightgreen;
+    outline: 3px doubled green;
+  }
 }
 
 .clearfix {
