@@ -34,7 +34,7 @@ export const parse_my_svg = (file: File, next: Function, gen_id: () => number) =
             let rects: MyRect[] = [];
 
             // Rect
-            const g_rects = doc.querySelector('g.rects'); // 必要に応じてクラス名を変更するにゃ
+            const g_rects = doc.querySelector('g.rects');
             if (g_rects) {
                 const _rects = g_rects.querySelectorAll('rect');
                 rects = Array.from(_rects).map(rect => {
@@ -51,18 +51,44 @@ export const parse_my_svg = (file: File, next: Function, gen_id: () => number) =
             let texts: LabelText[] = [];
 
             // LabelText
-            const g_texts = doc.querySelector('g.texts'); // 必要に応じてクラス名を変更するにゃ
-            if (g_texts) {
-                const _texts = g_texts.querySelectorAll('text.label_text');
-                texts = Array.from(_texts).map(text => {
-                    const label_text: LabelText = {
-                        x: Number(text.getAttribute('x')),
-                        y: Number(text.getAttribute('y')),
-                        text: text.innerHTML,
-                        id: gen_id()
-                    };
-                    return label_text;
-                });
+            const g_text_layer = doc.querySelector('g.texts');
+            if (g_text_layer) {
+                const boxes = Array.from(g_text_layer.querySelectorAll('g.text_box'));
+                const _texts_old = Array.from(g_text_layer.querySelectorAll('text.label_text'));
+
+                if (boxes.length > 0) {
+                    texts = boxes.map((box) => {
+                        const _texts = Array.from(box.querySelectorAll('text.main'));
+                        if (_texts.length > 0) {
+                            const x = Number(_texts[0].getAttribute('x'));
+                            const y = Number(_texts[0].getAttribute('y'));
+                            const id = gen_id();
+                            const text_joined = _texts.map((t) => {
+                                return t.innerHTML
+                            }).join('\\n');
+                            return {
+                                x,
+                                y,
+                                id,
+                                text: text_joined
+                            };
+                        }
+                    }).filter(Boolean);
+                } else {
+                    // 改行テキスト対応以前
+                    if (_texts_old.length > 0) {
+                        const _texts = g_text_layer.querySelectorAll('text.label_text');
+                        texts = Array.from(_texts).map(text => {
+                            const label_text: LabelText = {
+                                x: Number(text.getAttribute('x')),
+                                y: Number(text.getAttribute('y')),
+                                text: text.innerHTML,
+                                id: gen_id()
+                            };
+                            return label_text;
+                        });
+                    }
+                }
             }
 
             let circles: MyCircle[] = [];

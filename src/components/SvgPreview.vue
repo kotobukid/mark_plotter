@@ -160,7 +160,7 @@ const end_plot_line = (e: PointerEvent) => {
 };
 
 const end_plot_text = (e: PointerEvent) => {
-  const text: string = (prompt('') || '').trim();
+  const text: string = (prompt('\\nで改行', '') || '').trim();
   if (text) {
     emits('switch-tool', '');
     emits('add-text', {
