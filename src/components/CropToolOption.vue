@@ -19,10 +19,15 @@ const submit = () => {
   emits('commit-crop', crop_rect);
 };
 
+const reset = () => {
+  crop_store.reset();
+};
+
 </script>
 
 <template lang="pug">
   .option(v-if="tool==='crop'")
+    button(@click="reset") 解除
     button(@click="submit") 切り抜き確定
 </template>
 

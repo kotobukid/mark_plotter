@@ -26,6 +26,11 @@ export const useCropStore = defineStore('crop', {
         set_end(p: PointXY) {
             this.end = p;
         },
+        reset() {
+            this.start = {x: 0, y: 0};
+            this.end = {x: 0, y: 0};
+            this.show_preview = false;
+        },
         commit() {
             this.show_preview = false;
 
