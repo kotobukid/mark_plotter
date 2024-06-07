@@ -1,5 +1,11 @@
-import {createApp} from 'vue'
-import './style.css'
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 
-createApp(App).mount('#app')
+let app = createApp(App)
+
+// Create a pinia instance and install as a plugin to the app
+let pinia = createPinia()
+app.use(pinia)
+
+app.mount('#app')

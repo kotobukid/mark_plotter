@@ -10,6 +10,7 @@ import {
   type LabelText
 } from "../types.ts";
 import BoxedText from "./BoxedText.vue";
+import CropToolLayer from "./CropToolLayer.vue";
 
 const props = defineProps<{
   tool: Tool,
@@ -82,25 +83,6 @@ const end_plot_rect = (e: PointerEvent) => {
   const y = s_gte_y ? end.value.y : start.value.y;
 
   emits('add-rect', {
-    x, y, width, height, id: -1
-  });
-
-  show_preview.value = false;
-  plotting.value = false;
-};
-
-const end_crop = (e: PointerEvent) => {
-  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
-  emits('switch-tool', '');
-  const s_gte_x: boolean = start.value.x - end.value.x > 0;
-  const s_gte_y: boolean = start.value.y - end.value.y > 0;
-
-  const width = (start.value.x - end.value.x) * (s_gte_x ? 1 : -1);
-  const height = (start.value.y - end.value.y) * (s_gte_y ? 1 : -1);
-  const x = s_gte_x ? end.value.x : start.value.x;
-  const y = s_gte_y ? end.value.y : start.value.y;
-
-  emits('commit-crop', {
     x, y, width, height, id: -1
   });
 
@@ -360,16 +342,7 @@ const hide_cursor = (hide: boolean) => {
           @pointermove="shift_text_preview"
         )
         rect.preview(:x="start.x - 10" :y="start.y - 33" width="120" height="42" stroke="red" border-width="1" fill="white" opacity="0.5")
-      g.crop_layer(
-        v-if="tool === 'crop'"
-      )
-        rect(fill="black" opacity="0.1" x="0" y="0" width="1920" height="1080"
-          @pointerdown="start_plot"
-          @pointerup="end_crop"
-          @pointerleave="cancel_plot"
-          @pointermove="move_end"
-        )
-        rect.preview(v-if="show_preview && plotting" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
+      crop-tool-layer(v-if="tool === 'crop'" :tool="tool")
     g.cursor_pos(:style="cursor_transform" v-if="show_cursor")
       line(x1="0" y1="30" x2="0" y2="15")
       line(x1="0" y1="-30" x2="0" y2="-15")

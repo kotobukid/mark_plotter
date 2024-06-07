@@ -5,6 +5,7 @@ import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
 import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
 import {ref} from "vue";
+import CropToolOption from "./components/CropToolOption.vue";
 
 import type {
   Tool,
@@ -457,6 +458,11 @@ const handle_file_change_direct = (event: Event): void => {
 </script>
 
 <template lang="pug">
+  .tool_options#tool_option
+    crop-tool-option(
+      :tool="tool"
+      @commit-crop="commit_crop"
+    )
   .outer_frame(@dragenter="dragenter" @dragleave="dragleave" @dragover.prevent.stop="noop" @drop.prevent.stop="files_dropped" :data-accept-drop="can_accept_drop")
     .container(:style="container_style")
       ToolRibbon(style="margin-right: 16px; width: 200px; height: 600px; float: left;")
@@ -509,7 +515,6 @@ const handle_file_change_direct = (event: Event): void => {
         @add-circle="add_circle"
         @add-line="add_line"
         @add-ellipse="add_ellipse"
-        @commit-crop="commit_crop"
       )
     file-list(
       v-if="target_files.length > 0"
@@ -597,5 +602,24 @@ img.tool_icon {
 
 .clearfix {
   clear: both;
+}
+
+
+@tool_option_height: 40px;
+.tool_options {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  background-color: darkgrey;
+  border: 1px solid black;
+  border-radius: 3px;
+  padding: 3px;
+  width: 98%;
+  height: @tool_option_height;
+  margin: 0;
+}
+
+.outer_frame {
+  padding-top: @tool_option_height + 18px;
 }
 </style>
