@@ -264,6 +264,7 @@ const hide_cursor = (hide: boolean) => {
         feMerge
           feMergeNode
           feMergeNode(in="SourceGraphic")
+    defs#additional_defs
     g(style="transform: translate(5px, 5px);")
       image.main_image(
         :xlink:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height"

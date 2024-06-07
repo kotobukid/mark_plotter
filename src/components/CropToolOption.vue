@@ -23,7 +23,7 @@ const submit = () => {
 
 <template lang="pug">
   .option(v-if="tool==='crop'")
-    button(@click="submit") 確定
+    button(@click="submit") 切り抜き確定
 </template>
 
 <style scoped lang="less">

@@ -398,6 +398,7 @@ const commit_crop = (rect: MyRect) => {
     };
 
     let new_image_index: number = image_map_manager.push(image_cloned);
+    tool.value = '';
     commit_snapshot(new_image_index);
   });
 };

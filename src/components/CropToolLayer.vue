@@ -69,6 +69,16 @@ const rect_preview = computed(() => {
 </script>
 
 <template lang="pug">
+  teleport(to="#additional_defs")
+    mask#masking
+      rect(x="-10" y="-10" width="2000px" height="2000px" fill="white")
+      rect(
+        :x="rect_preview.x"
+        :y="rect_preview.y"
+        :width="rect_preview.width"
+        :height="rect_preview.height"
+        fill="black"
+      )
   g.crop_layer
     rect(fill="black" opacity="0.1" x="0" y="0" width="1920" height="1080"
       @pointerdown="start_plot"
@@ -76,7 +86,18 @@ const rect_preview = computed(() => {
       @pointerleave="cancel_plot"
       @pointermove="move_end"
     )
-    rect.preview(v-if="crop_store.show_preview" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="green" stroke-width="1")</template>
+    rect.preview(
+      v-if="crop_store.show_preview"
+      x="-10"
+      y="-10"
+      width="2000px"
+      height="2000px"
+      fill="black"
+      opacity="0.2"
+      mask="url('#masking')"
+      stroke="green" stroke-width="1"
+    )
+</template>
 
 <style scoped lang="less">
 .preview {
