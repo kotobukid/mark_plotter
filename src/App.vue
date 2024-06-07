@@ -591,8 +591,11 @@ img.tool_icon {
 }
 
 .outer_frame {
-  padding: 8px;
+  padding: 8px 8px 8px 0;
   height: 100%;
+
+  padding-top: @tool_option_height + 18px;
+
   background-color: white;
 
   &[data-accept-drop="true"] {
@@ -618,9 +621,5 @@ img.tool_icon {
   width: 98%;
   height: @tool_option_height;
   margin: 0;
-}
-
-.outer_frame {
-  padding-top: @tool_option_height + 18px;
 }
 </style>
