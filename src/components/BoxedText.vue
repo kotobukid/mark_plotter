@@ -78,5 +78,7 @@ const box_start_x = computed(() => {
 </template>
 
 <style scoped>
-
+g.text_box {
+  pointer-events: none;
+}
 </style>

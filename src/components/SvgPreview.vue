@@ -160,19 +160,21 @@ const end_plot_line = (e: PointerEvent) => {
 };
 
 const end_plot_text = (e: PointerEvent) => {
-  const text: string = (prompt('\\nで改行', '') || '').trim();
-  if (text) {
-    emits('switch-tool', '');
-    emits('add-text', {
-      text,
-      x: e.offsetX - tr_x,
-      y: e.offsetY - tr_y,
-      id: -1
-    });
-  }
-
   show_preview.value = false;
-  plotting.value = false;
+  show_cursor.value = false;
+  setTimeout(() => {
+    const text: string = (prompt('\\nで改行', '') || '').trim();
+    if (text) {
+      emits('switch-tool', '');
+      emits('add-text', {
+        text,
+        x: e.offsetX - tr_x,
+        y: e.offsetY - tr_y,
+        id: -1
+      });
+    }
+    plotting.value = false;
+  }, 100);
 };
 
 const move_end = (e: PointerEvent) => {
