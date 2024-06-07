@@ -308,7 +308,10 @@ const hide_cursor = (hide: boolean) => {
           @pointerleave="cancel_plot"
           @pointermove="move_end"
         )
-        rect.preview(v-if="show_preview && plotting" :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
+        g(v-if="show_preview && plotting")
+          rect.preview(:x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
+          circle.preview(:cx="rect_preview.x + rect_preview.width / 2" :cy="rect_preview.y + rect_preview.height / 2" r="3" fill="black" stroke="white" stroke-width="1")
+
       g.circle_plot_layer(
         v-if="tool === 'circle'"
       )
@@ -318,10 +321,11 @@ const hide_cursor = (hide: boolean) => {
           @pointerleave="cancel_plot"
           @pointermove="move_end_circle"
         )
-        circle.preview(v-if="show_preview && plotting" :cx="circle_center.x" :cy="circle_center.y" :r="circle_r" fill="transparent" stroke="red" stroke-width="1")
-        circle.preview(v-if="show_preview && plotting" :cx="circle_center.x" :cy="circle_center.y" r="2" fill="black" stroke="transparent" stroke-width="0")
-        circle.preview(v-if="show_preview && plotting" :cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
-        circle.preview(v-if="show_preview && plotting" :cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+        g(v-if="show_preview && plotting")
+          circle.preview(:cx="circle_center.x" :cy="circle_center.y" :r="circle_r" fill="transparent" stroke="red" stroke-width="1")
+          circle.preview(:cx="circle_center.x" :cy="circle_center.y" r="3" fill="black" stroke="white" stroke-width="1")
+          circle.preview(:cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+          circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
       g.ellipse_plot_layer(
         v-if="tool === 'ellipse'"
       )
@@ -331,10 +335,11 @@ const hide_cursor = (hide: boolean) => {
           @pointerleave="cancel_plot"
           @pointermove="move_end"
         )
-        ellipse.preview(v-if="show_preview && plotting" :cx="ellipse_preview.cx" :cy="ellipse_preview.cy" :rx="ellipse_preview.rx" :ry="ellipse_preview.ry" fill="transparent" stroke="red" stroke-width="1")
-        circle.preview(v-if="show_preview && plotting" :cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
-        circle.preview(v-if="show_preview && plotting" :cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
-
+        g(v-if="show_preview && plotting")
+          ellipse.preview(:cx="ellipse_preview.cx" :cy="ellipse_preview.cy" :rx="ellipse_preview.rx" :ry="ellipse_preview.ry" fill="transparent" stroke="red" stroke-width="1")
+          circle.preview(:cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+          circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+          circle.preview(:cx="(end.x + start.x) / 2" :cy="(end.y + start.y) / 2" fill="black" stroke-width="1" stroke="white" r="3")
       g.line_plot_layer(
         v-if="tool === 'line'"
       )
