@@ -502,7 +502,7 @@ const erase_element = (id: number): void => {
           img.tool_icon(src="/wipe_all.svg" draggable="false")
           span 全消去
         a.button.sub(href="#" @click.prevent="switch_tool('erase')" :data-active="tool === 'erase'" draggable="false")
-          img.tool_icon(src="/wipe.svg" draggable="false")
+          img.tool_icon(src="/erase.svg" draggable="false")
           span 選択削除
         a.button(href="#" @click.prevent="load_last_snapshot" draggable="false" :class="snapshots.length > 0 ? '' : 'disabled'")
           img.tool_icon(src="/undo.svg" draggable="false")
