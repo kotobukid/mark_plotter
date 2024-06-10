@@ -97,7 +97,14 @@ const rect_preview = computed(() => {
           fill="black"
           opacity="0.2"
           mask="url('#masking')"
-          stroke="green" stroke-width="1"
+          stroke="none" stroke-width="0"
+    ></rect>
+    <rect class="preview"
+          v-if="crop_store.show_preview"
+          :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height"
+          fill="transparent"
+          stroke="lightgreen"
+          stroke-width="1"
     ></rect>
   </g>
 </template>
