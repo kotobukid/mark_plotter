@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: 're-edit-text', value: LabelText): void
+  (e: 'erase-element', value: number): void
 }>();
 
 const lineHeight = 28;
@@ -64,7 +65,7 @@ const box_start_x = computed(() => {
 });
 
 const editable_style = computed(() => {
-  if (props.tool === 'edit') {
+  if (['edit', 'erase'].includes(props.tool)) {
     return "pointer-events: auto;";
   } else {
     return "pointer-events: none;"
@@ -72,7 +73,11 @@ const editable_style = computed(() => {
 });
 
 const re_edit = () => {
-  emits('re-edit-text', props.label_text);
+  if (props.tool === 'edit') {
+    emits('re-edit-text', props.label_text);
+  } else if (props.tool === 'erase') {
+    emits('erase-element', props.label_text.id)
+  }
 };
 
 </script>

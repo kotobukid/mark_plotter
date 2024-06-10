@@ -470,6 +470,16 @@ const handle_file_change_direct = (event: Event): void => {
     target_files.value = Array.from(event.target.files! || []);
   }
 };
+
+const erase_element = (id: number): void => {
+  commit_snapshot(-1);
+  circles.value = circles.value.filter(el => el.id !== id);
+  rects.value = rects.value.filter(el => el.id !== id);
+  ellipses.value = ellipses.value.filter(el => el.id !== id);
+  lines.value = lines.value.filter(el => el.id !== id);
+  texts.value = texts.value.filter(el => el.id !== id);
+};
+
 </script>
 
 <template lang="pug">
@@ -489,8 +499,11 @@ const handle_file_change_direct = (event: Event): void => {
           img.tool_icon(src="/paste.svg" draggable="false")
           span 新規貼り付け
         a.button(href="#" @click.prevent="wipe" draggable="false")
-          img.tool_icon(src="/wipe.svg" draggable="false")
+          img.tool_icon(src="/wipe_all.svg" draggable="false")
           span 全消去
+        a.button.sub(href="#" @click.prevent="switch_tool('erase')" :data-active="tool === 'erase'" draggable="false")
+          img.tool_icon(src="/wipe.svg" draggable="false")
+          span 選択削除
         a.button(href="#" @click.prevent="load_last_snapshot" draggable="false" :class="snapshots.length > 0 ? '' : 'disabled'")
           img.tool_icon(src="/undo.svg" draggable="false")
           span 元に戻す
@@ -512,9 +525,7 @@ const handle_file_change_direct = (event: Event): void => {
         a.button(href="#" @click.prevent="switch_tool('text')" :data-active="tool === 'text'" draggable="false")
           img.tool_icon(src="/text.svg" draggable="false")
           span テキストツール
-        a.button(href="#" @click.prevent="switch_tool('edit')" :data-active="tool === 'edit'" draggable="false"
-          style="margin-left: 10px; width: 180px;"
-        )
+        a.button.sub(href="#" @click.prevent="switch_tool('edit')" :data-active="tool === 'edit'" draggable="false")
           img.tool_icon(src="/edit.svg" draggable="false")
           span 再編集ツール
         a.button(href="#" @click.prevent="save_as_svg" draggable="false")
@@ -535,6 +546,7 @@ const handle_file_change_direct = (event: Event): void => {
         @add-circle="add_circle"
         @add-line="add_line"
         @add-ellipse="add_ellipse"
+        @erase-element="erase_element"
       )
     file-list(
       v-if="target_files.length > 0"
@@ -597,6 +609,11 @@ a.button {
   border: 1px solid black;
   border-radius: 3px;
   padding: 3px;
+
+  &.sub {
+    margin-left: 10px;
+    width: 180px;
+  }
 }
 
 img.tool_icon {

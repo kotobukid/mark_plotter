@@ -35,6 +35,7 @@ const emits = defineEmits<{
   (e: 'add-line', value: MyLine): void,
   (e: 'add-ellipse', value: MyEllipse): void,
   (e: 'commit-crop', value: MyRect): void,
+  (e: 'erase-element', value: number): void,
 }>();
 
 const viewBox = computed(() => {
@@ -243,13 +244,41 @@ const hide_cursor = (hide: boolean) => {
 
 const re_edit_text = (label_text: LabelText) => {
   const text: string = (prompt('\\nで改行', label_text.text) || '').trim();
-    if (text) {
-      const lt: LabelText = {
-        ...label_text,
-        text,
-      };
-      emits('add-text', lt);
-    }
+  if (text) {
+    const lt: LabelText = {
+      ...label_text,
+      text,
+    };
+    emits('add-text', lt);
+  }
+};
+
+const erase_element = (id: number) => {
+  emits('erase-element', id);
+};
+
+const rect_clicked = (id: number) => {
+  if (props.tool === 'erase') {
+    emits('erase-element', id);
+  }
+};
+
+const circle_clicked = (id: number) => {
+  if (props.tool === 'erase') {
+    emits('erase-element', id);
+  }
+};
+
+const ellipse_clicked = (id: number) => {
+  if (props.tool === 'erase') {
+    emits('erase-element', id);
+  }
+};
+
+const line_clicked = (id: number) => {
+  if (props.tool === 'erase') {
+    emits('erase-element', id);
+  }
 };
 
 </script>
@@ -283,13 +312,21 @@ const re_edit_text = (label_text: LabelText) => {
         :key="props.image.id"
       )
       g.rects
-        rect(v-for="r in rects" :key="r.id" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
+        rect(v-for="r in rects" :key="r.id" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
+          @click="rect_clicked(r.id)"
+        )
       g.circles
-        circle(v-for="c in circles" :key="c.id" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
+        circle(v-for="c in circles" :key="c.id" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
+          @click="circle_clicked(c.id)"
+        )
       g.ellipses
-        ellipse(v-for="e in ellipses" :key="e.id" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;")
+        ellipse(v-for="e in ellipses" :key="e.id" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
+          @click="ellipse_clicked(e.id)"
+        )
       g.lines
-        line.line_arrow(v-for="l in lines" :key="l.id" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");")
+        line.line_arrow(v-for="l in lines" :key="l.id" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");"
+          @click="line_clicked(l.id)"
+        )
       g.texts
         BoxedText(
           v-for="t in texts"
@@ -297,6 +334,7 @@ const re_edit_text = (label_text: LabelText) => {
           :label_text="t"
           :tool="tool"
           @re-edit-text="re_edit_text"
+          @erase-element="erase_element"
         )
 
       g.rect_plot_layer(

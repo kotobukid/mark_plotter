@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs/>
+  <g>
+    <path d="M 19.14 44.039 L 13.024 59.801 L 3.378 50.155 L 19.14 44.039 Z" style="transform-origin: 10.296px 11.819px;"/>
+    <path d="M 44.86 44.039 L 50.976 59.801 L 60.622 50.155 L 44.86 44.039 Z" style="transform-origin: 53.704px 11.819px;"/>
+    <path d="M 44.86 19.961 L 50.976 4.199 L 60.622 13.845 L 44.86 19.961 Z" style="transform-origin: 53.704px 52.181px;"/>
+    <path d="M 19.141 19.961 L 13.025 4.199 L 3.379 13.845 L 19.141 19.961 Z" style="transform-origin: 10.297px 52.181px;"/>
+    <animate attributeName="opacity" values="1;0.2;0.2;1" begin="0.3s" dur="1.46s" fill="freeze" keyTimes="0; 0.39227; 0.536199; 1" repeatCount="indefinite"/>
+  </g>
+</svg>
