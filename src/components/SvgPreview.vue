@@ -7,7 +7,8 @@ import {
   type Point2D,
   type MyLine,
   type MyEllipse,
-  type LabelText
+  type LabelText,
+  type EraseTarget
 } from "../types.ts";
 import BoxedText from "./BoxedText.vue";
 import CropToolLayer from "./CropToolLayer.vue";
@@ -35,7 +36,7 @@ const emits = defineEmits<{
   (e: 'add-line', value: MyLine): void,
   (e: 'add-ellipse', value: MyEllipse): void,
   (e: 'commit-crop', value: MyRect): void,
-  (e: 'erase-element', value: number): void,
+  (e: 'erase-element', value: EraseTarget): void,
 }>();
 
 const viewBox = computed(() => {
@@ -253,31 +254,31 @@ const re_edit_text = (label_text: LabelText) => {
   }
 };
 
-const erase_element = (id: number) => {
-  emits('erase-element', id);
+const erase_text = (erase_target: EraseTarget) => {
+  emits('erase-element', erase_target);
 };
 
 const rect_clicked = (id: number) => {
   if (props.tool === 'erase') {
-    emits('erase-element', id);
+    emits('erase-element', {id, cat: 'rect'});
   }
 };
 
 const circle_clicked = (id: number) => {
   if (props.tool === 'erase') {
-    emits('erase-element', id);
+    emits('erase-element', {id, cat: 'circle'});
   }
 };
 
 const ellipse_clicked = (id: number) => {
   if (props.tool === 'erase') {
-    emits('erase-element', id);
+    emits('erase-element', {id, cat: 'ellipse'});
   }
 };
 
 const line_clicked = (id: number) => {
   if (props.tool === 'erase') {
-    emits('erase-element', id);
+    emits('erase-element', {id, cat: 'line'});
   }
 };
 
@@ -334,7 +335,7 @@ const line_clicked = (id: number) => {
           :label_text="t"
           :tool="tool"
           @re-edit-text="re_edit_text"
-          @erase-element="erase_element"
+          @erase-element="erase_text"
         )
 
       g.rect_plot_layer(

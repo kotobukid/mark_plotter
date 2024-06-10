@@ -1,4 +1,10 @@
+export type ElementType = 'rect' | 'circle' | 'ellipse' | 'line' | 'text';
 export type Tool = "" | "erase" | "circle" | "rect" | "line" | "ellipse" | "crop" | 'text' | 'edit';
+
+export type EraseTarget = {
+    cat: ElementType,
+    id: number
+};
 
 export type ImageAndDimensions = {
     dataUrl: string,

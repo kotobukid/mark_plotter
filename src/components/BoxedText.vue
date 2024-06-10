@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref, computed, onMounted, watch, watchEffect, nextTick} from 'vue';
-import type {LabelText, Tool} from "../types.ts";
+import type {EraseTarget, LabelText, Tool} from "../types.ts";
 
 const props = defineProps<{
   label_text: LabelText,
@@ -9,7 +9,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (e: 're-edit-text', value: LabelText): void
-  (e: 'erase-element', value: number): void
+  (e: 'erase-element', value: EraseTarget): void
 }>();
 
 const lineHeight = 28;
@@ -76,7 +76,11 @@ const re_edit = () => {
   if (props.tool === 'edit') {
     emits('re-edit-text', props.label_text);
   } else if (props.tool === 'erase') {
-    emits('erase-element', props.label_text.id)
+    emits('erase-element', {
+        cat: 'text',
+        id: props.label_text.id
+      }
+    );
   }
 };
 

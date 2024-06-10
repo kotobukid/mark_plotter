@@ -15,7 +15,7 @@ import type {
   MyLine,
   MyEllipse,
   Snapshot,
-  LabelText,
+  LabelText, EraseTarget,
 } from "./types.ts";
 import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
 
@@ -471,13 +471,20 @@ const handle_file_change_direct = (event: Event): void => {
   }
 };
 
-const erase_element = (id: number): void => {
+const erase_element = ({cat, id}: EraseTarget): void => {
   commit_snapshot(-1);
-  circles.value = circles.value.filter(el => el.id !== id);
-  rects.value = rects.value.filter(el => el.id !== id);
-  ellipses.value = ellipses.value.filter(el => el.id !== id);
-  lines.value = lines.value.filter(el => el.id !== id);
-  texts.value = texts.value.filter(el => el.id !== id);
+
+  if (cat === 'rect') {
+    rects.value = rects.value.filter(el => el.id !== id);
+  } else if (cat === 'circle') {
+    circles.value = circles.value.filter(el => el.id !== id);
+  } else if (cat === 'ellipse') {
+    ellipses.value = ellipses.value.filter(el => el.id !== id);
+  } else if (cat === 'line') {
+    lines.value = lines.value.filter(el => el.id !== id);
+  } else if (cat === 'text') {
+    texts.value = texts.value.filter(el => el.id !== id);
+  }
 };
 
 </script>
