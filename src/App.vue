@@ -279,11 +279,25 @@ const add_rect = (r: MyRect) => {
 
 const add_text = (t: LabelText) => {
   commit_snapshot(-1);
-  t.text = t
-    .text.replace(/\</, '＜')
-    .replace(/\>/, '＞')
-  t.id = gen_id();
-  texts.value.push(t);
+
+  if (t.id !== -1) {
+    // edit
+    const _texts = texts.value.concat([]);
+    for (let i = 0; i < _texts.length; i++) {
+      if (_texts[i].id === t.id) {
+        _texts[i].text = t.text;
+        break;
+      }
+    }
+    texts.value = _texts;
+  } else {
+    // new
+    t.text = t
+      .text.replace(/\</, '＜')
+      .replace(/\>/, '＞')
+    t.id = gen_id();
+    texts.value.push(t);
+  }
 };
 
 const add_circle = (c: MyCircle) => {
@@ -498,6 +512,11 @@ const handle_file_change_direct = (event: Event): void => {
         a.button(href="#" @click.prevent="switch_tool('text')" :data-active="tool === 'text'" draggable="false")
           img.tool_icon(src="/text.svg" draggable="false")
           span テキストツール
+        a.button(href="#" @click.prevent="switch_tool('edit')" :data-active="tool === 'edit'" draggable="false"
+          style="margin-left: 10px; width: 180px;"
+        )
+          img.tool_icon(src="/edit.svg" draggable="false")
+          span 再編集ツール
         a.button(href="#" @click.prevent="save_as_svg" draggable="false")
           img.tool_icon(src="/save.svg" draggable="false")
           span SVGを保存
@@ -531,7 +550,6 @@ const handle_file_change_direct = (event: Event): void => {
 a.button {
   display: block;
   width: 190px;
-  min-width: 190px;
 
   &.disabled {
     background-color: grey;

@@ -241,6 +241,17 @@ const hide_cursor = (hide: boolean) => {
   show_cursor.value = !hide;
 };
 
+const re_edit_text = (label_text: LabelText) => {
+  const text: string = (prompt('\\nで改行', label_text.text) || '').trim();
+    if (text) {
+      const lt: LabelText = {
+        ...label_text,
+        text,
+      };
+      emits('add-text', lt);
+    }
+};
+
 </script>
 
 <template lang="pug">
@@ -280,7 +291,13 @@ const hide_cursor = (hide: boolean) => {
       g.lines
         line.line_arrow(v-for="l in lines" :key="l.id" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");")
       g.texts
-        BoxedText(v-for="t in texts" :key="t.id" :label_text="t")
+        BoxedText(
+          v-for="t in texts"
+          :key="t.id"
+          :label_text="t"
+          :tool="tool"
+          @re-edit-text="re_edit_text"
+        )
 
       g.rect_plot_layer(
         v-if="tool === 'rect'"

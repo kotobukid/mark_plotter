@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import {ref, computed, onMounted, watch} from 'vue';
-import type {LabelText} from "../types.ts";
+import {ref, computed, onMounted, watch, watchEffect, nextTick} from 'vue';
+import type {LabelText, Tool} from "../types.ts";
 
 const props = defineProps<{
   label_text: LabelText,
+  tool: Tool
+}>();
+
+const emits = defineEmits<{
+  (e: 're-edit-text', value: LabelText): void
 }>();
 
 const lineHeight = 28;
 const textRef = ref(null);
 
+const whole_text = computed(() => {
+  return props.label_text.text;
+});
+
 const lines = computed(() => {
   return props.label_text.text.split('\\n');
 });
 
-watch(lines, () => {
-  // const $g = textRef.value;
-  // $g.querySelectorAll('text').forEach(($text) => {
-  //   const bbox = $text.getBBox();
-  // });
-  //
-  // textRef.value = lines.value.map((_, i) => ref(null));
-});
-
-onMounted(() => {
+const adjust_box = () => {
   const $g = textRef;
 
   if ($g.value) {
@@ -36,9 +36,20 @@ onMounted(() => {
       b_width_max = Math.max(b_width_max, bbox.width);
       b_height = b_height + bbox.height
     });
+
     box_width.value = b_width_max;
     box_height.value = b_height;
   }
+};
+
+watch(whole_text, () => {
+  nextTick(() => {
+    adjust_box();
+  });
+});
+
+onMounted(() => {
+  adjust_box();
 });
 
 const box_width = ref(0);
@@ -51,6 +62,18 @@ const box_start_y = computed(() => {
 const box_start_x = computed(() => {
   return props.label_text.x - 10;
 });
+
+const editable_style = computed(() => {
+  if (props.tool === 'edit') {
+    return "pointer-events: auto;";
+  } else {
+    return "pointer-events: none;"
+  }
+});
+
+const re_edit = () => {
+  emits('re-edit-text', props.label_text);
+};
 
 </script>
 
@@ -66,6 +89,8 @@ const box_start_x = computed(() => {
       :y="box_start_y"
       :width="box_width + 20"
       :height="box_height + 10"
+      :style="editable_style"
+      @click="re_edit"
     )
     g(ref="textRef")
       text.main.line(
@@ -80,5 +105,9 @@ const box_start_x = computed(() => {
 <style scoped>
 g.text_box {
   pointer-events: none;
+
+  rect.box {
+    cursor: text;
+  }
 }
 </style>
