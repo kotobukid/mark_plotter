@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import {computed, nextTick} from "vue";
+import {computed, nextTick, ref, type Ref} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
 import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
-import {ref} from "vue";
 import CropToolOption from "./components/CropToolOption.vue";
 
 import type {
@@ -129,10 +128,42 @@ const load_last_snapshot = () => {
 };
 
 
-const fileInput = ref(null);
 const open_svg = () => {
-  fileInput.value.click();
+  open_file_dialog();
   wipe_snapshots();
+};
+
+const target_file: Ref<FileSystemFileHandle> = ref(null);
+const target_files: Ref<FileSystemFileHandle[]> = ref([]);
+const writable_handle = ref<FileSystemWritableFileStream>(null);
+
+const open_file_dialog = async () => {
+  const options = {
+    types: [
+      {
+        description: 'Images',
+        accept: {
+          'image/*': ['.svg', '.png', '.jpg'],
+        },
+      },
+    ],
+    excludeAcceptAllOption: true,
+    multiple: true
+  };
+  // @ts-ignore
+  const a: FileSystemFileHandle[] = await window.showOpenFilePicker(options);
+  target_files.value = a;
+
+  await read_file(a[0]);
+};
+
+const read_file = async (fileHandle: FileSystemFileHandle) => {
+  const file = await fileHandle.getFile();
+  const fileContents = await file.text();
+  target_file.value = fileHandle;
+  filename.value = file.name;
+
+  handle_file_change(file);
 };
 
 const handle_file_change = (file: File) => {
@@ -219,6 +250,96 @@ const capture_clipboard = async () => {
   }).catch(() => {
     alert('PrintScreenができていません');
   });
+};
+
+const can_overwrite = computed(() => {
+  if (target_file.value && target_file.value.name) {
+    return target_file.value.name.endsWith('.svg');
+  } else {
+    return false;
+  }
+});
+
+const overwrite_file = async () => {
+  if (can_overwrite.value) {
+    const $svg_original = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
+
+    writable_handle.value = await target_file.value.createWritable();
+    const file_content: string = await generate_svg_text_to_save($svg_original);
+    await writable_handle.value.write(file_content);
+    await writable_handle.value.close();
+  }
+};
+
+const close_file = async () => {
+  target_file.value = null;
+  // text_content.value = '';
+  filename.value = '';
+};
+
+const save_as = async () => {
+  const $svg_original = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
+
+  const file_content: string = await generate_svg_text_to_save($svg_original);
+
+  // @ts-ignore
+  const fileHandle = await window.showSaveFilePicker();
+  const writable = await fileHandle.createWritable();
+  await writable.write(file_content);
+  await writable.close();
+};
+
+const generate_svg_text_to_save = async ($svg_original: HTMLElement): Promise<string> => {
+  return new Promise((resolve => {
+    const $svg = $svg_original.cloneNode(true) as HTMLElement;
+
+    const remove_data_attribute = ($elem: HTMLElement) => {
+      // 最初に、削除する属性を収集
+      const attributesToRemove = [];
+      for (const attr of $elem.attributes) {
+        if (attr.name.startsWith('data-')) {
+          attributesToRemove.push(attr.name);
+        }
+      }
+
+      // 収集した属性を削除
+      attributesToRemove.forEach(attr => {
+        console.log(attr);
+        $elem.removeAttribute(attr);
+      });
+    };
+
+    remove_data_attribute($svg);
+
+    const elements = $svg.querySelectorAll('*');
+
+    // 各要素からdata-v-xxx属性を削除
+    elements.forEach((element: HTMLElement) => {
+      remove_data_attribute(element);
+    });
+
+    // @ts-ignore
+    $svg.removeAttribute!('style');
+    // $svg.addAttribute('xmlns:xlink', "http://www.w3.org/1999/xlink")
+
+    const text: string = $svg.outerHTML!;
+    resolve(`<?xml version="1.0" encoding="utf-8" ?>
+${text}`);
+
+//     const download_text_as_file = (text: string) => {
+//       const blob = new Blob([`<?xml version="1.0" encoding="utf-8" ?>
+// ${text}`], {type: 'image/svg+xml'});
+//       const link = document.createElement('a');
+//       link.href = URL.createObjectURL(blob);
+//       link.target = '_blank';
+//       link.download = filename.value || `download.svg`;
+//       link.click();
+//       URL.revokeObjectURL(link.href);
+//       setTimeout(() => {
+//         link.remove();
+//       });
+//     };
+  }));
 };
 
 const save_as_svg = () => {
@@ -429,7 +550,7 @@ const container_style = computed(() => {
 });
 
 
-const target_files = ref<File[]>([]);
+// const target_files = ref<File[]>([]);
 const can_accept_drop = ref(false);
 
 const dragenter = (e: DragEvent): void => {
@@ -459,23 +580,14 @@ const files_dropped = (e: DragEvent): void => {
 const noop = (e: DragEvent): void => {
 };
 
-const open_file = (f: File): void => {
-  handle_file_change(f);
+const open_file_from_list = async (f: FileSystemFileHandle) => {
+  const file = await f.getFile();
+  target_file.value = f;
+  handle_file_change(file);
 };
 
 const clear_files = (): void => {
   target_files.value = [];
-};
-
-const handle_file_change_direct = (event: Event): void => {
-  // @ts-ignore
-  if (event.target.files && event.target.files.length > 0) {
-    // @ts-ignore
-    const file: File = event.target.files[0]!;
-    handle_file_change(file);
-    // @ts-ignore
-    target_files.value = Array.from(event.target.files! || []);
-  }
 };
 
 const erase_element = ({cat, id}: EraseTarget): void => {
@@ -508,7 +620,6 @@ const erase_element = ({cat, id}: EraseTarget): void => {
         a.button(href="#" @click.prevent="open_svg" draggable="false")
           img.tool_icon(src="/open.svg" draggable="false")
           span 画像を開く
-        input(:multiple="true" type="file" ref="fileInput" accept=".svg, .png, .jpg, .jpeg, .bmp" @change="handle_file_change_direct" style="display:none")
         a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
           img.tool_icon(src="/paste.svg" draggable="false")
           span 新規貼り付け
@@ -542,9 +653,12 @@ const erase_element = ({cat, id}: EraseTarget): void => {
         a.button.sub(href="#" @click.prevent="switch_tool('edit')" :data-active="tool === 'edit'" draggable="false")
           img.tool_icon(src="/edit.svg" draggable="false")
           span 再編集ツール
-        a.button(href="#" @click.prevent="save_as_svg" draggable="false")
+        a.button(href="#" @click.prevent="save_as" draggable="false")
           img.tool_icon(src="/save.svg" draggable="false")
-          span SVGを保存
+          span SVGを新規保存
+        a.button.sub(href="#" @click.prevent="overwrite_file" draggable="false" :class="can_overwrite ? '' : 'disabled'")
+          img.tool_icon(src="/save_overwrite.svg" draggable="false")
+          span 上書き保存
       SvgPreview(
         style="float: left;"
         :image="image"
@@ -566,7 +680,7 @@ const erase_element = ({cat, id}: EraseTarget): void => {
       v-if="target_files.length > 0"
       :files="target_files"
       :opened_file="original_filename"
-      @open-file="open_file"
+      @open-file="open_file_from_list"
       @clear-files="clear_files"
     )
     br.clearfix

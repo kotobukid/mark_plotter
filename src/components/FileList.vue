@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 
 const props = defineProps<{
-  files: File[],
+  files: FileSystemFileHandle[],
   opened_file: string
 }>();
+
 const emits = defineEmits<{
-  (e: 'open-file', value: File): void
+  (e: 'open-file', value: FileSystemFileHandle): void
   (e: 'clear-files'): void
 }>();
 
-const handle_file = (f: File): void => {
+const handle_file = (f: FileSystemFileHandle): void => {
   emits('open-file', f);
 };
 
@@ -25,8 +26,7 @@ const minimized = ref(false);
     .table_wrapper
       table.file_list
         colgroup
-          col(style="width: 200px;")
-          col(style="width: 120px;")
+          col(style="width: 320px;")
         tbody
           tr(
             v-for="f in files"
@@ -36,7 +36,6 @@ const minimized = ref(false);
             :title="f.name"
           )
             td(v-text="f.name")
-            td(v-text="f.type")
 
 </template>
 
@@ -49,6 +48,7 @@ const minimized = ref(false);
   width: 320px;
   position: absolute;
   right: 20px;
+  top: 10px;
 
   &[data-minimized="min"] {
     width: 21px;
