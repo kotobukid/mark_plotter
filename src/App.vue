@@ -8,7 +8,13 @@ import {useClipBoardParser} from "./composables/clipboard.ts";
 import {useHistoryManager} from "./composables/history_management.ts";
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
-const {gen_id} = useHistoryManager();
+const {
+  gen_id,
+  commit_snapshot,
+  wipe_snapshots,
+  undo_enabled,
+  pop_last_snapshot
+} = useHistoryManager();
 
 import type {
   Tool,
@@ -84,9 +90,7 @@ const image_map_manager = (() => {
 const filename = ref('');
 const original_filename = ref('');
 
-const snapshots = ref<Snapshot[]>([] as Snapshot[]);
-
-const commit_snapshot = (image_changed: number | -1) => {
+const take_snapshot = (image_changed: number | -1) => {
   const ss: Snapshot = {
     circles: [...circles.value],
     rects: [...rects.value],
@@ -95,18 +99,11 @@ const commit_snapshot = (image_changed: number | -1) => {
     texts: [...texts.value],
     image_index: image_changed
   };
-
-  // image_map_manager.dump();
-
-  snapshots.value = [...snapshots.value, ss];
+  return ss;
 };
 
-const wipe_snapshots = () => {
-  snapshots.value = [];
-};
-
-const load_last_snapshot = () => {
-  const ss = snapshots.value.pop();
+const apply_last_snapshot = () => {
+  const ss = pop_last_snapshot();
 
   if (ss) {
     rects.value = ss.rects;
@@ -184,7 +181,7 @@ const handle_file_change = (file: File) => {
           };
 
           let new_image_index: number = image_map_manager.push(image_cloned);
-          commit_snapshot(new_image_index);
+          commit_snapshot(take_snapshot(new_image_index));
         }, gen_id);
       } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
         parse_binary_image(file, (result) => {
@@ -207,7 +204,7 @@ const handle_file_change = (file: File) => {
           };
 
           let new_image_index: number = image_map_manager.push(image_cloned);
-          commit_snapshot(new_image_index);
+          commit_snapshot(take_snapshot(new_image_index));
         }, gen_id);
       }
     };
@@ -240,9 +237,9 @@ const capture_clipboard = async () => {
     };
 
     let new_image_index: number = image_map_manager.push(image_cloned);
-    commit_snapshot(new_image_index);
+    commit_snapshot(take_snapshot(new_image_index));
   } catch {
-    alert('PrintScreenができていません!!');
+    alert('PrintScreenができていません');
   }
 };
 
@@ -405,12 +402,12 @@ const switch_tool = (_tool: Tool) => {
 
 const add_rect = (r: MyRect) => {
   r.id = gen_id();
-  commit_snapshot(-1);
+  commit_snapshot(take_snapshot(-1));
   rects.value.push(r);
 };
 
 const add_text = (t: LabelText) => {
-  commit_snapshot(-1);
+  commit_snapshot(take_snapshot(-1));
 
   if (t.id !== -1) {
     // edit
@@ -433,19 +430,19 @@ const add_text = (t: LabelText) => {
 };
 
 const add_circle = (c: MyCircle) => {
-  commit_snapshot(-1);
+  commit_snapshot(take_snapshot(-1));
   c.id = gen_id();
   circles.value.push(c);
 };
 
 const add_line = (l: MyLine) => {
-  commit_snapshot(-1);
+  commit_snapshot(take_snapshot(-1));
   l.id = gen_id();
   lines.value.push(l);
 };
 
 const add_ellipse = (e: MyEllipse) => {
-  commit_snapshot(-1);
+  commit_snapshot(take_snapshot(-1));
   e.id = gen_id();
   ellipses.value.push(e);
 };
@@ -453,7 +450,7 @@ const add_ellipse = (e: MyEllipse) => {
 const wipe = () => {
   const do_wipe = confirm("画像以外の全要素を削除しますか？");
   if (do_wipe) {
-    commit_snapshot(-1);
+    commit_snapshot(take_snapshot(-1));
     rects.value = [];
     circles.value = [];
     lines.value = [];
@@ -545,7 +542,7 @@ const commit_crop = (rect: MyRect) => {
 
     let new_image_index: number = image_map_manager.push(image_cloned);
     tool.value = '';
-    commit_snapshot(new_image_index);
+    commit_snapshot(take_snapshot(new_image_index));
   });
 };
 
@@ -595,7 +592,7 @@ const clear_files = (): void => {
 };
 
 const erase_element = ({cat, id}: EraseTarget): void => {
-  commit_snapshot(-1);
+  commit_snapshot(take_snapshot(-1));
 
   if (cat === 'rect') {
     rects.value = rects.value.filter(el => el.id !== id);
@@ -633,7 +630,7 @@ const erase_element = ({cat, id}: EraseTarget): void => {
         a.button.sub(href="#" @click.prevent="switch_tool('erase')" :data-active="tool === 'erase'" draggable="false")
           img.tool_icon(src="/erase.svg" draggable="false")
           span 選択削除
-        a.button(href="#" @click.prevent="load_last_snapshot" draggable="false" :class="snapshots.length > 0 ? '' : 'disabled'")
+        a.button(href="#" @click.prevent="apply_last_snapshot" draggable="false" :class="undo_enabled ? '' : 'disabled'")
           img.tool_icon(src="/undo.svg" draggable="false")
           span 元に戻す
         a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool === 'crop'" draggable="false")
