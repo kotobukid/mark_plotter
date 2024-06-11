@@ -235,6 +235,7 @@ const capture_clipboard = async () => {
     image.value = await getDataUrlAndDimensions(dataUrl, gen_id);
     filename.value = `clipboard_${current_timestamp()}.svg`;
     document.title = filename.value;
+    target_file.value = null;
     wipe_snapshots();
 
     const image_cloned: ImageAndDimensions = {
@@ -282,8 +283,18 @@ const save_as = async () => {
 
   const file_content: string = await generate_svg_text_to_save($svg_original);
 
+  const option = {
+    types: [
+      {
+        description: "SVGファイル",
+        accept: {"image/svg+xml": [".svg"]},
+      },
+    ],
+    suggestedName: filename.value
+  };
+
   // @ts-ignore
-  const fileHandle = await window.showSaveFilePicker();
+  const fileHandle = await window.showSaveFilePicker(option);
   const writable = await fileHandle.createWritable();
   await writable.write(file_content);
   await writable.close();
