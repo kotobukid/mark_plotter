@@ -3,8 +3,10 @@ import {computed, nextTick, ref, type Ref} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
-import {getDataUrlAndDimensions, blobToDataURL, getClipboardImage} from "./clipboard_util.ts";
 import CropToolOption from "./components/CropToolOption.vue";
+import {useClipBoardParser} from "./composables/clipboard.ts";
+
+const {getDataUrlFromClipboard} = useClipBoardParser();
 
 import type {
   Tool,
@@ -230,27 +232,26 @@ const current_timestamp = () => {
 
 const capture_clipboard = async () => {
   tool.value = '';
-  const data: Blob = await getClipboardImage();
-  blobToDataURL(data).then(async (dataUrl) => {
-    image.value = await getDataUrlAndDimensions(dataUrl, gen_id);
+  try {
+    const _data: ImageAndDimensions = await getDataUrlFromClipboard();
+
+    image.value = _data;
+
     filename.value = `clipboard_${current_timestamp()}.svg`;
     document.title = filename.value;
     target_file.value = null;
     wipe_snapshots();
 
     const image_cloned: ImageAndDimensions = {
-      width: image.value.width,
-      height: image.value.height,
-      dataUrl,
+      ..._data,
       id: gen_id()
     };
 
     let new_image_index: number = image_map_manager.push(image_cloned);
     commit_snapshot(new_image_index);
-
-  }).catch(() => {
-    alert('PrintScreenができていません');
-  });
+  } catch {
+    alert('PrintScreenができていません!!');
+  }
 };
 
 const can_overwrite = computed(() => {
