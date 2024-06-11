@@ -550,37 +550,6 @@ const container_style = computed(() => {
   return `width: ${220 + (image.value.width || 0) + 20}px;`;
 });
 
-
-// const target_files = ref<File[]>([]);
-const can_accept_drop = ref(false);
-
-const dragenter = (e: DragEvent): void => {
-  can_accept_drop.value = true;
-  // if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) {
-  //   console.log('ドラッグ行為がローカルファイルシステム上のファイルを抱えています');
-  // }
-};
-
-const dragleave = (): void => {
-  can_accept_drop.value = false;
-};
-
-const files_dropped = (e: DragEvent): void => {
-  if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) {
-    const _files: File[] = Array.from(e.dataTransfer.files)
-    if (_files.length === 1) {
-      handle_file_change(_files[0]);
-    } else {
-      // @ts-ignore
-      target_files.value = _files;
-    }
-  }
-  can_accept_drop.value = false;
-};
-
-const noop = (e: DragEvent): void => {
-};
-
 const open_file_from_list = async (f: FileSystemFileHandle) => {
   const file = await f.getFile();
   target_file.value = f;
@@ -615,76 +584,75 @@ const erase_element = ({cat, id}: EraseTarget): void => {
       :tool="tool"
       @commit-crop="commit_crop"
     )
-  .outer_frame(@dragenter="dragenter" @dragleave="dragleave" @dragover.prevent.stop="noop" @drop.prevent.stop="files_dropped" :data-accept-drop="can_accept_drop")
-    .container(:style="container_style")
-      ToolRibbon(style="margin-right: 16px; width: 200px; height: 600px; float: left;")
-        a.button(href="#" @click.prevent="open_svg" draggable="false")
-          img.tool_icon(src="/open.svg" draggable="false")
-          span 画像を開く
-        a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
-          img.tool_icon(src="/paste.svg" draggable="false")
-          span 新規貼り付け
-        a.button(href="#" @click.prevent="wipe" draggable="false")
-          img.tool_icon(src="/wipe_all.svg" draggable="false")
-          span 全消去
-        a.button.sub(href="#" @click.prevent="switch_tool('erase')" :data-active="tool === 'erase'" draggable="false")
-          img.tool_icon(src="/erase.svg" draggable="false")
-          span 選択削除
-        a.button(href="#" @click.prevent="apply_last_snapshot" draggable="false" :class="undo_enabled ? '' : 'disabled'")
-          img.tool_icon(src="/undo.svg" draggable="false")
-          span 元に戻す
-        a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool === 'crop'" draggable="false")
-          img.tool_icon(src="/crop.svg" draggable="false")
-          span 切り抜きツール
-        a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool === 'rect'" draggable="false")
-          img.tool_icon(src="/rect.svg" draggable="false")
-          span 矩形ツール
-        a.button(href="#" @click.prevent="switch_tool('circle')" :data-active="tool === 'circle'" draggable="false")
-          img.tool_icon(src="/circle.svg" draggable="false")
-          span 円ツール
-        a.button(href="#" @click.prevent="switch_tool('ellipse')" :data-active="tool === 'ellipse'" draggable="false")
-          img.tool_icon(src="/ellipse.svg" draggable="false")
-          span 楕円ツール
-        a.button(href="#" @click.prevent="switch_tool('line')" :data-active="tool === 'line'" draggable="false")
-          img.tool_icon(src="/line.svg" draggable="false")
-          span 矢印ツール
-        a.button(href="#" @click.prevent="switch_tool('text')" :data-active="tool === 'text'" draggable="false")
-          img.tool_icon(src="/text.svg" draggable="false")
-          span テキストツール
-        a.button.sub(href="#" @click.prevent="switch_tool('edit')" :data-active="tool === 'edit'" draggable="false")
-          img.tool_icon(src="/edit.svg" draggable="false")
-          span 再編集ツール
-        a.button(href="#" @click.prevent="save_as" draggable="false")
-          img.tool_icon(src="/save.svg" draggable="false")
-          span SVGを新規保存
-        a.button.sub(href="#" @click.prevent="overwrite_file" draggable="false" :class="can_overwrite ? '' : 'disabled'")
-          img.tool_icon(src="/save_overwrite.svg" draggable="false")
-          span 上書き保存
-      SvgPreview(
-        style="float: left;"
-        :image="image"
-        :tool="tool"
-        :circles="circles"
-        :rects="rects"
-        :texts="texts"
-        :lines="lines"
-        :ellipses="ellipses"
-        @switch-tool="switch_tool"
-        @add-rect="add_rect"
-        @add-text="add_text"
-        @add-circle="add_circle"
-        @add-line="add_line"
-        @add-ellipse="add_ellipse"
-        @erase-element="erase_element"
-      )
-    file-list(
-      v-if="target_files.length > 0"
-      :files="target_files"
-      :opened_file="original_filename"
-      @open-file="open_file_from_list"
-      @clear-files="clear_files"
+  .container(:style="container_style")
+    ToolRibbon(style="margin-right: 16px; width: 200px; height: 600px; float: left;")
+      a.button(href="#" @click.prevent="open_svg" draggable="false")
+        img.tool_icon(src="/open.svg" draggable="false")
+        span 画像を開く
+      a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
+        img.tool_icon(src="/paste.svg" draggable="false")
+        span 新規貼り付け
+      a.button(href="#" @click.prevent="wipe" draggable="false")
+        img.tool_icon(src="/wipe_all.svg" draggable="false")
+        span 全消去
+      a.button.sub(href="#" @click.prevent="switch_tool('erase')" :data-active="tool === 'erase'" draggable="false")
+        img.tool_icon(src="/erase.svg" draggable="false")
+        span 選択削除
+      a.button(href="#" @click.prevent="apply_last_snapshot" draggable="false" :class="undo_enabled ? '' : 'disabled'")
+        img.tool_icon(src="/undo.svg" draggable="false")
+        span 元に戻す
+      a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool === 'crop'" draggable="false")
+        img.tool_icon(src="/crop.svg" draggable="false")
+        span 切り抜きツール
+      a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool === 'rect'" draggable="false")
+        img.tool_icon(src="/rect.svg" draggable="false")
+        span 矩形ツール
+      a.button(href="#" @click.prevent="switch_tool('circle')" :data-active="tool === 'circle'" draggable="false")
+        img.tool_icon(src="/circle.svg" draggable="false")
+        span 円ツール
+      a.button(href="#" @click.prevent="switch_tool('ellipse')" :data-active="tool === 'ellipse'" draggable="false")
+        img.tool_icon(src="/ellipse.svg" draggable="false")
+        span 楕円ツール
+      a.button(href="#" @click.prevent="switch_tool('line')" :data-active="tool === 'line'" draggable="false")
+        img.tool_icon(src="/line.svg" draggable="false")
+        span 矢印ツール
+      a.button(href="#" @click.prevent="switch_tool('text')" :data-active="tool === 'text'" draggable="false")
+        img.tool_icon(src="/text.svg" draggable="false")
+        span テキストツール
+      a.button.sub(href="#" @click.prevent="switch_tool('edit')" :data-active="tool === 'edit'" draggable="false")
+        img.tool_icon(src="/edit.svg" draggable="false")
+        span 再編集ツール
+      a.button(href="#" @click.prevent="save_as" draggable="false")
+        img.tool_icon(src="/save.svg" draggable="false")
+        span SVGを新規保存
+      a.button.sub(href="#" @click.prevent="overwrite_file" draggable="false" :class="can_overwrite ? '' : 'disabled'")
+        img.tool_icon(src="/save_overwrite.svg" draggable="false")
+        span 上書き保存
+    SvgPreview(
+      style="float: left;"
+      :image="image"
+      :tool="tool"
+      :circles="circles"
+      :rects="rects"
+      :texts="texts"
+      :lines="lines"
+      :ellipses="ellipses"
+      @switch-tool="switch_tool"
+      @add-rect="add_rect"
+      @add-text="add_text"
+      @add-circle="add_circle"
+      @add-line="add_line"
+      @add-ellipse="add_ellipse"
+      @erase-element="erase_element"
     )
-    br.clearfix
+  file-list(
+    v-if="target_files.length > 0"
+    :files="target_files"
+    :opened_file="original_filename"
+    @open-file="open_file_from_list"
+    @clear-files="clear_files"
+  )
+  br.clearfix
 </template>
 
 <style scoped lang="less">
@@ -752,20 +720,12 @@ img.tool_icon {
 
 .container {
   float: left;
-}
-
-.outer_frame {
   padding: 8px 8px 8px 0;
   height: 100%;
 
   padding-top: @tool_option_height + 18px;
 
   background-color: white;
-
-  &[data-accept-drop="true"] {
-    background-color: lightgreen;
-    outline: 3px doubled green;
-  }
 }
 
 .clearfix {
