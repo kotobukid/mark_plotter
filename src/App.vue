@@ -5,8 +5,10 @@ import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
 import CropToolOption from "./components/CropToolOption.vue";
 import {useClipBoardParser} from "./composables/clipboard.ts";
+import {useHistoryManager} from "./composables/history_management.ts";
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
+const {gen_id} = useHistoryManager();
 
 import type {
   Tool,
@@ -33,16 +35,6 @@ const rects = ref<MyRect[]>([]);
 const texts = ref<LabelText[]>([]);
 const lines = ref<MyLine[]>([]);
 const ellipses = ref<MyEllipse[]>([]);
-
-let {gen_id} = (() => {
-  let id: number = 0;
-  return {
-    gen_id: (): number => {
-      id = id + 1;
-      return id;
-    }
-  };
-})();
 
 const image_map_manager = (() => {
   const image_map = new Map<number, ImageAndDimensions>();
