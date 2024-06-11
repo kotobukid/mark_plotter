@@ -224,33 +224,40 @@ const capture_clipboard = async () => {
 const save_as_svg = () => {
   tool.value = '';
   nextTick(() => {
-    const $svg = document.getElementById("svg_main").cloneNode(true);
+    const $svg = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
 
-    const remove_data_custom_attrs = (elem, attrToRemove) => {
-      // 指定した属性を削除します。
-      elem.removeAttribute(attrToRemove);
-
-      // 全ての子要素に対して同じ操作を行います。
-      for (let i = 0; i < elem.children.length; i++) {
-        remove_data_custom_attrs(elem.children[i], attrToRemove);
+    const remove_data_attribute = ($elem: HTMLElement) => {
+      // 最初に、削除する属性を収集
+      const attributesToRemove = [];
+      for (const attr of $elem.attributes) {
+        if (attr.name.startsWith('data-')) {
+          attributesToRemove.push(attr.name);
+        }
       }
+
+      // 収集した属性を削除
+      attributesToRemove.forEach(attr => {
+        console.log(attr);
+        $elem.removeAttribute(attr);
+      });
     };
 
-    // @ts-ignore
-    for (let attr of $svg.attributes) {
-      if (attr.name.startsWith('data-')) {
-        remove_data_custom_attrs($svg, attr.name);
-      }
-    }
+    remove_data_attribute($svg);
+
+    const elements = $svg.querySelectorAll('*');
+
+    // 各要素からdata-v-xxx属性を削除
+    elements.forEach((element: HTMLElement) => {
+      remove_data_attribute(element);
+    });
 
     // @ts-ignore
     $svg.removeAttribute!('style');
     // $svg.addAttribute('xmlns:xlink', "http://www.w3.org/1999/xlink")
 
-    // @ts-ignore
-    const text = $svg.outerHTML!;
+    const text: string = $svg.outerHTML!;
 
-    const download_text_as_file = (text) => {
+    const download_text_as_file = (text: string) => {
       const blob = new Blob([`<?xml version="1.0" encoding="utf-8" ?>
 ${text}`], {type: 'image/svg+xml'});
       const link = document.createElement('a');
