@@ -6,6 +6,9 @@ import FileList from "./components/FileList.vue";
 import CropToolOption from "./components/CropToolOption.vue";
 import {useClipBoardParser} from "./composables/clipboard.ts";
 import {useHistoryManager} from "./composables/history_management.ts";
+import {useRectStore} from "./stores/rects.ts";
+
+const rect_store = useRectStore();
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
 const {
@@ -37,7 +40,9 @@ const image = ref<ImageAndDimensions>({
 });
 
 const circles = ref<MyCircle[]>([]);
-const rects = ref<MyRect[]>([]);
+
+const rects = computed(() => rect_store.rects);
+
 const texts = ref<LabelText[]>([]);
 const lines = ref<MyLine[]>([]);
 const ellipses = ref<MyEllipse[]>([]);
@@ -90,6 +95,11 @@ const image_map_manager = (() => {
 const filename = ref('');
 const original_filename = ref('');
 
+const take_snapshot_by_child = (callback: Function) => {
+  commit_snapshot(take_snapshot(-1));
+  callback();
+};
+
 const take_snapshot = (image_changed: number | -1) => {
   const ss: Snapshot = {
     circles: [...circles.value],
@@ -106,7 +116,7 @@ const apply_last_snapshot = () => {
   const ss = pop_last_snapshot();
 
   if (ss) {
-    rects.value = ss.rects;
+    rect_store.replace(ss.rects);
     lines.value = ss.lines;
     circles.value = ss.circles;
     ellipses.value = ss.ellipses;
@@ -163,7 +173,7 @@ const handle_file_change = (file: File) => {
       if (file.type === 'image/svg+xml') {
         parse_my_svg(file, (result) => {
           image.value = result.image;
-          rects.value = result.rects;
+          rect_store.replace(result.rects);
           texts.value = result.texts;
           circles.value = result.circles;
           ellipses.value = result.ellipses;
@@ -186,7 +196,7 @@ const handle_file_change = (file: File) => {
       } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
         parse_binary_image(file, (result) => {
           image.value = result.image;
-          rects.value = [];
+          rect_store.replace([]);
           texts.value = [];
           circles.value = [];
           ellipses.value = [];
@@ -401,9 +411,8 @@ const switch_tool = (_tool: Tool) => {
 };
 
 const add_rect = (r: MyRect) => {
-  r.id = gen_id();
   commit_snapshot(take_snapshot(-1));
-  rects.value.push(r);
+  rect_store.create(r);
 };
 
 const add_text = (t: LabelText) => {
@@ -451,7 +460,7 @@ const wipe = () => {
   const do_wipe = confirm("画像以外の全要素を削除しますか？");
   if (do_wipe) {
     commit_snapshot(take_snapshot(-1));
-    rects.value = [];
+    rect_store.replace([]);
     circles.value = [];
     lines.value = [];
     ellipses.value = [];
@@ -504,7 +513,7 @@ const commit_crop = (rect: MyRect) => {
       };
     });
 
-    rects.value = rects.value.map(r => {
+    rect_store.replace(rects.value.map(r => {
       return {
         x: r.x - rect.x,
         y: r.y - rect.y,
@@ -512,7 +521,7 @@ const commit_crop = (rect: MyRect) => {
         height: r.height,
         id: gen_id()
       };
-    });
+    }));
 
     lines.value = lines.value.map(l => {
       return {
@@ -564,7 +573,7 @@ const erase_element = ({cat, id}: EraseTarget): void => {
   commit_snapshot(take_snapshot(-1));
 
   if (cat === 'rect') {
-    rects.value = rects.value.filter(el => el.id !== id);
+    rect_store.remove_rect_by_id(id);
   } else if (cat === 'circle') {
     circles.value = circles.value.filter(el => el.id !== id);
   } else if (cat === 'ellipse') {
@@ -633,12 +642,11 @@ const erase_element = ({cat, id}: EraseTarget): void => {
       :image="image"
       :tool="tool"
       :circles="circles"
-      :rects="rects"
       :texts="texts"
       :lines="lines"
       :ellipses="ellipses"
+      @take-snapshot="take_snapshot_by_child"
       @switch-tool="switch_tool"
-      @add-rect="add_rect"
       @add-text="add_text"
       @add-circle="add_circle"
       @add-line="add_line"

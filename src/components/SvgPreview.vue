@@ -12,6 +12,14 @@ import {
 } from "../types.ts";
 import BoxedText from "./BoxedText.vue";
 import CropToolLayer from "./CropToolLayer.vue";
+import {useHistoryManager} from "../composables/history_management.ts";
+import {useRectStore} from "../stores/rects.ts";
+
+const rect_store = useRectStore();
+
+const {gen_id} = useHistoryManager();
+
+const rects = computed(() => rect_store.rects);
 
 const props = defineProps<{
   tool: Tool,
@@ -22,7 +30,6 @@ const props = defineProps<{
     id: number
   },
   circles: MyCircle[],
-  rects: MyRect[],
   texts: LabelText[],
   lines: MyLine[],
   ellipses: MyEllipse[],
@@ -32,7 +39,7 @@ const emits = defineEmits<{
   (e: 'switch-tool', value: Tool): void,
   (e: 'add-text', value: LabelText): void,
   (e: 'add-circle', value: MyCircle): void,
-  (e: 'add-rect', value: MyRect): void,
+  (e: 'take-snapshot', value: Function): void,
   (e: 'add-line', value: MyLine): void,
   (e: 'add-ellipse', value: MyEllipse): void,
   (e: 'commit-crop', value: MyRect): void,
@@ -84,12 +91,13 @@ const end_plot_rect = (e: PointerEvent) => {
   const x = s_gte_x ? end.value.x : start.value.x;
   const y = s_gte_y ? end.value.y : start.value.y;
 
-  emits('add-rect', {
-    x, y, width, height, id: -1
-  });
+  emits('take-snapshot', () => {
+    const r = {x, y, width, height, id: gen_id()};
+    rect_store.create(r);
 
-  show_preview.value = false;
-  plotting.value = false;
+    show_preview.value = false;
+    plotting.value = false;
+  });
 };
 
 const end_plot_circle = (e: PointerEvent) => {
