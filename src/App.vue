@@ -7,7 +7,9 @@ import CropToolOption from "./components/CropToolOption.vue";
 import {useClipBoardParser} from "./composables/clipboard.ts";
 import {useHistoryManager} from "./composables/history_management.ts";
 import {useRectStore} from "./stores/rects.ts";
+import {useToolStore} from "./stores/tool.ts";
 
+const tool_store = useToolStore();
 const rect_store = useRectStore();
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
@@ -20,18 +22,16 @@ const {
 } = useHistoryManager();
 
 import type {
-  Tool,
   ImageAndDimensions,
   MyCircle,
   MyRect,
   MyLine,
   MyEllipse,
   Snapshot,
-  LabelText, EraseTarget,
+  LabelText, EraseTarget, Tool,
 } from "./types.ts";
 import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
 
-const tool = ref<Tool>("");
 const image = ref<ImageAndDimensions>({
   dataUrl: '',
   width: 0,
@@ -230,7 +230,7 @@ const current_timestamp = () => {
 };
 
 const capture_clipboard = async () => {
-  tool.value = '';
+  tool_store.set('');
   try {
     const _data: ImageAndDimensions = await getDataUrlFromClipboard();
 
@@ -354,7 +354,7 @@ ${text}`);
 };
 
 const save_as_svg = () => {
-  tool.value = '';
+  tool_store.set('');
   nextTick(() => {
     const $svg = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
 
@@ -407,7 +407,7 @@ ${text}`], {type: 'image/svg+xml'});
 };
 
 const switch_tool = (_tool: Tool) => {
-  tool.value = _tool;
+  tool_store.set(_tool);
 };
 
 const add_rect = (r: MyRect) => {
@@ -550,7 +550,7 @@ const commit_crop = (rect: MyRect) => {
     };
 
     let new_image_index: number = image_map_manager.push(image_cloned);
-    tool.value = '';
+    tool_store.set('');
     commit_snapshot(take_snapshot(new_image_index));
   });
 };
@@ -590,7 +590,7 @@ const erase_element = ({cat, id}: EraseTarget): void => {
 <template lang="pug">
   .tool_options#tool_option
     crop-tool-option(
-      :tool="tool"
+      :tool="tool_store.current"
       @commit-crop="commit_crop"
     )
   .container(:style="container_style")
@@ -604,31 +604,31 @@ const erase_element = ({cat, id}: EraseTarget): void => {
       a.button(href="#" @click.prevent="wipe" draggable="false")
         img.tool_icon(src="/wipe_all.svg" draggable="false")
         span 全消去
-      a.button.sub(href="#" @click.prevent="switch_tool('erase')" :data-active="tool === 'erase'" draggable="false")
+      a.button.sub(href="#" @click.prevent="switch_tool('erase')" :data-active="tool_store.current === 'erase'" draggable="false")
         img.tool_icon(src="/erase.svg" draggable="false")
         span 選択削除
       a.button(href="#" @click.prevent="apply_last_snapshot" draggable="false" :class="undo_enabled ? '' : 'disabled'")
         img.tool_icon(src="/undo.svg" draggable="false")
         span 元に戻す
-      a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool === 'crop'" draggable="false")
+      a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool_store.current === 'crop'" draggable="false")
         img.tool_icon(src="/crop.svg" draggable="false")
         span 切り抜きツール
-      a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool === 'rect'" draggable="false")
+      a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool_store.current === 'rect'" draggable="false")
         img.tool_icon(src="/rect.svg" draggable="false")
         span 矩形ツール
-      a.button(href="#" @click.prevent="switch_tool('circle')" :data-active="tool === 'circle'" draggable="false")
+      a.button(href="#" @click.prevent="switch_tool('circle')" :data-active="tool_store.current === 'circle'" draggable="false")
         img.tool_icon(src="/circle.svg" draggable="false")
         span 円ツール
-      a.button(href="#" @click.prevent="switch_tool('ellipse')" :data-active="tool === 'ellipse'" draggable="false")
+      a.button(href="#" @click.prevent="switch_tool('ellipse')" :data-active="tool_store.current === 'ellipse'" draggable="false")
         img.tool_icon(src="/ellipse.svg" draggable="false")
         span 楕円ツール
-      a.button(href="#" @click.prevent="switch_tool('line')" :data-active="tool === 'line'" draggable="false")
+      a.button(href="#" @click.prevent="switch_tool('line')" :data-active="tool_store.current === 'line'" draggable="false")
         img.tool_icon(src="/line.svg" draggable="false")
         span 矢印ツール
-      a.button(href="#" @click.prevent="switch_tool('text')" :data-active="tool === 'text'" draggable="false")
+      a.button(href="#" @click.prevent="switch_tool('text')" :data-active="tool_store.current === 'text'" draggable="false")
         img.tool_icon(src="/text.svg" draggable="false")
         span テキストツール
-      a.button.sub(href="#" @click.prevent="switch_tool('edit')" :data-active="tool === 'edit'" draggable="false")
+      a.button.sub(href="#" @click.prevent="switch_tool('edit')" :data-active="tool_store.current === 'edit'" draggable="false")
         img.tool_icon(src="/edit.svg" draggable="false")
         span 再編集ツール
       a.button(href="#" @click.prevent="save_as" draggable="false")
@@ -640,13 +640,11 @@ const erase_element = ({cat, id}: EraseTarget): void => {
     SvgPreview(
       style="float: left;"
       :image="image"
-      :tool="tool"
       :circles="circles"
       :texts="texts"
       :lines="lines"
       :ellipses="ellipses"
       @take-snapshot="take_snapshot_by_child"
-      @switch-tool="switch_tool"
       @add-text="add_text"
       @add-circle="add_circle"
       @add-line="add_line"

@@ -13,8 +13,10 @@ import {
 import BoxedText from "./BoxedText.vue";
 import CropToolLayer from "./CropToolLayer.vue";
 import {useHistoryManager} from "../composables/history_management.ts";
+import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
 
+const tool_store = useToolStore();
 const rect_store = useRectStore();
 
 const {gen_id} = useHistoryManager();
@@ -22,7 +24,6 @@ const {gen_id} = useHistoryManager();
 const rects = computed(() => rect_store.rects);
 
 const props = defineProps<{
-  tool: Tool,
   image: {
     dataUrl: string,
     width: number,
@@ -36,7 +37,6 @@ const props = defineProps<{
 }>();
 
 const emits = defineEmits<{
-  (e: 'switch-tool', value: Tool): void,
   (e: 'add-text', value: LabelText): void,
   (e: 'add-circle', value: MyCircle): void,
   (e: 'take-snapshot', value: Function): void,
@@ -77,12 +77,12 @@ const start_plot = (e: PointerEvent) => {
 const cancel_plot = () => {
   show_preview.value = false;
   plotting.value = false;
-  emits('switch-tool', '');
+  tool_store.set('')
 };
 
 const end_plot_rect = (e: PointerEvent) => {
   end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_x};
-  emits('switch-tool', '');
+  tool_store.set('');
   const s_gte_x: boolean = start.value.x - end.value.x > 0;
   const s_gte_y: boolean = start.value.y - end.value.y > 0;
 
@@ -102,7 +102,7 @@ const end_plot_rect = (e: PointerEvent) => {
 
 const end_plot_circle = (e: PointerEvent) => {
   end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
-  emits('switch-tool', '');
+  tool_store.set('');
 
   emits("add-circle", {
     cx: circle_center.value.x,
@@ -117,7 +117,7 @@ const end_plot_circle = (e: PointerEvent) => {
 
 const end_plot_ellipse = (e: PointerEvent) => {
   end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
-  emits('switch-tool', '');
+  tool_store.set('');
 
   const cx = (start.value.x + end.value.x) / 2;
   const cy = (start.value.y + end.value.y) / 2;
@@ -137,7 +137,7 @@ const end_plot_ellipse = (e: PointerEvent) => {
 
 const end_plot_line = (e: PointerEvent) => {
   end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
-  emits('switch-tool', '');
+  tool_store.set('');
 
   emits("add-line", {
     x1: start.value.x,
@@ -157,7 +157,7 @@ const end_plot_text = (e: PointerEvent) => {
   setTimeout(() => {
     const text: string = (prompt('\\nで改行', '') || '').trim();
     if (text) {
-      emits('switch-tool', '');
+      tool_store.set('')
       emits('add-text', {
         text,
         x: e.offsetX - tr_x,
@@ -267,25 +267,25 @@ const erase_text = (erase_target: EraseTarget) => {
 };
 
 const rect_clicked = (id: number) => {
-  if (props.tool === 'erase') {
+  if (tool_store.current === 'erase') {
     emits('erase-element', {id, cat: 'rect'});
   }
 };
 
 const circle_clicked = (id: number) => {
-  if (props.tool === 'erase') {
+  if (tool_store.current === 'erase') {
     emits('erase-element', {id, cat: 'circle'});
   }
 };
 
 const ellipse_clicked = (id: number) => {
-  if (props.tool === 'erase') {
+  if (tool_store.current === 'erase') {
     emits('erase-element', {id, cat: 'ellipse'});
   }
 };
 
 const line_clicked = (id: number) => {
-  if (props.tool === 'erase') {
+  if (tool_store.current === 'erase') {
     emits('erase-element', {id, cat: 'line'});
   }
 };
@@ -341,13 +341,13 @@ const line_clicked = (id: number) => {
           v-for="t in texts"
           :key="t.id"
           :label_text="t"
-          :tool="tool"
+          :tool="tool_store.current"
           @re-edit-text="re_edit_text"
           @erase-element="erase_text"
         )
 
       g.rect_plot_layer(
-        v-if="tool === 'rect'"
+        v-if="tool_store.current === 'rect'"
       )
         rect(fill="blue" opacity="0.1" x="0" y="0" width="1920" height="1080"
           @pointerdown="start_plot"
@@ -360,7 +360,7 @@ const line_clicked = (id: number) => {
           circle.preview(:cx="rect_preview.x + rect_preview.width / 2" :cy="rect_preview.y + rect_preview.height / 2" r="3" fill="black" stroke="white" stroke-width="1")
 
       g.circle_plot_layer(
-        v-if="tool === 'circle'"
+        v-if="tool_store.current === 'circle'"
       )
         rect(fill="red" opacity="0.1" x="0" y="0" width="1920" height="1080"
           @pointerdown="start_plot"
@@ -374,7 +374,7 @@ const line_clicked = (id: number) => {
           circle.preview(:cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
           circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
       g.ellipse_plot_layer(
-        v-if="tool === 'ellipse'"
+        v-if="tool_store.current === 'ellipse'"
       )
         rect(fill="orange" opacity="0.1" x="0" y="0" width="1920" height="1080"
           @pointerdown="start_plot"
@@ -388,7 +388,7 @@ const line_clicked = (id: number) => {
           circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
           circle.preview(:cx="(end.x + start.x) / 2" :cy="(end.y + start.y) / 2" fill="black" stroke-width="1" stroke="white" r="3")
       g.line_plot_layer(
-        v-if="tool === 'line'"
+        v-if="tool_store.current === 'line'"
       )
         rect(fill="green" opacity="0.1" x="0" y="0" width="1920" height="1080"
           @pointerdown="start_plot"
@@ -398,7 +398,7 @@ const line_clicked = (id: number) => {
         )
         line.preview(v-if="show_preview && plotting" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
       g.text_plot_layer(
-        v-if="tool === 'text'"
+        v-if="tool_store.current === 'text'"
       )
         rect(fill="orange" opacity="0.1" x="0" y="0" width="1920" height="1080"
           @pointerdown="start_plot"
@@ -407,7 +407,7 @@ const line_clicked = (id: number) => {
           @pointermove="shift_text_preview"
         )
         rect.preview(:x="start.x - 10" :y="start.y - 33" width="120" height="42" stroke="red" border-width="1" fill="white" opacity="0.5")
-      crop-tool-layer(v-if="tool === 'crop'" :tool="tool")
+      crop-tool-layer(v-if="tool_store.current === 'crop'" :tool="tool_store.current")
     g.cursor_pos(:style="cursor_transform" v-if="show_cursor")
       line(x1="0" y1="30" x2="0" y2="15")
       line(x1="0" y1="-30" x2="0" y2="-15")
