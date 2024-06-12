@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import {useTextStore} from "../stores/texts.ts";
 import {useToolStore} from "../stores/tool.ts";
-import {useHistoryManager} from "../composables/history_management.ts";
 import BoxedText from "./BoxedText.vue";
-import {computed} from "vue";
+import {computed, inject} from "vue";
 import type {EraseTarget, LabelText} from "../types.ts";
 
 const store = useTextStore();
 const tool_store = useToolStore();
-const {gen_id} = useHistoryManager();
+const gen_id = inject('gen-id') as () => number;
+
 
 const texts = computed(() => store.texts);
 

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {useToolStore} from "../stores/tool.ts";
 import {useTextStore} from "../stores/texts.ts";
-import {useHistoryManager} from "../composables/history_management.ts";
 import {usePlots} from "../composables/plots.ts";
 import type {Point2D} from "../types.ts";
 import {inject} from "vue";
 
 const store = useTextStore();
-const {gen_id} = useHistoryManager();
+const gen_id = inject('gen-id') as () => number;
+
 const tool_store = useToolStore();
 
 const layer_offset: Point2D = inject('layer-offset');

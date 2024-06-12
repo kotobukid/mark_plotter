@@ -8,9 +8,9 @@ import {useCircleStore} from "../stores/circles.ts";
 import {useEllipseStore} from "../stores/ellipses.ts";
 import {useLineStore} from "../stores/lines.ts";
 import {useTextStore} from "../stores/texts.ts";
-import {useHistoryManager} from "../composables/history_management.ts";
 
 import type {ImageAndDimensions, MyRect} from "../types.ts";
+import {inject} from "vue";
 
 const crop_store = useCropStore();
 const image_store = useImageStore();
@@ -20,7 +20,7 @@ const ellipse_store = useEllipseStore();
 const line_store = useLineStore();
 const text_store = useTextStore();
 const tool_store = useToolStore();
-const {gen_id} = useHistoryManager();
+const gen_id = inject('gen-id') as () => number;
 
 const submit = () => {
   const crop_rect: MyRect = crop_store.commit();

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
-import {useHistoryManager} from "../composables/history_management.ts";
 import {usePlots} from "../composables/plots.ts";
 import {computed, inject, nextTick, ref} from "vue";
 import type {Point2D} from "../types.ts";
 
 const rect_store = useRectStore();
-const {gen_id} = useHistoryManager();
+const gen_id = inject('gen-id') as () => number;
+
 const tool_store = useToolStore();
 
 const layer_offset: Point2D = inject('layer-offset');

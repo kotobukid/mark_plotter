@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, ref, type Ref} from "vue";
+import {computed, nextTick, provide, ref, type Ref} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
@@ -25,12 +25,25 @@ const text_store = useTextStore();
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
 const {
-  gen_id,
+  // gen_id,
   commit_snapshot,
   wipe_snapshots,
   undo_enabled,
   pop_last_snapshot
 } = useHistoryManager();
+
+const _gen_id = (() => {
+  let id: number = 0;
+  return () => {
+    id = id + 1;
+    console.log(id);
+    return id;
+  };
+});
+
+const gen_id = _gen_id();
+
+provide('gen-id', gen_id);
 
 import type {
   ImageAndDimensions,

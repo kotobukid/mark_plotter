@@ -8,7 +8,7 @@ import {inject, ref} from "vue";
 
 const store = useCircleStore();
 const tool_store = useToolStore();
-const {gen_id} = useHistoryManager();
+const gen_id = inject('gen-id') as () => number;
 
 const layer_offset: Point2D = inject('layer-offset');
 
