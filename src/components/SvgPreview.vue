@@ -16,13 +16,16 @@ import CircleLayer from "./CircleLayer.vue";
 import {useHistoryManager} from "../composables/history_management.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
+import {useEllipseStore} from "../stores/ellipses.ts";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
+const ellipse_store = useEllipseStore();
 
 const {gen_id} = useHistoryManager();
 
 const rects = computed(() => rect_store.rects);
+const ellipses = computed(() => ellipse_store.ellipses);
 
 const props = defineProps<{
   image: {
@@ -33,7 +36,6 @@ const props = defineProps<{
   },
   texts: LabelText[],
   lines: MyLine[],
-  ellipses: MyEllipse[],
 }>();
 
 const emits = defineEmits<{
