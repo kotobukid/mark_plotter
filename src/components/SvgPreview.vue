@@ -22,6 +22,7 @@ import TextLayer from "./TextLayer.vue";
 import RectLayer from "./RectLayer.vue";
 import RectEditLayer from "./RectEditLayer.vue";
 import CircleEditLayer from "./CircleEditLayer.vue";
+import EllipseEditLayer from "./EllipseEditLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
@@ -82,25 +83,6 @@ const cancel_plot = () => {
 };
 
 
-const end_plot_ellipse = (e: PointerEvent) => {
-  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
-  tool_store.set('');
-
-  const cx = (start.value.x + end.value.x) / 2;
-  const cy = (start.value.y + end.value.y) / 2;
-  const rx = Math.abs(start.value.x - end.value.x) / 2;
-  const ry = Math.abs(start.value.y - end.value.y) / 2;
-  emits('add-ellipse', {
-    cx,
-    cy,
-    rx,
-    ry,
-    id: -1
-  });
-
-  show_preview.value = false;
-  plotting.value = false;
-};
 
 const end_plot_line = (e: PointerEvent) => {
   end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
@@ -154,18 +136,6 @@ const shift_text_preview = (e: PointerEvent) => {
   };
 };
 
-const ellipse_preview = computed(() => {
-  const cx = (start.value.x + end.value.x) / 2;
-  const cy = (start.value.y + end.value.y) / 2;
-  const rx = Math.abs(start.value.x - end.value.x) / 2;
-  const ry = Math.abs(start.value.y - end.value.y) / 2;
-  return {
-    cx,
-    cy,
-    rx,
-    ry
-  };
-});
 
 const cursor_pos = ref<Point2D>({x: -1, y: -1});
 
@@ -224,21 +194,8 @@ const hide_cursor = (hide: boolean) => {
 
       rect-edit-layer
       circle-edit-layer
+      ellipse-edit-layer
 
-      g.ellipse_plot_layer(
-        v-if="tool_store.current === 'ellipse'"
-      )
-        rect(fill="orange" opacity="0.1" x="0" y="0" width="1920" height="1080"
-          @pointerdown="start_plot"
-          @pointerup="end_plot_ellipse"
-          @pointerleave="cancel_plot"
-          @pointermove="move_end"
-        )
-        g(v-if="show_preview && plotting")
-          ellipse.preview(:cx="ellipse_preview.cx" :cy="ellipse_preview.cy" :rx="ellipse_preview.rx" :ry="ellipse_preview.ry" fill="transparent" stroke="red" stroke-width="1")
-          circle.preview(:cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
-          circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
-          circle.preview(:cx="(end.x + start.x) / 2" :cy="(end.y + start.y) / 2" fill="black" stroke-width="1" stroke="white" r="3")
       g.line_plot_layer(
         v-if="tool_store.current === 'line'"
       )
