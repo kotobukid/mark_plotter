@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {inject} from "vue";
 import {useToolStore} from "../stores/tool.ts";
 import {useLineStore} from "../stores/lines.ts";
 import {useHistoryManager} from "../composables/history_management.ts";
@@ -9,10 +10,7 @@ const store = useLineStore();
 const {gen_id} = useHistoryManager();
 const tool_store = useToolStore();
 
-const layer_offset: Point2D = {
-  x: 5,
-  y: 5
-};
+const layer_offset: Point2D = inject('layer-offset');
 
 const {
   start,

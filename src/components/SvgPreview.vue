@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import {computed, nextTick, ref} from "vue";
+import {computed, nextTick, ref, provide} from "vue";
 import {
-  type Tool,
   type MyRect,
   type MyCircle,
   type Point2D,
@@ -27,9 +26,15 @@ import LineEditLayer from "./LineEditLayer.vue";
 import TextEditLayer from "./TextEditLayer.vue";
 
 const tool_store = useToolStore();
-const rect_store = useRectStore();
 
 const {gen_id} = useHistoryManager();
+
+const layer_offset: Point2D = {
+  x: 5,
+  y: 5
+};
+
+provide('layer-offset', layer_offset);
 
 const props = defineProps<{
   image: {
@@ -59,49 +64,6 @@ const viewBox = computed(() => {
   }
 });
 
-const start = ref<Point2D>({x: 0, y: 0});
-const end = ref<Point2D>({x: 0, y: 0});
-
-
-const show_preview = ref<boolean>(false);
-const plotting = ref<boolean>(false);
-
-const tr_x = 5;
-const tr_y = 5;
-
-const start_plot = (e: PointerEvent) => {
-  start.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
-  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
-  nextTick(() => {
-    show_preview.value = true;
-    plotting.value = true;
-  });
-};
-
-const cancel_plot = () => {
-  show_preview.value = false;
-  plotting.value = false;
-  tool_store.set('')
-};
-
-
-
-
-
-
-const move_end = (e: PointerEvent) => {
-  if (plotting.value) {
-    end.value = {
-      x: e.offsetX - tr_x,
-      y: e.offsetY - tr_y
-    };
-    show_preview.value = true;
-  }
-};
-
-
-
-
 const cursor_pos = ref<Point2D>({x: -1, y: -1});
 
 const cursor_move = (e: PointerEvent) => {
@@ -120,6 +82,10 @@ const cursor_transform = computed(() => {
 const hide_cursor = (hide: boolean) => {
   show_cursor.value = !hide;
 };
+
+const global_layer_offset = computed(() => {
+  return `transform: translate(${layer_offset.x}px, ${layer_offset.y}px);`;
+});
 
 </script>
 
@@ -145,7 +111,7 @@ const hide_cursor = (hide: boolean) => {
           feMergeNode
           feMergeNode(in="SourceGraphic")
     defs#additional_defs
-    g(style="transform: translate(5px, 5px);")
+    g(:style="global_layer_offset")
       image.main_image(
         :xlink:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height"
         style="filter: url(#box-shadow1);"

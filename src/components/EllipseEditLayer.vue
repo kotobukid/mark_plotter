@@ -3,17 +3,14 @@ import {useToolStore} from "../stores/tool.ts";
 import {useEllipseStore} from "../stores/ellipses.ts";
 import {useHistoryManager} from "../composables/history_management.ts";
 import {usePlots} from "../composables/plots.ts";
-import {computed} from "vue";
+import {computed, inject} from "vue";
 import type {Point2D} from "../types.ts";
 
 const store = useEllipseStore();
 const {gen_id} = useHistoryManager();
 const tool_store = useToolStore();
 
-const layer_offset: Point2D = {
-  x: 5,
-  y: 5
-};
+const layer_offset: Point2D = inject('layer-offset');
 
 const {
   start,
