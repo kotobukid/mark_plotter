@@ -21,6 +21,7 @@ import {useLineStore} from "../stores/lines.ts";
 import EllipseLayer from "./EllipseLayer.vue";
 import LineLayer from "./LineLayer.vue";
 import TextLayer from "./TextLayer.vue";
+import RectLayer from "./RectLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
@@ -258,11 +259,6 @@ const hide_cursor = (hide: boolean) => {
   show_cursor.value = !hide;
 };
 
-const rect_clicked = (id: number) => {
-  if (tool_store.current === 'erase') {
-    emits('erase-element', {id, cat: 'rect'});
-  }
-};
 
 const ellipse_clicked = (id: number) => {
   if (tool_store.current === 'erase') {
@@ -300,10 +296,7 @@ const ellipse_clicked = (id: number) => {
         style="filter: url(#box-shadow1);"
         :key="props.image.id"
       )
-      g.rects
-        rect(v-for="r in rects" :key="r.id" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
-          @click="rect_clicked(r.id)"
-        )
+      rect-layer
       circle-layer
       ellipse-layer
       line-layer

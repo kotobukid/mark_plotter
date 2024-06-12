@@ -14,7 +14,7 @@ export const useRectStore = defineStore('rect', {
         replace(rects: MyRect[]) {
             this.rects = rects;
         },
-        remove_rect_by_id (id: number) {
+        erase (id: number) {
             this.rects = this.rects.filter(el => el.id !== id);
         }
     }
