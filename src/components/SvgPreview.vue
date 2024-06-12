@@ -17,6 +17,7 @@ import {useHistoryManager} from "../composables/history_management.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
 import {useEllipseStore} from "../stores/ellipses.ts";
+import EllipseLayer from "./EllipseLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
@@ -321,10 +322,7 @@ const line_clicked = (id: number) => {
           @click="rect_clicked(r.id)"
         )
       circle-layer
-      g.ellipses
-        ellipse(v-for="e in ellipses" :key="e.id" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
-          @click="ellipse_clicked(e.id)"
-        )
+      ellipse-layer
       g.lines
         line.line_arrow(v-for="l in lines" :key="l.id" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");"
           @click="line_clicked(l.id)"

@@ -580,7 +580,7 @@ const erase_element = ({cat, id}: EraseTarget): void => {
   } else if (cat === 'circle') {
     // circles.value = circles.value.filter(el => el.id !== id);
   } else if (cat === 'ellipse') {
-    ellipse_store.erase(id);
+    // ellipse_store.erase(id);
   } else if (cat === 'line') {
     lines.value = lines.value.filter(el => el.id !== id);
   } else if (cat === 'text') {
