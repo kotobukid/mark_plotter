@@ -21,6 +21,7 @@ import LineLayer from "./LineLayer.vue";
 import TextLayer from "./TextLayer.vue";
 import RectLayer from "./RectLayer.vue";
 import RectEditLayer from "./RectEditLayer.vue";
+import CircleEditLayer from "./CircleEditLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
@@ -57,8 +58,7 @@ const viewBox = computed(() => {
 
 const start = ref<Point2D>({x: 0, y: 0});
 const end = ref<Point2D>({x: 0, y: 0});
-const circle_center = ref<Point2D>({x: 0, y: 0});
-const circle_r = ref<number>(0);
+
 
 const show_preview = ref<boolean>(false);
 const plotting = ref<boolean>(false);
@@ -81,20 +81,6 @@ const cancel_plot = () => {
   tool_store.set('')
 };
 
-const end_plot_circle = (e: PointerEvent) => {
-  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
-  tool_store.set('');
-
-  emits("add-circle", {
-    cx: circle_center.value.x,
-    cy: circle_center.value.y,
-    r: circle_r.value,
-    id: -1
-  });
-
-  show_preview.value = false;
-  plotting.value = false;
-};
 
 const end_plot_ellipse = (e: PointerEvent) => {
   end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
@@ -160,23 +146,6 @@ const move_end = (e: PointerEvent) => {
   }
 };
 
-const move_end_circle = (e: PointerEvent) => {
-  if (plotting.value) {
-    end.value = {
-      x: e.offsetX - tr_x,
-      y: e.offsetY - tr_y
-    };
-
-    const bb_edge: number = Math.max(Math.abs(start.value.x - end.value.x), Math.abs(start.value.y - end.value.y));
-    circle_center.value = {
-      x: (start.value.x + end.value.x) / 2,
-      y: (start.value.y + end.value.y) / 2,
-    };
-    circle_r.value = bb_edge / 2;
-
-    show_preview.value = true;
-  }
-};
 
 const shift_text_preview = (e: PointerEvent) => {
   start.value = {
@@ -254,21 +223,8 @@ const hide_cursor = (hide: boolean) => {
       text-layer
 
       rect-edit-layer
+      circle-edit-layer
 
-      g.circle_plot_layer(
-        v-if="tool_store.current === 'circle'"
-      )
-        rect(fill="red" opacity="0.1" x="0" y="0" width="1920" height="1080"
-          @pointerdown="start_plot"
-          @pointerup="end_plot_circle"
-          @pointerleave="cancel_plot"
-          @pointermove="move_end_circle"
-        )
-        g(v-if="show_preview && plotting")
-          circle.preview(:cx="circle_center.x" :cy="circle_center.y" :r="circle_r" fill="transparent" stroke="red" stroke-width="1")
-          circle.preview(:cx="circle_center.x" :cy="circle_center.y" r="3" fill="black" stroke="white" stroke-width="1")
-          circle.preview(:cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
-          circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
       g.ellipse_plot_layer(
         v-if="tool_store.current === 'ellipse'"
       )
