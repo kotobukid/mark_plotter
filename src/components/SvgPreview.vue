@@ -15,6 +15,7 @@ import CircleLayer from "./CircleLayer.vue";
 import {useHistoryManager} from "../composables/history_management.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
+import {useImageStore} from "../stores/images.ts";
 import EllipseLayer from "./EllipseLayer.vue";
 import LineLayer from "./LineLayer.vue";
 import TextLayer from "./TextLayer.vue";
@@ -25,9 +26,7 @@ import EllipseEditLayer from "./EllipseEditLayer.vue";
 import LineEditLayer from "./LineEditLayer.vue";
 import TextEditLayer from "./TextEditLayer.vue";
 
-const tool_store = useToolStore();
-
-const {gen_id} = useHistoryManager();
+const image_store = useImageStore();
 
 const layer_offset: Point2D = {
   x: 5,
@@ -36,29 +35,15 @@ const layer_offset: Point2D = {
 
 provide('layer-offset', layer_offset);
 
-const props = defineProps<{
-  image: {
-    dataUrl: string,
-    width: number,
-    height: number,
-    id: number
-  },
-  texts: LabelText[],
-}>();
-
 const emits = defineEmits<{
-  (e: 'add-text', value: LabelText): void,
-  (e: 'add-circle', value: MyCircle): void,
   (e: 'take-snapshot', value: Function): void,
-  (e: 'add-line', value: MyLine): void,
-  (e: 'add-ellipse', value: MyEllipse): void,
   (e: 'commit-crop', value: MyRect): void,
   (e: 'erase-element', value: EraseTarget): void,
 }>();
 
 const viewBox = computed(() => {
-  if (props.image.dataUrl) {
-    return `0 0 ${props.image.width + 10} ${props.image.height + 10}`
+  if (image_store.image.dataUrl) {
+    return `0 0 ${image_store.image.width + 10} ${image_store.image.height + 10}`
   } else {
     return '0 0 480 360';
   }
@@ -90,7 +75,7 @@ const global_layer_offset = computed(() => {
 </script>
 
 <template lang="pug">
-  svg#svg_main(xmlns="http://www.w3.org/2000/svg" v-if="props.image.dataUrl" :viewBox="viewBox" :width="props.image.width + 10" :height="props.image.height + 10"
+  svg#svg_main(xmlns="http://www.w3.org/2000/svg" v-if="image_store.image.dataUrl" :viewBox="viewBox" :width="image_store.image.width + 10" :height="image_store.image.height + 10"
     xmlns:xlink="http://www.w3.org/1999/xlink"
     @pointermove="cursor_move"
     @pointerleave="hide_cursor(true)"
@@ -113,9 +98,9 @@ const global_layer_offset = computed(() => {
     defs#additional_defs
     g(:style="global_layer_offset")
       image.main_image(
-        :xlink:href="props.image.dataUrl" :width="props.image.width" :height="props.image.height"
+        :xlink:href="image_store.image.dataUrl" :width="image_store.image.width" :height="image_store.image.height"
         style="filter: url(#box-shadow1);"
-        :key="props.image.id"
+        :key="image_store.image.id"
       )
       rect-layer
       circle-layer

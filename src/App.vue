@@ -413,30 +413,6 @@ const switch_tool = (_tool: Tool) => {
   tool_store.set(_tool);
 };
 
-const add_rect = (r: MyRect) => {
-  commit_snapshot(take_snapshot(-1));
-  rect_store.create(r);
-};
-
-
-const add_circle = (c: MyCircle) => {
-  commit_snapshot(take_snapshot(-1));
-  c.id = gen_id();
-  circle_store.create(c);
-};
-
-const add_line = (l: MyLine) => {
-  commit_snapshot(take_snapshot(-1));
-  l.id = gen_id();
-  line_store.create(l);
-};
-
-const add_ellipse = (e: MyEllipse) => {
-  commit_snapshot(take_snapshot(-1));
-  e.id = gen_id();
-  ellipse_store.create(e);
-};
-
 const wipe = () => {
   const do_wipe = confirm("画像以外の全要素を削除しますか？");
   if (do_wipe) {
@@ -479,28 +455,6 @@ const erase_element = ({cat, id}: EraseTarget): void => {
   }
 };
 
-const add_text = (t: LabelText) => {
-  // commit_snapshot(take_snapshot(-1));
-
-  if (t.id !== -1) {
-    // edit
-    const _texts = texts.value.concat([]);
-    for (let i = 0; i < _texts.length; i++) {
-      if (_texts[i].id === t.id) {
-        _texts[i].text = t.text;
-        break;
-      }
-    }
-    text_store.replace(_texts);
-  } else {
-    // new
-    t.text = t
-      .text.replace(/\</, '＜')
-      .replace(/\>/, '＞')
-    t.id = gen_id();
-    text_store.create(t);
-  }
-};
 </script>
 
 <template lang="pug">
@@ -552,14 +506,7 @@ const add_text = (t: LabelText) => {
         span 上書き保存
     SvgPreview(
       style="float: left;"
-      :image="image"
-      :texts="texts"
-      :lines="lines"
       @take-snapshot="take_snapshot_by_child"
-      @add-text="add_text"
-      @add-circle="add_circle"
-      @add-line="add_line"
-      @add-ellipse="add_ellipse"
       @erase-element="erase_element"
     )
   file-list(
