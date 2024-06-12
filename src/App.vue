@@ -10,13 +10,14 @@ import {useToolStore} from "./stores/tool.ts";
 import {useRectStore} from "./stores/rects.ts";
 import {useCircleStore} from "./stores/circles.ts";
 import {useEllipseStore} from "./stores/ellipses.ts";
+import {useLineStore} from "./stores/lines.ts";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
 const circle_store = useCircleStore();
 const ellipse_store = useEllipseStore();
+const line_store = useLineStore();
 
-const ellipses = computed(() => {ellipse_store.ellipses});
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
 const {
@@ -46,9 +47,11 @@ const image = ref<ImageAndDimensions>({
 });
 
 const rects = computed(() => rect_store.rects);
+const circles = computed(() => circle_store.circles);
+const ellipses = computed(() => ellipse_store.ellipses);
+const lines = computed(() => line_store.lines);
 
 const texts = ref<LabelText[]>([]);
-const lines = ref<MyLine[]>([]);
 
 const image_map_manager = (() => {
   const image_map = new Map<number, ImageAndDimensions>();
@@ -105,9 +108,9 @@ const take_snapshot_by_child = (callback: Function) => {
 
 const take_snapshot = (image_changed: number | -1) => {
   const ss: Snapshot = {
-    circles: [...circle_store.circles],
+    circles: [...circles.value],
     rects: [...rects.value],
-    ellipses: [...ellipse_store.ellipses],
+    ellipses: [...ellipses.value],
     lines: [...lines.value],
     texts: [...texts.value],
     image_index: image_changed
@@ -120,7 +123,7 @@ const apply_last_snapshot = () => {
 
   if (ss) {
     rect_store.replace(ss.rects);
-    lines.value = ss.lines;
+    line_store.replace(ss.lines);
     circle_store.replace(ss.circles);
     ellipse_store.replace(ss.ellipses);
     texts.value = ss.texts;
@@ -180,7 +183,7 @@ const handle_file_change = (file: File) => {
           texts.value = result.texts;
           circle_store.replace(result.circles);
           ellipse_store.replace(result.ellipses);
-          lines.value = result.lines;
+          line_store.replace(result.lines);
           filename.value = result.filename;
           document.title = filename.value;
           original_filename.value = file.name;
@@ -203,7 +206,7 @@ const handle_file_change = (file: File) => {
           texts.value = [];
           circle_store.replace([]);
           ellipse_store.replace([]);
-          lines.value = [];
+          line_store.replace([]);
           filename.value = result.filename;
           document.title = filename.value;
           original_filename.value = file.name;
@@ -450,7 +453,7 @@ const add_circle = (c: MyCircle) => {
 const add_line = (l: MyLine) => {
   commit_snapshot(take_snapshot(-1));
   l.id = gen_id();
-  lines.value.push(l);
+  line_store.create(l);
 };
 
 const add_ellipse = (e: MyEllipse) => {
@@ -465,7 +468,7 @@ const wipe = () => {
     commit_snapshot(take_snapshot(-1));
     rect_store.replace([]);
     circle_store.replace([]);
-    lines.value = [];
+    line_store.replace([]);
     ellipse_store.replace([]);
     texts.value = [];
   }
@@ -526,7 +529,7 @@ const commit_crop = (rect: MyRect) => {
       };
     }));
 
-    lines.value = lines.value.map(l => {
+    line_store.replace(lines.value.map(l => {
       return {
         x1: l.x1 - rect.x,
         y1: l.y1 - rect.y,
@@ -534,7 +537,7 @@ const commit_crop = (rect: MyRect) => {
         y2: l.y2 - rect.y,
         id: gen_id()
       };
-    });
+    }));
 
     texts.value = texts.value.map(t => {
       return {
@@ -582,7 +585,7 @@ const erase_element = ({cat, id}: EraseTarget): void => {
   } else if (cat === 'ellipse') {
     // ellipse_store.erase(id);
   } else if (cat === 'line') {
-    lines.value = lines.value.filter(el => el.id !== id);
+    // lines.value = lines.value.filter(el => el.id !== id);
   } else if (cat === 'text') {
     texts.value = texts.value.filter(el => el.id !== id);
   }

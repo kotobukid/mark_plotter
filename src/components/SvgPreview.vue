@@ -17,16 +17,20 @@ import {useHistoryManager} from "../composables/history_management.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
 import {useEllipseStore} from "../stores/ellipses.ts";
+import {useLineStore} from "../stores/lines.ts";
 import EllipseLayer from "./EllipseLayer.vue";
+import LineLayer from "./LineLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
 const ellipse_store = useEllipseStore();
+const line_store = useLineStore();
 
 const {gen_id} = useHistoryManager();
 
 const rects = computed(() => rect_store.rects);
 const ellipses = computed(() => ellipse_store.ellipses);
+const lines = computed(() => line_store.lines);
 
 const props = defineProps<{
   image: {
@@ -36,7 +40,6 @@ const props = defineProps<{
     id: number
   },
   texts: LabelText[],
-  lines: MyLine[],
 }>();
 
 const emits = defineEmits<{
@@ -281,12 +284,6 @@ const ellipse_clicked = (id: number) => {
   }
 };
 
-const line_clicked = (id: number) => {
-  if (tool_store.current === 'erase') {
-    emits('erase-element', {id, cat: 'line'});
-  }
-};
-
 </script>
 
 <template lang="pug">
@@ -323,10 +320,7 @@ const line_clicked = (id: number) => {
         )
       circle-layer
       ellipse-layer
-      g.lines
-        line.line_arrow(v-for="l in lines" :key="l.id" :x1="l.x1" :y1="l.y1" :x2="l.x2" :y2="l.y2" fill="transparent" stroke="red" stroke-width="2" style="marker-start: url(\"#marker-1\");"
-          @click="line_clicked(l.id)"
-        )
+      line-layer
       g.texts
         BoxedText(
           v-for="t in texts"
