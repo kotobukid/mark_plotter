@@ -24,6 +24,7 @@ import RectEditLayer from "./RectEditLayer.vue";
 import CircleEditLayer from "./CircleEditLayer.vue";
 import EllipseEditLayer from "./EllipseEditLayer.vue";
 import LineEditLayer from "./LineEditLayer.vue";
+import TextEditLayer from "./TextEditLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
@@ -86,23 +87,7 @@ const cancel_plot = () => {
 
 
 
-const end_plot_text = (e: PointerEvent) => {
-  show_preview.value = false;
-  show_cursor.value = false;
-  setTimeout(() => {
-    const text: string = (prompt('\\nで改行', '') || '').trim();
-    if (text) {
-      tool_store.set('')
-      emits('add-text', {
-        text,
-        x: e.offsetX - tr_x,
-        y: e.offsetY - tr_y,
-        id: -1
-      });
-    }
-    plotting.value = false;
-  }, 100);
-};
+
 
 const move_end = (e: PointerEvent) => {
   if (plotting.value) {
@@ -115,12 +100,6 @@ const move_end = (e: PointerEvent) => {
 };
 
 
-const shift_text_preview = (e: PointerEvent) => {
-  start.value = {
-    x: e.offsetX - tr_x,
-    y: e.offsetY - tr_y
-  };
-};
 
 
 const cursor_pos = ref<Point2D>({x: -1, y: -1});
@@ -182,17 +161,8 @@ const hide_cursor = (hide: boolean) => {
       circle-edit-layer
       ellipse-edit-layer
       line-edit-layer
+      text-edit-layer
 
-      g.text_plot_layer(
-        v-if="tool_store.current === 'text'"
-      )
-        rect(fill="orange" opacity="0.1" x="0" y="0" width="1920" height="1080"
-          @pointerdown="start_plot"
-          @pointerup="end_plot_text"
-          @pointerleave="cancel_plot"
-          @pointermove="shift_text_preview"
-        )
-        rect.preview(:x="start.x - 10" :y="start.y - 33" width="120" height="42" stroke="red" stroke-width="1" fill="white" opacity="0.5")
       crop-tool-layer(v-if="tool_store.current === 'crop'" :tool="tool_store.current")
     g.cursor_pos(:style="cursor_transform" v-if="show_cursor")
       line(x1="0" y1="30" x2="0" y2="15")
