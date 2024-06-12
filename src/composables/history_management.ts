@@ -4,7 +4,6 @@ import type {Snapshot} from "../types.ts";
 const useHistoryManager = () => {
     const snapshots = ref<Snapshot[]>([] as Snapshot[]);
 
-
     const commit_snapshot = (ss: Snapshot) => {
         // const ss: Snapshot = {
         //     circles: [...circles.value],
@@ -30,22 +29,11 @@ const useHistoryManager = () => {
         snapshots.value = [];
     };
 
-    const {gen_id} = (() => {
-        let id: number = 0;
-        return {
-            gen_id: (): number => {
-                id = id + 1;
-                return id;
-            }
-        };
-    })();
-
     const undo_enabled = computed(() => {
         return snapshots.value.length > 0;
     });
 
     return {
-        gen_id,
         commit_snapshot,
         wipe_snapshots,
         pop_last_snapshot,

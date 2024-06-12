@@ -25,7 +25,6 @@ const text_store = useTextStore();
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
 const {
-  // gen_id,
   commit_snapshot,
   wipe_snapshots,
   undo_enabled,
@@ -36,7 +35,7 @@ const _gen_id = (() => {
   let id: number = 0;
   return () => {
     id = id + 1;
-    console.log(id);
+    // console.log(id);
     return id;
   };
 });
