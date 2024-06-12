@@ -16,8 +16,6 @@ import CircleLayer from "./CircleLayer.vue";
 import {useHistoryManager} from "../composables/history_management.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
-import {useEllipseStore} from "../stores/ellipses.ts";
-import {useLineStore} from "../stores/lines.ts";
 import EllipseLayer from "./EllipseLayer.vue";
 import LineLayer from "./LineLayer.vue";
 import TextLayer from "./TextLayer.vue";
@@ -25,14 +23,8 @@ import RectLayer from "./RectLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
-const ellipse_store = useEllipseStore();
-const line_store = useLineStore();
 
 const {gen_id} = useHistoryManager();
-
-const rects = computed(() => rect_store.rects);
-const ellipses = computed(() => ellipse_store.ellipses);
-const lines = computed(() => line_store.lines);
 
 const props = defineProps<{
   image: {
@@ -259,13 +251,6 @@ const hide_cursor = (hide: boolean) => {
   show_cursor.value = !hide;
 };
 
-
-const ellipse_clicked = (id: number) => {
-  if (tool_store.current === 'erase') {
-    emits('erase-element', {id, cat: 'ellipse'});
-  }
-};
-
 </script>
 
 <template lang="pug">
@@ -362,7 +347,7 @@ const ellipse_clicked = (id: number) => {
           @pointerleave="cancel_plot"
           @pointermove="shift_text_preview"
         )
-        rect.preview(:x="start.x - 10" :y="start.y - 33" width="120" height="42" stroke="red" border-width="1" fill="white" opacity="0.5")
+        rect.preview(:x="start.x - 10" :y="start.y - 33" width="120" height="42" stroke="red" stroke-width="1" fill="white" opacity="0.5")
       crop-tool-layer(v-if="tool_store.current === 'crop'" :tool="tool_store.current")
     g.cursor_pos(:style="cursor_transform" v-if="show_cursor")
       line(x1="0" y1="30" x2="0" y2="15")

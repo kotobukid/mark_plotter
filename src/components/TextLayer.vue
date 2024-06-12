@@ -26,7 +26,6 @@ const re_edit_text = (label_text: LabelText) => {
 
 const add_text = (t: LabelText) => {
   // commit_snapshot(take_snapshot(-1));
-
   if (t.id !== -1) {
     // edit
     const _texts = texts.value.concat([]);

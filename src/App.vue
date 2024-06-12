@@ -570,6 +570,28 @@ const erase_element = ({cat, id}: EraseTarget): void => {
   }
 };
 
+const add_text = (t: LabelText) => {
+  // commit_snapshot(take_snapshot(-1));
+
+  if (t.id !== -1) {
+    // edit
+    const _texts = texts.value.concat([]);
+    for (let i = 0; i < _texts.length; i++) {
+      if (_texts[i].id === t.id) {
+        _texts[i].text = t.text;
+        break;
+      }
+    }
+    text_store.replace(_texts);
+  } else {
+    // new
+    t.text = t
+      .text.replace(/\</, '＜')
+      .replace(/\>/, '＞')
+    t.id = gen_id();
+    text_store.create(t);
+  }
+};
 </script>
 
 <template lang="pug">
