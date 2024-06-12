@@ -23,6 +23,7 @@ import RectLayer from "./RectLayer.vue";
 import RectEditLayer from "./RectEditLayer.vue";
 import CircleEditLayer from "./CircleEditLayer.vue";
 import EllipseEditLayer from "./EllipseEditLayer.vue";
+import LineEditLayer from "./LineEditLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
@@ -84,21 +85,6 @@ const cancel_plot = () => {
 
 
 
-const end_plot_line = (e: PointerEvent) => {
-  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
-  tool_store.set('');
-
-  emits("add-line", {
-    x1: start.value.x,
-    y1: start.value.y,
-    x2: end.value.x,
-    y2: end.value.y,
-    id: -1
-  });
-
-  show_preview.value = false;
-  plotting.value = false;
-};
 
 const end_plot_text = (e: PointerEvent) => {
   show_preview.value = false;
@@ -195,17 +181,8 @@ const hide_cursor = (hide: boolean) => {
       rect-edit-layer
       circle-edit-layer
       ellipse-edit-layer
+      line-edit-layer
 
-      g.line_plot_layer(
-        v-if="tool_store.current === 'line'"
-      )
-        rect(fill="green" opacity="0.1" x="0" y="0" width="1920" height="1080"
-          @pointerdown="start_plot"
-          @pointerup="end_plot_line"
-          @pointerleave="cancel_plot"
-          @pointermove="move_end"
-        )
-        line.preview(v-if="show_preview && plotting" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
       g.text_plot_layer(
         v-if="tool_store.current === 'text'"
       )
