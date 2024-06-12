@@ -11,12 +11,14 @@ import {useRectStore} from "./stores/rects.ts";
 import {useCircleStore} from "./stores/circles.ts";
 import {useEllipseStore} from "./stores/ellipses.ts";
 import {useLineStore} from "./stores/lines.ts";
+import {useTextStore} from "./stores/texts.ts";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
 const circle_store = useCircleStore();
 const ellipse_store = useEllipseStore();
 const line_store = useLineStore();
+const text_store = useTextStore();
 
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
@@ -50,8 +52,7 @@ const rects = computed(() => rect_store.rects);
 const circles = computed(() => circle_store.circles);
 const ellipses = computed(() => ellipse_store.ellipses);
 const lines = computed(() => line_store.lines);
-
-const texts = ref<LabelText[]>([]);
+const texts = computed(() => text_store.texts);
 
 const image_map_manager = (() => {
   const image_map = new Map<number, ImageAndDimensions>();
@@ -126,7 +127,7 @@ const apply_last_snapshot = () => {
     line_store.replace(ss.lines);
     circle_store.replace(ss.circles);
     ellipse_store.replace(ss.ellipses);
-    texts.value = ss.texts;
+    text_store.replace(ss.texts);
 
     if (ss.image_index !== -1) {
       image.value = image_map_manager.get(ss.image_index);
@@ -180,7 +181,7 @@ const handle_file_change = (file: File) => {
         parse_my_svg(file, (result) => {
           image.value = result.image;
           rect_store.replace(result.rects);
-          texts.value = result.texts;
+          text_store.replace(result.texts);
           circle_store.replace(result.circles);
           ellipse_store.replace(result.ellipses);
           line_store.replace(result.lines);
@@ -203,7 +204,7 @@ const handle_file_change = (file: File) => {
         parse_binary_image(file, (result) => {
           image.value = result.image;
           rect_store.replace([]);
-          texts.value = [];
+          text_store.replace([]);
           circle_store.replace([]);
           ellipse_store.replace([]);
           line_store.replace([]);
@@ -421,28 +422,6 @@ const add_rect = (r: MyRect) => {
   rect_store.create(r);
 };
 
-const add_text = (t: LabelText) => {
-  commit_snapshot(take_snapshot(-1));
-
-  if (t.id !== -1) {
-    // edit
-    const _texts = texts.value.concat([]);
-    for (let i = 0; i < _texts.length; i++) {
-      if (_texts[i].id === t.id) {
-        _texts[i].text = t.text;
-        break;
-      }
-    }
-    texts.value = _texts;
-  } else {
-    // new
-    t.text = t
-      .text.replace(/\</, '＜')
-      .replace(/\>/, '＞')
-    t.id = gen_id();
-    texts.value.push(t);
-  }
-};
 
 const add_circle = (c: MyCircle) => {
   commit_snapshot(take_snapshot(-1));
@@ -470,7 +449,7 @@ const wipe = () => {
     circle_store.replace([]);
     line_store.replace([]);
     ellipse_store.replace([]);
-    texts.value = [];
+    text_store.replace([]);
   }
 };
 
@@ -539,14 +518,14 @@ const commit_crop = (rect: MyRect) => {
       };
     }));
 
-    texts.value = texts.value.map(t => {
+    text_store.replace(texts.value.map(t => {
       return {
         x: t.x - rect.x,
         y: t.y - rect.y,
         text: t.text,
         id: gen_id()
       };
-    });
+    }));
 
     const image_cloned: ImageAndDimensions = {
       width: rect.width,
@@ -587,7 +566,7 @@ const erase_element = ({cat, id}: EraseTarget): void => {
   } else if (cat === 'line') {
     // lines.value = lines.value.filter(el => el.id !== id);
   } else if (cat === 'text') {
-    texts.value = texts.value.filter(el => el.id !== id);
+    // texts.value = texts.value.filter(el => el.id !== id);
   }
 };
 

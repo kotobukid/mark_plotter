@@ -20,6 +20,7 @@ import {useEllipseStore} from "../stores/ellipses.ts";
 import {useLineStore} from "../stores/lines.ts";
 import EllipseLayer from "./EllipseLayer.vue";
 import LineLayer from "./LineLayer.vue";
+import TextLayer from "./TextLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
@@ -257,21 +258,6 @@ const hide_cursor = (hide: boolean) => {
   show_cursor.value = !hide;
 };
 
-const re_edit_text = (label_text: LabelText) => {
-  const text: string = (prompt('\\nで改行', label_text.text) || '').trim();
-  if (text) {
-    const lt: LabelText = {
-      ...label_text,
-      text,
-    };
-    emits('add-text', lt);
-  }
-};
-
-const erase_text = (erase_target: EraseTarget) => {
-  emits('erase-element', erase_target);
-};
-
 const rect_clicked = (id: number) => {
   if (tool_store.current === 'erase') {
     emits('erase-element', {id, cat: 'rect'});
@@ -321,15 +307,7 @@ const ellipse_clicked = (id: number) => {
       circle-layer
       ellipse-layer
       line-layer
-      g.texts
-        BoxedText(
-          v-for="t in texts"
-          :key="t.id"
-          :label_text="t"
-          :tool="tool_store.current"
-          @re-edit-text="re_edit_text"
-          @erase-element="erase_text"
-        )
+      text-layer
 
       g.rect_plot_layer(
         v-if="tool_store.current === 'rect'"
