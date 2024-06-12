@@ -12,6 +12,7 @@ import {
 } from "../types.ts";
 import BoxedText from "./BoxedText.vue";
 import CropToolLayer from "./CropToolLayer.vue";
+import CircleLayer from "./CircleLayer.vue";
 import {useHistoryManager} from "../composables/history_management.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
@@ -30,7 +31,6 @@ const props = defineProps<{
     height: number,
     id: number
   },
-  circles: MyCircle[],
   texts: LabelText[],
   lines: MyLine[],
   ellipses: MyEllipse[],
@@ -272,12 +272,6 @@ const rect_clicked = (id: number) => {
   }
 };
 
-const circle_clicked = (id: number) => {
-  if (tool_store.current === 'erase') {
-    emits('erase-element', {id, cat: 'circle'});
-  }
-};
-
 const ellipse_clicked = (id: number) => {
   if (tool_store.current === 'erase') {
     emits('erase-element', {id, cat: 'ellipse'});
@@ -324,10 +318,7 @@ const line_clicked = (id: number) => {
         rect(v-for="r in rects" :key="r.id" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
           @click="rect_clicked(r.id)"
         )
-      g.circles
-        circle(v-for="c in circles" :key="c.id" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
-          @click="circle_clicked(c.id)"
-        )
+      circle-layer
       g.ellipses
         ellipse(v-for="e in ellipses" :key="e.id" :cx="e.cx" :cy="e.cy" :rx="e.rx" :ry="e.ry" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
           @click="ellipse_clicked(e.id)"
