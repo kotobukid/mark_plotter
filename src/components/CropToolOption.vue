@@ -1,13 +1,12 @@
 <script setup lang="ts">
 
 import {useCropStore} from "../stores/crop.ts";
+import {useToolStore} from "../stores/tool.ts";
 import type {MyRect, Tool} from "../types.ts";
 
 const crop_store = useCropStore();
+const tool_store = useToolStore();
 
-const props = defineProps<{
-  tool: Tool,
-}>();
 
 const emits = defineEmits<{
   (e: 'switch-tool', value: Tool): void,
@@ -21,12 +20,13 @@ const submit = () => {
 
 const reset = () => {
   crop_store.reset();
+  tool_store.set('');
 };
 
 </script>
 
 <template lang="pug">
-  .option(v-if="tool==='crop'")
+  .option(v-if="tool_store.current === 'crop'")
     button(@click="reset") 解除
     button(@click="submit") 切り抜き確定
 </template>

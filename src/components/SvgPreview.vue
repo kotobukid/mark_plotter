@@ -129,7 +129,7 @@ const global_layer_offset = computed(() => {
       line-edit-layer
       text-edit-layer
 
-      crop-tool-layer(v-if="tool_store.current === 'crop'" :tool="tool_store.current")
+      crop-tool-layer
     g.cursor_pos(:style="cursor_transform" v-if="show_cursor")
       line(x1="0" y1="30" x2="0" y2="15")
       line(x1="0" y1="-30" x2="0" y2="-15")

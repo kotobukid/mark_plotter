@@ -19,23 +19,9 @@ const {
   plotting,
   start_plot,
   cancel_plot,
-  move_end
+  move_end,
+  rect_preview
 } = usePlots(layer_offset);
-
-
-const rect_preview = computed(() => {
-  const s_gte_x: boolean = start.value.x - end.value.x > 0;
-  const s_gte_y: boolean = start.value.y - end.value.y > 0;
-
-  const width = (start.value.x - end.value.x) * (s_gte_x ? 1 : -1);
-  const height = (start.value.y - end.value.y) * (s_gte_y ? 1 : -1);
-  const x = s_gte_x ? end.value.x : start.value.x;
-  const y = s_gte_y ? end.value.y : start.value.y;
-
-  return {
-    x, y, width, height
-  };
-});
 
 const end_plot_rect = (e: PointerEvent) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
