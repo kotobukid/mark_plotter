@@ -20,6 +20,7 @@ import EllipseLayer from "./EllipseLayer.vue";
 import LineLayer from "./LineLayer.vue";
 import TextLayer from "./TextLayer.vue";
 import RectLayer from "./RectLayer.vue";
+import RectEditLayer from "./RectEditLayer.vue";
 
 const tool_store = useToolStore();
 const rect_store = useRectStore();
@@ -78,26 +79,6 @@ const cancel_plot = () => {
   show_preview.value = false;
   plotting.value = false;
   tool_store.set('')
-};
-
-const end_plot_rect = (e: PointerEvent) => {
-  end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_x};
-  tool_store.set('');
-  const s_gte_x: boolean = start.value.x - end.value.x > 0;
-  const s_gte_y: boolean = start.value.y - end.value.y > 0;
-
-  const width = (start.value.x - end.value.x) * (s_gte_x ? 1 : -1);
-  const height = (start.value.y - end.value.y) * (s_gte_y ? 1 : -1);
-  const x = s_gte_x ? end.value.x : start.value.x;
-  const y = s_gte_y ? end.value.y : start.value.y;
-
-  emits('take-snapshot', () => {
-    const r = {x, y, width, height, id: gen_id()};
-    rect_store.create(r);
-
-    show_preview.value = false;
-    plotting.value = false;
-  });
 };
 
 const end_plot_circle = (e: PointerEvent) => {
@@ -202,22 +183,7 @@ const shift_text_preview = (e: PointerEvent) => {
     x: e.offsetX - tr_x,
     y: e.offsetY - tr_y
   };
-  // show_preview.value = true;
 };
-
-const rect_preview = computed(() => {
-  const s_gte_x: boolean = start.value.x - end.value.x > 0;
-  const s_gte_y: boolean = start.value.y - end.value.y > 0;
-
-  const width = (start.value.x - end.value.x) * (s_gte_x ? 1 : -1);
-  const height = (start.value.y - end.value.y) * (s_gte_y ? 1 : -1);
-  const x = s_gte_x ? end.value.x : start.value.x;
-  const y = s_gte_y ? end.value.y : start.value.y;
-
-  return {
-    x, y, width, height
-  };
-});
 
 const ellipse_preview = computed(() => {
   const cx = (start.value.x + end.value.x) / 2;
@@ -287,18 +253,7 @@ const hide_cursor = (hide: boolean) => {
       line-layer
       text-layer
 
-      g.rect_plot_layer(
-        v-if="tool_store.current === 'rect'"
-      )
-        rect(fill="blue" opacity="0.1" x="0" y="0" width="1920" height="1080"
-          @pointerdown="start_plot"
-          @pointerup="end_plot_rect"
-          @pointerleave="cancel_plot"
-          @pointermove="move_end"
-        )
-        g(v-if="show_preview && plotting")
-          rect.preview(:x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
-          circle.preview(:cx="rect_preview.x + rect_preview.width / 2" :cy="rect_preview.y + rect_preview.height / 2" r="3" fill="black" stroke="white" stroke-width="1")
+      rect-edit-layer
 
       g.circle_plot_layer(
         v-if="tool_store.current === 'circle'"
