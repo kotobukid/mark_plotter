@@ -12,7 +12,9 @@ import {useCircleStore} from "./stores/circles.ts";
 import {useEllipseStore} from "./stores/ellipses.ts";
 import {useLineStore} from "./stores/lines.ts";
 import {useTextStore} from "./stores/texts.ts";
+import {useImageStore} from "./stores/images.ts";
 
+const image_store = useImageStore();
 const tool_store = useToolStore();
 const rect_store = useRectStore();
 const circle_store = useCircleStore();
@@ -41,13 +43,7 @@ import type {
 } from "./types.ts";
 import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
 
-const image = ref<ImageAndDimensions>({
-  dataUrl: '',
-  width: 0,
-  height: 0,
-  id: 0
-});
-
+const image = computed(() => image_store.image);
 const rects = computed(() => rect_store.rects);
 const circles = computed(() => circle_store.circles);
 const ellipses = computed(() => ellipse_store.ellipses);
@@ -130,7 +126,7 @@ const apply_last_snapshot = () => {
     text_store.replace(ss.texts);
 
     if (ss.image_index !== -1) {
-      image.value = image_map_manager.get(ss.image_index);
+      image_store.replace(image_map_manager.get(ss.image_index));
     }
   }
 };
@@ -179,7 +175,7 @@ const handle_file_change = (file: File) => {
     const readFileContent = (file) => {
       if (file.type === 'image/svg+xml') {
         parse_my_svg(file, (result) => {
-          image.value = result.image;
+          image_store.replace(result.image);
           rect_store.replace(result.rects);
           text_store.replace(result.texts);
           circle_store.replace(result.circles);
@@ -202,7 +198,7 @@ const handle_file_change = (file: File) => {
         }, gen_id);
       } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
         parse_binary_image(file, (result) => {
-          image.value = result.image;
+          image_store.replace(result.image);
           rect_store.replace([]);
           text_store.replace([]);
           circle_store.replace([]);
@@ -241,7 +237,7 @@ const capture_clipboard = async () => {
   try {
     const _data: ImageAndDimensions = await getDataUrlFromClipboard();
 
-    image.value = _data;
+    image_store.replace(_data);
 
     filename.value = `clipboard_${current_timestamp()}.svg`;
     document.title = filename.value;
