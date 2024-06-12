@@ -449,93 +449,6 @@ const wipe = () => {
   }
 };
 
-const trimImage = (dataUrl: string, {x, y, width, height}: MyRect, callback) => {
-  let img = new Image();
-  img.src = dataUrl;
-
-  img.onload = function () {
-    let canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    let ctx = canvas.getContext('2d');
-
-    // Draw the image onto the canvas, but only the desired section
-    ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
-
-    // Get the dataURL of the trimmed section
-    let trimmedDataUrl = canvas.toDataURL();
-
-    callback(trimmedDataUrl);
-  };
-}
-
-const commit_crop = (rect: MyRect) => {
-  trimImage(image.value.dataUrl, rect, (dataUrl: string) => {
-    image.value.dataUrl = dataUrl;
-    image.value.width = rect.width;
-    image.value.height = rect.height;
-
-    circle_store.replace(circle_store.circles.map(c => {
-      return {
-        cx: c.cx - rect.x,
-        cy: c.cy - rect.y,
-        r: c.r,
-        id: gen_id()
-      };
-    }));
-
-    ellipse_store.replace(ellipse_store.ellipses.map(e => {
-      return {
-        cx: e.cx - rect.x,
-        cy: e.cy - rect.y,
-        rx: e.rx,
-        ry: e.ry,
-        id: gen_id()
-      };
-    }));
-
-    rect_store.replace(rects.value.map(r => {
-      return {
-        x: r.x - rect.x,
-        y: r.y - rect.y,
-        width: r.width,
-        height: r.height,
-        id: gen_id()
-      };
-    }));
-
-    line_store.replace(lines.value.map(l => {
-      return {
-        x1: l.x1 - rect.x,
-        y1: l.y1 - rect.y,
-        x2: l.x2 - rect.x,
-        y2: l.y2 - rect.y,
-        id: gen_id()
-      };
-    }));
-
-    text_store.replace(texts.value.map(t => {
-      return {
-        x: t.x - rect.x,
-        y: t.y - rect.y,
-        text: t.text,
-        id: gen_id()
-      };
-    }));
-
-    const image_cloned: ImageAndDimensions = {
-      width: rect.width,
-      height: rect.height,
-      dataUrl,
-      id: gen_id()
-    };
-
-    let new_image_index: number = image_map_manager.push(image_cloned);
-    tool_store.set('');
-    commit_snapshot(take_snapshot(new_image_index));
-  });
-};
-
 const container_style = computed(() => {
   return `width: ${220 + (image.value.width || 0) + 20}px;`;
 });
@@ -592,10 +505,7 @@ const add_text = (t: LabelText) => {
 
 <template lang="pug">
   .tool_options#tool_option
-    crop-tool-option(
-      :tool="tool_store.current"
-      @commit-crop="commit_crop"
-    )
+    crop-tool-option
   .container(:style="container_style")
     ToolRibbon(style="margin-right: 16px; width: 200px; height: 600px; float: left;")
       a.button(href="#" @click.prevent="open_svg" draggable="false")
