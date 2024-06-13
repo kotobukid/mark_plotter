@@ -46,6 +46,7 @@ const {
 } = useFileSystem(gen_id);
 
 import type {Tool} from "./types.ts";
+import TextToolOption from "./components/TextToolOption.vue";
 
 const open_svg_handle = () => {
   open_file_dialog().then(() => {
@@ -107,6 +108,7 @@ const save_as_handler = () => {
 <template lang="pug">
   .tool_options#tool_option
     crop-tool-option
+    text-tool-option
   .container(:style="container_style")
     ToolRibbon(style="margin-right: 16px; width: 200px; height: 600px; float: left;")
       a.button(href="#" @click.prevent="open_svg_handle" draggable="false")
