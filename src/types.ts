@@ -59,3 +59,13 @@ export type Snapshot = {
     texts: LabelText[],
     image_index: number
 };
+
+export type ApplicationImage = {
+    image: ImageAndDimensions,
+    circles: MyCircle[],
+    rects: MyRect[],
+    ellipses: MyEllipse[],
+    lines: MyLine[],
+    texts: LabelText[],
+    filename: string
+};

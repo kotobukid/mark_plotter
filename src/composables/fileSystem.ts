@@ -1,6 +1,6 @@
 import {computed, ref, type Ref} from "vue";
 import {useSVG} from "./svg.ts";
-import type {ImageAndDimensions} from "../types.ts";
+import type {ApplicationImage, ImageAndDimensions} from "../types.ts";
 import {useCircleStore} from "../stores/circles.ts";
 import {useImageStore} from "../stores/images.ts";
 import {useRectStore} from "../stores/rects.ts";
@@ -49,9 +49,9 @@ export const useFileSystem = (gen_id: () => number) => {
 
     const handle_file_change = (file: File) => {
         if (file) {
-            const readFileContent = (file) => {
+            const readFileContent = (file: File) => {
                 if (file.type === 'image/svg+xml') {
-                    parse_my_svg(file, (result) => {
+                    parse_my_svg(file, (result: ApplicationImage) => {
                         image_store.replace(result.image);
                         rect_store.replace(result.rects);
                         text_store.replace(result.texts);
@@ -101,13 +101,13 @@ export const useFileSystem = (gen_id: () => number) => {
         }
     };
     const open_file_from_list = async (f: FileSystemFileHandle) => {
-        const file = await f.getFile();
+        const file: File = await f.getFile();
         target_file.value = f;
         handle_file_change(file);
     };
 
     const read_file = async (fileHandle: FileSystemFileHandle) => {
-        const file = await fileHandle.getFile();
+        const file: File = await fileHandle.getFile();
         target_file.value = fileHandle;
         filename.value = file.name;
 
@@ -139,7 +139,7 @@ export const useFileSystem = (gen_id: () => number) => {
     };
 
     const save_as = async (suggestedName: string) => {
-        const $svg_original = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
+        const $svg_original: HTMLElement = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
 
         const file_content: string = await generate_svg_text_to_save($svg_original);
 
@@ -161,7 +161,7 @@ export const useFileSystem = (gen_id: () => number) => {
 
     const overwrite_file = async () => {
         if (overwrite_available.value) {
-            const $svg_original = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
+            const $svg_original: HTMLElement = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
 
             writable_handle.value = await target_file.value.createWritable();
             const file_content: string = await generate_svg_text_to_save($svg_original);

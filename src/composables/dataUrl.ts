@@ -6,7 +6,7 @@ const useDataUrl = () => {
             if (!blob) {
                 reject();
             } else {
-                const reader = new FileReader();
+                const reader: FileReader = new FileReader();
                 reader.onloadend = () => resolve(reader.result as string);
                 reader.onerror = reject;
                 reader.readAsDataURL(blob);
@@ -16,7 +16,7 @@ const useDataUrl = () => {
 
     const getDataUrlDimensions = (dataUrl: string): Promise<{ width: number, height: number }> => {
         return new Promise((resolve, reject) => {
-            const img = new Image();
+            const img: HTMLImageElement = new Image();
             img.onload = () => {
                 resolve({width: img.width, height: img.height});
             };
@@ -27,7 +27,7 @@ const useDataUrl = () => {
 
     const getDataUrlAndDimensions = (dataUrl: string, gen_id?: () => number): Promise<ImageAndDimensions> => {
         return new Promise((resolve, reject) => {
-            const img = new Image();
+            const img: HTMLImageElement = new Image();
             img.onload = () => {
                 resolve({
                     dataUrl: dataUrl,

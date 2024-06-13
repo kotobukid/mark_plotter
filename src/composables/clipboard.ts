@@ -15,7 +15,7 @@ const {
 const getClipboardImage = async (): Promise<Blob> => {
     return new Promise<Blob>(async (resolve, reject) => {
         try {
-            const clipboardItems = await navigator.clipboard.read();
+            const clipboardItems:ClipboardItems = await navigator.clipboard.read();
             let found: boolean = false;
             for (const clipboardItem of clipboardItems) {
                 if (clipboardItem.types.includes('image/png')) {
@@ -33,7 +33,7 @@ const getClipboardImage = async (): Promise<Blob> => {
 };
 
 const current_timestamp = () => {
-    const now = new Date();
+    const now: Date = new Date();
 
     return `${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}`;
 };

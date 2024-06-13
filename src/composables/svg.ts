@@ -1,14 +1,14 @@
 import {nextTick} from "vue";
-import type {ImageAndDimensions, LabelText, MyCircle, MyEllipse, MyLine, MyRect} from "../types.ts";
+import type {ApplicationImage, ImageAndDimensions, LabelText, MyCircle, MyEllipse, MyLine, MyRect} from "../types.ts";
 
 export const useSVG = () => {
     const generate_svg_text_to_save = async ($svg_original: HTMLElement): Promise<string> => {
         return new Promise((resolve => {
-            const $svg = $svg_original.cloneNode(true) as HTMLElement;
+            const $svg: HTMLElement = $svg_original.cloneNode(true) as HTMLElement;
 
             const remove_data_attribute = ($elem: HTMLElement) => {
                 // 最初に、削除する属性を収集
-                const attributesToRemove = [];
+                const attributesToRemove: string[] = [];
                 for (const attr of $elem.attributes) {
                     if (attr.name.startsWith('data-')) {
                         attributesToRemove.push(attr.name);
@@ -57,7 +57,7 @@ ${text}`);
         const filename = filename_to_save || `download.svg`
         // tool_store.set('');
         nextTick(() => {
-            const $svg = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
+            const $svg: HTMLElement = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
 
             const remove_data_attribute = ($elem: HTMLElement) => {
                 // 最初に、削除する属性を収集
@@ -91,9 +91,9 @@ ${text}`);
             const text: string = $svg.outerHTML!;
 
             const download_text_as_file = (text: string) => {
-                const blob = new Blob([`<?xml version="1.0" encoding="utf-8" ?>
+                const blob: Blob = new Blob([`<?xml version="1.0" encoding="utf-8" ?>
 ${text}`], {type: 'image/svg+xml'});
-                const link = document.createElement('a');
+                const link: HTMLAnchorElement = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 link.target = '_blank';
                 link.download = filename;
@@ -107,10 +107,10 @@ ${text}`], {type: 'image/svg+xml'});
         }).then();
     };
 
-    const parse_my_svg = (file: File, next: Function, gen_id: () => number) => {
+    const parse_my_svg = (file: File, next: (data: ApplicationImage) => void, gen_id: () => number) => {
         const parseSvgContent = (content: string) => {  // readAsStringしているためstring
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(content, "image/svg+xml");
+            const parser: DOMParser = new DOMParser();
+            const doc: Document = parser.parseFromString(content, "image/svg+xml");
             const elements = doc.querySelectorAll('image.main_image');
 
             let is_my_svg: boolean = elements.length === 1;
@@ -238,7 +238,7 @@ ${text}`], {type: 'image/svg+xml'});
                 const g_lines = doc.querySelector('g.lines');
                 if (g_lines) {
                     const _lines = g_lines.querySelectorAll('line');
-                    lines = Array.from(_lines).map(line => {
+                    lines = Array.from(_lines).map((line: SVGLineElement) => {
                         return {
                             x1: Number(line.getAttribute('x1')),
                             y1: Number(line.getAttribute('y1')),
@@ -263,11 +263,11 @@ ${text}`], {type: 'image/svg+xml'});
             } else {
                 const do_convert = confirm("指定された画像ファイルはこのアプリで保存されたものではないようです。ビットマップとして解釈して編集を始めますか？");
                 if (do_convert) {
-                    const $img = new Image();
+                    const $img: HTMLImageElement = new Image();
 
                     $img.onload = function () {
-                        const canvas = document.createElement('canvas');
-                        const ctx = canvas.getContext('2d');
+                        const canvas: HTMLCanvasElement = document.createElement('canvas');
+                        const ctx: CanvasRenderingContext2D = canvas.getContext('2d');
 
                         canvas.width = $img.width;
                         canvas.height = $img.height;
@@ -296,17 +296,18 @@ ${text}`], {type: 'image/svg+xml'});
             }
         };
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
+        const reader: FileReader = new FileReader();
+        reader.onload = (event: ProgressEvent<FileReader>) => {
             const fileContent = event.target.result as string;
 
             parseSvgContent(fileContent);
         };
         reader.readAsText(file);
     };
-    const parse_binary_image = (file: File, next: Function, gen_id: () => number) => {
+
+    const parse_binary_image = (file: File, next: (data: Omit<ApplicationImage, "rects" | "circles" | "ellipses" | "texts" | "lines">) => void, gen_id: () => number) => {
         const parseImageContent = (dataUrl: string) => {
-            const $img = new Image();
+            const $img: HTMLImageElement = new Image();
             $img.onload = () => {
                 let image: ImageAndDimensions = {
                     dataUrl,
@@ -325,8 +326,8 @@ ${text}`], {type: 'image/svg+xml'});
             $img.src = dataUrl;
         };
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
+        const reader: FileReader = new FileReader();
+        reader.onload = (event: ProgressEvent<FileReader>) => {
             const fileContent = event.target.result as string;
 
             parseImageContent(fileContent);
