@@ -48,8 +48,11 @@ const {
 import type {Tool} from "./types.ts";
 
 const open_svg_handle = () => {
-  open_file_dialog();
-  wipe();
+  open_file_dialog().then(() => {
+    wipe();
+  }).catch(() => {
+    alert('FileSystemAPIに対応したブラウザを使用してください');
+  });
 };
 
 const overwrite_handle = () => {

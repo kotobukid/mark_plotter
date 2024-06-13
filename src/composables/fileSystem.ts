@@ -114,28 +114,31 @@ export const useFileSystem = (gen_id: () => number) => {
         handle_file_change(file);
     };
 
-    const open_file_dialog = async () => {
-        if (window.showOpenFilePicker) {
-            const options = {
-                types: [
-                    {
-                        description: 'Images',
-                        accept: {
-                            'image/*': ['.svg', '.png', '.jpg'],
+    const open_file_dialog = (): Promise<void> => {
+        return new Promise(async (resolve, reject) => {
+            if (window.showOpenFilePicker) {
+                const options = {
+                    types: [
+                        {
+                            description: 'Images',
+                            accept: {
+                                'image/*': ['.svg', '.png', '.jpg'],
+                            },
                         },
-                    },
-                ],
-                excludeAcceptAllOption: true,
-                multiple: true
-            };
+                    ],
+                    excludeAcceptAllOption: true,
+                    multiple: true
+                };
 
-            const fileSystemFileHandles: FileSystemFileHandle[] = await window.showOpenFilePicker!(options);
-            target_files.value = fileSystemFileHandles;
+                const fileSystemFileHandles: FileSystemFileHandle[] = await window.showOpenFilePicker!(options);
+                target_files.value = fileSystemFileHandles;
 
-            await read_file(fileSystemFileHandles[0]);
-        } else {
-            alert('FileSystemAPIに対応したブラウザを使用してください');
-        }
+                await read_file(fileSystemFileHandles[0]);
+                resolve();
+            } else {
+                reject();
+            }
+        });
     };
 
     const save_as = async (suggestedName: string) => {
