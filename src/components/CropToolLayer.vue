@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {Point2D} from "../types.ts";
-import {inject} from "vue";
+import {computed, inject} from "vue";
 import {useCropStore} from "../stores/crop.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {usePlots} from "../composables/plots.ts";
@@ -34,9 +34,19 @@ const end_crop = (e: PointerEvent) => {
   crop_store.set_start(start.value);
   crop_store.set_end(end.value);
 
+  start.value = {x: 0, y: 0};
+  end.value = {x: 0, y: 0};
+
   plotting.value = false;
 };
 
+const crop_preview = computed(() => {
+  if (plotting.value) {
+    return rect_preview.value;
+  } else {
+    return crop_store.rect_preview;
+  }
+});
 </script>
 
 <template>
@@ -44,10 +54,10 @@ const end_crop = (e: PointerEvent) => {
     <mask id="masking">
       <rect x="-10" y="-10" width="2000px" height="2000px" fill="white"></rect>
       <rect
-        :x="rect_preview.x"
-        :y="rect_preview.y"
-        :width="rect_preview.width"
-        :height="rect_preview.height"
+        :x="crop_preview.x"
+        :y="crop_preview.y"
+        :width="crop_preview.width"
+        :height="crop_preview.height"
         fill="black"
       ></rect>
     </mask>
@@ -72,7 +82,7 @@ const end_crop = (e: PointerEvent) => {
     ></rect>
     <rect class="preview"
           v-if="show_preview"
-          :x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height"
+          :x="crop_preview.x" :y="crop_preview.y" :width="crop_preview.width" :height="crop_preview.height"
           fill="transparent"
           stroke="lightgreen"
           stroke-width="1"

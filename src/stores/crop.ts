@@ -63,4 +63,21 @@ export const useCropStore = defineStore('crop', {
             };
         }
     },
+    getters: {
+        rect_preview() {
+            const start = this.start;
+            const end = this.end;
+            const s_gte_x: boolean = start.x - end.x > 0;
+            const s_gte_y: boolean = start.y - end.y > 0;
+
+            const width = (start.x - end.x) * (s_gte_x ? 1 : -1);
+            const height = (start.y - end.y) * (s_gte_y ? 1 : -1);
+            const x = s_gte_x ? end.x : start.x;
+            const y = s_gte_y ? end.y : start.y;
+
+            return {
+                x, y, width, height
+            };
+        }
+    },
 });

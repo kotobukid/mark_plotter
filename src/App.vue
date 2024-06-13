@@ -53,10 +53,10 @@ import type {
   LabelText, Tool,
 } from "./types.ts";
 import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
+import {useCropStore} from "./stores/crop.ts";
 
 const {
-  image,
-  image_map_manager
+  push_image
 } = useImage();
 
 const filename = ref('');
@@ -132,7 +132,7 @@ const handle_file_change = (file: File) => {
             id: gen_id()
           };
 
-          let new_image_index: number = image_map_manager.push(image_cloned);
+          let new_image_index: number = push_image(image_cloned);
           commit(new_image_index);
         }, gen_id);
       } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
@@ -154,7 +154,7 @@ const handle_file_change = (file: File) => {
             id: gen_id()
           };
 
-          let new_image_index: number = image_map_manager.push(image_cloned);
+          let new_image_index: number = push_image(image_cloned);
           commit(new_image_index);
         }, gen_id);
       }
@@ -319,7 +319,7 @@ const switch_tool = (_tool: Tool) => {
 };
 
 const container_style = computed(() => {
-  return `width: ${220 + (image.value.width || 0) + 20}px;`;
+  return image_store.container_style(220 + 20);
 });
 
 const open_file_from_list = async (f: FileSystemFileHandle) => {

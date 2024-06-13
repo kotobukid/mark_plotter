@@ -7,6 +7,7 @@ import {useLineStore} from "../stores/lines.ts";
 import {computed} from "vue";
 import {Snapshot} from "../types.ts";
 import {useImageStore} from "../stores/images.ts";
+import {useImage} from "./image.ts";
 
 export const useSnapshot = () => {
     const snapshot_store = useSnapshotStore();
@@ -16,6 +17,7 @@ export const useSnapshot = () => {
     const text_store = useTextStore();
     const line_store = useLineStore();
     const image_store = useImageStore();
+    const {get_image} = useImage();
 
     const commit = (image_index: number) => {
         snapshot_store.commit(image_index,
@@ -37,8 +39,12 @@ export const useSnapshot = () => {
             ellipse_store.replace(ss.ellipses);
             line_store.replace(ss.lines);
             text_store.replace(ss.texts);
+
             if (ss.image_index) {
-                // image_store.replace(ss)
+                const image_to_restore = get_image(ss.image_index);
+                if (image_to_restore) {
+                    image_store.replace(image_to_restore);
+                }
             }
         }
     };

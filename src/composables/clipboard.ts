@@ -42,7 +42,7 @@ const useClipBoard = (gen_id: () => number) => {
     const tool_store = useToolStore();
     const image_store = useImageStore();
     const {commit, wipe} = useSnapshot();
-    const {image_map_manager} = useImage();
+    const {push_image} = useImage();
 
     const capture_clipboard = (): Promise<string> => {
         return new Promise(async (resolve, reject) => {
@@ -61,7 +61,7 @@ const useClipBoard = (gen_id: () => number) => {
                     id: gen_id()
                 };
 
-                let new_image_index: number = image_map_manager.push(image_cloned);
+                let new_image_index: number = push_image(image_cloned);
                 commit(new_image_index);
                 resolve(filename);
             } catch {

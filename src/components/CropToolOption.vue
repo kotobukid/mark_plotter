@@ -8,6 +8,8 @@ import {useCircleStore} from "../stores/circles.ts";
 import {useEllipseStore} from "../stores/ellipses.ts";
 import {useLineStore} from "../stores/lines.ts";
 import {useTextStore} from "../stores/texts.ts";
+import {useImage} from "../composables/image.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 
 import type {ImageAndDimensions, MyRect} from "../types.ts";
 import {inject} from "vue";
@@ -22,6 +24,9 @@ const text_store = useTextStore();
 const tool_store = useToolStore();
 const gen_id = inject('gen-id') as () => number;
 
+const {commit} = useSnapshot();
+const {push_image, get_current_image_index} = useImage();
+
 const submit = () => {
   const crop_rect: MyRect = crop_store.commit();
   commit_crop(crop_rect);
@@ -33,11 +38,9 @@ const reset = () => {
 };
 
 const commit_crop = (rect: MyRect) => {
-  trimImage(image_store.image.dataUrl, rect, (dataUrl: string) => {
-    // image.value.dataUrl = dataUrl;
-    // image.value.width = rect.width;
-    // image.value.height = rect.height;
+  commit(get_current_image_index());
 
+  trimImage(image_store.image.dataUrl, rect, (dataUrl: string) => {
     circle_store.replace(circle_store.circles.map(c => {
       return {
         cx: c.cx - rect.x,
@@ -93,11 +96,11 @@ const commit_crop = (rect: MyRect) => {
       id: gen_id()
     };
 
+    let new_image_index: number = push_image(image_cloned);
+
     image_store.replace(image_cloned);
 
-    // let new_image_index: number = image_map_manager.push(image_cloned);
     tool_store.set('');
-    // commit_snapshot(take_snapshot(new_image_index));
   });
 };
 
