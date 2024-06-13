@@ -28,6 +28,8 @@ const end_plot_text = (e: PointerEvent) => {
   show_preview.value = false;
 
   // show_cursor.value = false;
+  store.set_edit_target(-1);
+  store.set_buffer('');
   store.show_tool_option();
 
   store.set_locate_to_create({

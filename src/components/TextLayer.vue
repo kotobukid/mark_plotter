@@ -15,15 +15,10 @@ const gen_id = inject('gen-id') as () => number;
 const texts = computed(() => store.texts);
 
 const re_edit_text = (label_text: LabelText) => {
-  const text: string = (prompt('\\nで改行', label_text.text) || '').trim();
-  if (text) {
-    const lt: LabelText = {
-      ...label_text,
-      text,
-    };
-    // emits('add-text', lt);
-    add_text(lt);
-  }
+  store.set_edit_target(label_text.id);
+  store.set_buffer(label_text.text.replace(/\\n/g, '\n'));
+
+  store.show_tool_option();
 };
 
 const add_text = (t: LabelText) => {

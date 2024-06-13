@@ -12,7 +12,7 @@ const {commit} = useSnapshot();
 
 const vAutoFocus = {
   mounted(el: HTMLElement) {
-    text.value = '';
+    text.value = store.buffer + '';
     el.focus();
   }
 };
@@ -33,14 +33,23 @@ const submit_text = () => {
 
     const pos: Point2D = store.locate_to_create;
 
-    store.create({
-      ...pos,
-      text: _text.replace(/\n/g, '\\n'),
-      id: gen_id()
-    });
+    if (store.edit_target > 0) {
+      store.update_text(_text.replace(/\n/g, '\\n'));
+    } else {
+      store.create({
+        ...pos,
+        text: _text.replace(/\n/g, '\\n'),
+        id: gen_id()
+      });
+    }
+
     store.hide_tool_option();
     text.value = '';
   }
+};
+
+const cancel_edit = () => {
+  store.hide_tool_option();
 };
 </script>
 
@@ -49,6 +58,7 @@ const submit_text = () => {
     .block
       textarea(v-auto-focus :value="text" @change="text_changed")
       button.submit(@click="submit_text") OK
+      button.cancel(@click="cancel_edit") Cancel
 </template>
 
 <style scoped lang="less">
@@ -65,6 +75,13 @@ textarea {
 
 button.submit {
   width: 40px;
+  height: 37px;
+  padding: 2px;
+  margin: 1px;
+}
+
+button.cancel {
+  width: 80px;
   height: 37px;
   padding: 2px;
   margin: 1px;
