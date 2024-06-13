@@ -150,7 +150,7 @@ const save_as_handler = () => {
       a.button(href="#" @click.prevent="save_as_handler" draggable="false")
         img.tool_icon(src="/save.svg" draggable="false")
         span SVGを新規保存
-      a.button.sub(href="#" @click.prevent="overwrite_file_handle" draggable="false" :class="overwrite_available ? '' : 'disabled'")
+      a.button.sub(href="#" @click.prevent="overwrite_handle" draggable="false" :class="overwrite_available ? '' : 'disabled'")
         img.tool_icon(src="/save_overwrite.svg" draggable="false")
         span 上書き保存
     SvgPreview(
