@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, provide} from "vue";
+import {computed, nextTick, provide} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
@@ -57,7 +57,10 @@ const open_svg_handle = () => {
 };
 
 const overwrite_handle = () => {
-  overwrite_file();
+  tool_store.set('');
+  nextTick(() => {
+    overwrite_file();
+  });
 };
 
 const close_file = async () => {
