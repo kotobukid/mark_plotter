@@ -3,10 +3,12 @@ import {inject} from "vue";
 import {useToolStore} from "../stores/tool.ts";
 import {useLineStore} from "../stores/lines.ts";
 import {usePlots} from "../composables/plots.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 import type {Point2D} from "../types.ts";
 
 const store = useLineStore();
 const gen_id = inject('gen-id') as () => number;
+const {commit} = useSnapshot();
 const tool_store = useToolStore();
 
 const layer_offset: Point2D = inject('layer-offset');
@@ -24,6 +26,8 @@ const {
 const end_plot_line = (e: PointerEvent) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
   tool_store.set('');
+
+  commit(-1);
 
   store.create({
     x1: start.value.x,

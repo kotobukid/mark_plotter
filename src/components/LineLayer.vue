@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import {useLineStore} from "../stores/lines.ts";
 import {useToolStore} from "../stores/tool.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 import {computed} from "vue";
 
 const store = useLineStore();
 const tool_store = useToolStore();
+const {commit} = useSnapshot();
 
 const lines = computed(() => store.lines);
 
 const line_clicked = (id: number) => {
   if (tool_store.current === 'erase') {
+    commit(-1);
     store.erase(id);
   }
 };

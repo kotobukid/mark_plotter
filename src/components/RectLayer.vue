@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import {useRectStore} from "../stores/rects.ts";
 import {useToolStore} from "../stores/tool.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 import {computed} from "vue";
 
 const store = useRectStore();
 const tool_store = useToolStore();
+const {commit} = useSnapshot();
 
 const rects = computed(() => store.rects);
 
 const rect_clicked = (id: number) => {
   if (tool_store.current === 'erase') {
+    commit(-1);
     store.erase(id);
   }
 };

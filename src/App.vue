@@ -13,22 +13,21 @@ import {useEllipseStore} from "./stores/ellipses.ts";
 import {useLineStore} from "./stores/lines.ts";
 import {useTextStore} from "./stores/texts.ts";
 import {useImageStore} from "./stores/images.ts";
+import {useSnapshot} from "./composables/snapshot.ts";
 
 const image_store = useImageStore();
-const tool_store = useToolStore();
 const rect_store = useRectStore();
 const circle_store = useCircleStore();
 const ellipse_store = useEllipseStore();
 const line_store = useLineStore();
 const text_store = useTextStore();
 
+const tool_store = useToolStore();
+const {commit, undo_available, pop_last, wipe} = useSnapshot();
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
 const {
-  commit_snapshot,
   wipe_snapshots,
-  undo_enabled,
-  pop_last_snapshot
 } = useHistoryManager();
 
 const _gen_id = (() => {
@@ -51,7 +50,7 @@ import type {
   MyLine,
   MyEllipse,
   Snapshot,
-  LabelText, EraseTarget, Tool,
+  LabelText, Tool,
 } from "./types.ts";
 import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
 
@@ -110,43 +109,10 @@ const image_map_manager = (() => {
 const filename = ref('');
 const original_filename = ref('');
 
-const take_snapshot_by_child = (callback: Function) => {
-  commit_snapshot(take_snapshot(-1));
-  callback();
-};
-
-const take_snapshot = (image_changed: number | -1) => {
-  const ss: Snapshot = {
-    circles: [...circles.value],
-    rects: [...rects.value],
-    ellipses: [...ellipses.value],
-    lines: [...lines.value],
-    texts: [...texts.value],
-    image_index: image_changed
-  };
-  return ss;
-};
-
-const apply_last_snapshot = () => {
-  const ss = pop_last_snapshot();
-
-  if (ss) {
-    rect_store.replace(ss.rects);
-    line_store.replace(ss.lines);
-    circle_store.replace(ss.circles);
-    ellipse_store.replace(ss.ellipses);
-    text_store.replace(ss.texts);
-
-    if (ss.image_index !== -1) {
-      image_store.replace(image_map_manager.get(ss.image_index));
-    }
-  }
-};
-
 
 const open_svg = () => {
   open_file_dialog();
-  wipe_snapshots();
+  wipe();
 };
 
 const target_file: Ref<FileSystemFileHandle> = ref(null);
@@ -206,7 +172,7 @@ const handle_file_change = (file: File) => {
           };
 
           let new_image_index: number = image_map_manager.push(image_cloned);
-          commit_snapshot(take_snapshot(new_image_index));
+          commit(new_image_index);
         }, gen_id);
       } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
         parse_binary_image(file, (result) => {
@@ -229,7 +195,7 @@ const handle_file_change = (file: File) => {
           };
 
           let new_image_index: number = image_map_manager.push(image_cloned);
-          commit_snapshot(take_snapshot(new_image_index));
+          commit(new_image_index);
         }, gen_id);
       }
     };
@@ -254,7 +220,7 @@ const capture_clipboard = async () => {
     filename.value = `clipboard_${current_timestamp()}.svg`;
     document.title = filename.value;
     target_file.value = null;
-    wipe_snapshots();
+    wipe();
 
     const image_cloned: ImageAndDimensions = {
       ..._data,
@@ -262,7 +228,7 @@ const capture_clipboard = async () => {
     };
 
     let new_image_index: number = image_map_manager.push(image_cloned);
-    commit_snapshot(take_snapshot(new_image_index));
+    commit(new_image_index);
   } catch {
     alert('PrintScreenができていません');
   }
@@ -425,18 +391,6 @@ const switch_tool = (_tool: Tool) => {
   tool_store.set(_tool);
 };
 
-const wipe = () => {
-  const do_wipe = confirm("画像以外の全要素を削除しますか？");
-  if (do_wipe) {
-    commit_snapshot(take_snapshot(-1));
-    rect_store.replace([]);
-    circle_store.replace([]);
-    line_store.replace([]);
-    ellipse_store.replace([]);
-    text_store.replace([]);
-  }
-};
-
 const container_style = computed(() => {
   return `width: ${220 + (image.value.width || 0) + 20}px;`;
 });
@@ -451,22 +405,16 @@ const clear_files = (): void => {
   target_files.value = [];
 };
 
-const erase_element = ({cat, id}: EraseTarget): void => {
-  commit_snapshot(take_snapshot(-1));
-
-  if (cat === 'rect') {
-    // rect_store.remove_rect_by_id(id);
-  } else if (cat === 'circle') {
-    // circles.value = circles.value.filter(el => el.id !== id);
-  } else if (cat === 'ellipse') {
-    // ellipse_store.erase(id);
-  } else if (cat === 'line') {
-    // lines.value = lines.value.filter(el => el.id !== id);
-  } else if (cat === 'text') {
-    // texts.value = texts.value.filter(el => el.id !== id);
-  }
+const apply_last_snapshot = () => {
+  pop_last();
 };
 
+const wipe_handle = () => {
+  const do_wipe = confirm("画像以外の全要素を削除しますか？");
+  if (do_wipe) {
+    wipe();
+  }
+};
 </script>
 
 <template lang="pug">
@@ -480,13 +428,13 @@ const erase_element = ({cat, id}: EraseTarget): void => {
       a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
         img.tool_icon(src="/paste.svg" draggable="false")
         span 新規貼り付け
-      a.button(href="#" @click.prevent="wipe" draggable="false")
+      a.button(href="#" @click.prevent="wipe_handle" draggable="false")
         img.tool_icon(src="/wipe_all.svg" draggable="false")
         span 全消去
       a.button.sub(href="#" @click.prevent="switch_tool('erase')" :data-active="tool_store.current === 'erase'" draggable="false")
         img.tool_icon(src="/erase.svg" draggable="false")
         span 選択削除
-      a.button(href="#" @click.prevent="apply_last_snapshot" draggable="false" :class="undo_enabled ? '' : 'disabled'")
+      a.button(href="#" @click.prevent="apply_last_snapshot" draggable="false" :class="undo_available ? '' : 'disabled'")
         img.tool_icon(src="/undo.svg" draggable="false")
         span 元に戻す
       a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool_store.current === 'crop'" draggable="false")
@@ -518,8 +466,6 @@ const erase_element = ({cat, id}: EraseTarget): void => {
         span 上書き保存
     SvgPreview(
       style="float: left;"
-      @take-snapshot="take_snapshot_by_child"
-      @erase-element="erase_element"
     )
   file-list(
     v-if="target_files.length > 0"

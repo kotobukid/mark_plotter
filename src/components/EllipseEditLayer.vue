@@ -2,11 +2,13 @@
 import {useToolStore} from "../stores/tool.ts";
 import {useEllipseStore} from "../stores/ellipses.ts";
 import {usePlots} from "../composables/plots.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 import {computed, inject} from "vue";
 import type {Point2D} from "../types.ts";
 
 const store = useEllipseStore();
 const gen_id = inject('gen-id') as () => number;
+const {commit} = useSnapshot();
 
 const tool_store = useToolStore();
 
@@ -31,6 +33,8 @@ const end_plot_ellipse = (e: PointerEvent) => {
   const cy = (start.value.y + end.value.y) / 2;
   const rx = Math.abs(start.value.x - end.value.x) / 2;
   const ry = Math.abs(start.value.y - end.value.y) / 2;
+
+  commit(-1);
 
   store.create({
     cx,

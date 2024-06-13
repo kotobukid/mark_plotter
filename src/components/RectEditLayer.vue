@@ -2,11 +2,13 @@
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
 import {usePlots} from "../composables/plots.ts";
-import {computed, inject, nextTick, ref} from "vue";
+import {useSnapshot} from "../composables/snapshot.ts";
+import {inject} from "vue";
 import type {Point2D} from "../types.ts";
 
 const rect_store = useRectStore();
 const gen_id = inject('gen-id') as () => number;
+const {commit} = useSnapshot();
 
 const tool_store = useToolStore();
 
@@ -34,13 +36,13 @@ const end_plot_rect = (e: PointerEvent) => {
   const x = s_gte_x ? end.value.x : start.value.x;
   const y = s_gte_y ? end.value.y : start.value.y;
 
-  // emits('take-snapshot', () => {
+  commit(-1);
+
   const r = {x, y, width, height, id: gen_id()};
   rect_store.create(r);
 
   show_preview.value = false;
   plotting.value = false;
-  // });
 };
 
 const cancel_plot_handler = () => {

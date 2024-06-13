@@ -2,11 +2,13 @@
 import {useToolStore} from "../stores/tool.ts";
 import {useTextStore} from "../stores/texts.ts";
 import {usePlots} from "../composables/plots.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 import type {Point2D} from "../types.ts";
 import {inject} from "vue";
 
 const store = useTextStore();
 const gen_id = inject('gen-id') as () => number;
+const {commit} = useSnapshot();
 
 const tool_store = useToolStore();
 
@@ -31,6 +33,9 @@ const end_plot_text = (e: PointerEvent) => {
     const text: string = (prompt('\\nで改行', '') || '').trim();
     if (text) {
       tool_store.set('');
+
+      commit(-1);
+
       store.create({
         text,
         x: e.offsetX - layer_offset.x,

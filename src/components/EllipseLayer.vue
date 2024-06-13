@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import {useEllipseStore} from "../stores/ellipses.ts";
 import {useToolStore} from "../stores/tool.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 import {computed} from "vue";
 
 const store = useEllipseStore();
 const tool_store = useToolStore();
+const {commit} = useSnapshot();
 
 const ellipses = computed(() => store.ellipses);
 
 const ellipse_clicked = (id: number) => {
   if (tool_store.current === 'erase') {
+    commit(-1);
     store.erase(id);
   }
 };

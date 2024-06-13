@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import {useCircleStore} from "../stores/circles.ts";
 import {useToolStore} from "../stores/tool.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 import {computed} from "vue";
 
-const tool_store = useToolStore();
 const store = useCircleStore();
+const tool_store = useToolStore();
+const {commit} = useSnapshot();
 
 const circles = computed(() => {
   return store.circles
@@ -16,11 +18,9 @@ const tool = computed(() => {
 
 const circle_clicked = (id: number) => {
   if (tool.value === 'erase') {
+    commit(-1);
     store.erase(id);
   }
-  // if (tool_store.current === 'erase') {
-  //   emits('erase-element', {id, cat: 'circle'});
-  // }
 };
 </script>
 

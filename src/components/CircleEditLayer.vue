@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useCircleStore} from "../stores/circles.ts";
 import {useToolStore} from "../stores/tool.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 import {usePlots} from "../composables/plots.ts";
 import {useHistoryManager} from "../composables/history_management.ts";
 import type {Point2D} from "../types.ts";
@@ -9,6 +10,7 @@ import {inject, ref} from "vue";
 const store = useCircleStore();
 const tool_store = useToolStore();
 const gen_id = inject('gen-id') as () => number;
+const {commit} = useSnapshot();
 
 const layer_offset: Point2D = inject('layer-offset');
 
@@ -25,6 +27,8 @@ const {
 const end_plot_circle = (e: PointerEvent) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
   tool_store.set('');
+
+  commit(-1);
 
   store.create({
     cx: circle_center.value.x,

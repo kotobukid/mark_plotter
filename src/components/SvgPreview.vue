@@ -6,8 +6,7 @@ import {
   type Point2D,
   type MyLine,
   type MyEllipse,
-  type LabelText,
-  type EraseTarget
+  type LabelText
 } from "../types.ts";
 import BoxedText from "./BoxedText.vue";
 import CropToolLayer from "./CropToolLayer.vue";
@@ -38,7 +37,6 @@ provide('layer-offset', layer_offset);
 const emits = defineEmits<{
   (e: 'take-snapshot', value: Function): void,
   (e: 'commit-crop', value: MyRect): void,
-  (e: 'erase-element', value: EraseTarget): void,
 }>();
 
 const viewBox = computed(() => {

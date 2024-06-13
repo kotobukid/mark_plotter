@@ -3,10 +3,12 @@ import {useTextStore} from "../stores/texts.ts";
 import {useToolStore} from "../stores/tool.ts";
 import BoxedText from "./BoxedText.vue";
 import {computed, inject} from "vue";
-import type {EraseTarget, LabelText} from "../types.ts";
+import type {LabelText} from "../types.ts";
+import {useSnapshot} from "../composables/snapshot.ts";
 
 const store = useTextStore();
 const tool_store = useToolStore();
+const {commit} = useSnapshot();
 const gen_id = inject('gen-id') as () => number;
 
 
@@ -25,7 +27,6 @@ const re_edit_text = (label_text: LabelText) => {
 };
 
 const add_text = (t: LabelText) => {
-  // commit_snapshot(take_snapshot(-1));
   if (t.id !== -1) {
     // edit
     const _texts = texts.value.concat([]);
@@ -35,6 +36,7 @@ const add_text = (t: LabelText) => {
         break;
       }
     }
+    commit(-1);
     store.replace(_texts);
   } else {
     // new
@@ -42,14 +44,16 @@ const add_text = (t: LabelText) => {
       .text.replace(/\</, '＜')
       .replace(/\>/, '＞')
     t.id = gen_id();
+    commit(-1);
     store.create(t);
   }
 };
 
-
-const erase_text = (erase_target: EraseTarget) => {
-  store.erase(erase_target.id);
+const erase_text = (id: number) => {
+  commit(-1);
+  store.erase(id);
 };
+
 </script>
 
 <template lang="pug">
@@ -60,7 +64,7 @@ const erase_text = (erase_target: EraseTarget) => {
       :label_text="t"
       :tool="tool_store.current"
       @re-edit-text="re_edit_text"
-      @erase-element="erase_text"
+      @erase="erase_text"
     )
 </template>
 
