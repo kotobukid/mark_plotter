@@ -3,7 +3,6 @@ import {useCircleStore} from "../stores/circles.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {useSnapshot} from "../composables/snapshot.ts";
 import {usePlots} from "../composables/plots.ts";
-import {useHistoryManager} from "../composables/history_management.ts";
 import type {Point2D} from "../types.ts";
 import {inject, ref} from "vue";
 

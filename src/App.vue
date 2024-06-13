@@ -5,7 +5,6 @@ import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
 import CropToolOption from "./components/CropToolOption.vue";
 import {useClipBoardParser} from "./composables/clipboard.ts";
-import {useHistoryManager} from "./composables/history_management.ts";
 import {useToolStore} from "./stores/tool.ts";
 import {useRectStore} from "./stores/rects.ts";
 import {useCircleStore} from "./stores/circles.ts";
@@ -26,9 +25,6 @@ const tool_store = useToolStore();
 const {commit, undo_available, pop_last, wipe} = useSnapshot();
 
 const {getDataUrlFromClipboard} = useClipBoardParser();
-const {
-  wipe_snapshots,
-} = useHistoryManager();
 
 const _gen_id = (() => {
   let id: number = 0;

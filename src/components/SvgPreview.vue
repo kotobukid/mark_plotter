@@ -11,7 +11,6 @@ import {
 import BoxedText from "./BoxedText.vue";
 import CropToolLayer from "./CropToolLayer.vue";
 import CircleLayer from "./CircleLayer.vue";
-import {useHistoryManager} from "../composables/history_management.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
 import {useImageStore} from "../stores/images.ts";
@@ -35,7 +34,6 @@ const layer_offset: Point2D = {
 provide('layer-offset', layer_offset);
 
 const emits = defineEmits<{
-  (e: 'take-snapshot', value: Function): void,
   (e: 'commit-crop', value: MyRect): void,
 }>();
 
