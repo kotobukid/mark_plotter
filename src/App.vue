@@ -56,7 +56,6 @@ import type {
   Snapshot,
   LabelText, Tool,
 } from "./types.ts";
-import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
 
 const {
   push_image

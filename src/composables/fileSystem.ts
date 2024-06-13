@@ -1,6 +1,5 @@
 import {computed, ref, type Ref} from "vue";
 import {useSVG} from "./svg.ts";
-import {parse_binary_image, parse_my_svg} from "../file_processing.ts";
 import type {ImageAndDimensions} from "../types.ts";
 import {useCircleStore} from "../stores/circles.ts";
 import {useImageStore} from "../stores/images.ts";
@@ -18,7 +17,11 @@ interface Window {
 
 declare var window: Window;
 
-const {generate_svg_text_to_save} = useSVG();
+const {
+    parse_my_svg,
+    parse_binary_image,
+    generate_svg_text_to_save
+} = useSVG();
 
 export const useFileSystem = (gen_id: () => number) => {
     const image_store = useImageStore();
