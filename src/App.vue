@@ -4,7 +4,7 @@ import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
 import CropToolOption from "./components/CropToolOption.vue";
-import {useClipBoardParser} from "./composables/clipboard.ts";
+import {useClipBoard} from "./composables/clipboard.ts";
 import {useToolStore} from "./stores/tool.ts";
 import {useRectStore} from "./stores/rects.ts";
 import {useCircleStore} from "./stores/circles.ts";
@@ -13,6 +13,7 @@ import {useLineStore} from "./stores/lines.ts";
 import {useTextStore} from "./stores/texts.ts";
 import {useImageStore} from "./stores/images.ts";
 import {useSnapshot} from "./composables/snapshot.ts";
+import {useImage} from "./composables/image.ts";
 
 const image_store = useImageStore();
 const rect_store = useRectStore();
@@ -24,7 +25,6 @@ const text_store = useTextStore();
 const tool_store = useToolStore();
 const {commit, undo_available, pop_last, wipe} = useSnapshot();
 
-const {getDataUrlFromClipboard} = useClipBoardParser();
 
 const _gen_id = (() => {
   let id: number = 0;
@@ -39,6 +39,10 @@ const gen_id = _gen_id();
 
 provide('gen-id', gen_id);
 
+const {
+  capture_clipboard,
+} = useClipBoard(gen_id);
+
 import type {
   ImageAndDimensions,
   MyCircle,
@@ -50,61 +54,13 @@ import type {
 } from "./types.ts";
 import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
 
-const image = computed(() => image_store.image);
-const rects = computed(() => rect_store.rects);
-const circles = computed(() => circle_store.circles);
-const ellipses = computed(() => ellipse_store.ellipses);
-const lines = computed(() => line_store.lines);
-const texts = computed(() => text_store.texts);
-
-const image_map_manager = (() => {
-  const image_map = new Map<number, ImageAndDimensions>();
-  let index: number = 0;
-
-  const push = (image: ImageAndDimensions): number => {
-    index = index + 1;
-    image_map.set(index, image);
-    return index;
-  };
-
-  const get = (_index: number): ImageAndDimensions | null => {
-    if (image_map.has(_index)) {
-      return image_map.get(_index);
-    } else {
-      return null;
-    }
-  };
-
-  const wipe = (): void => {
-    image_map.clear();
-    index = 0;
-  };
-
-  const dump = () => {
-    console.log('dump start');
-    for (let key of image_map.keys()) {
-      const im = image_map.get(key);
-      console.log(key)
-      console.log({
-        width: im.width,
-        height: im.height
-      });
-    }
-    console.log('dump end');
-  }
-
-  return {
-    image_map,
-    get,
-    push,
-    wipe,
-    dump
-  };
-})();
+const {
+  image,
+  image_map_manager
+} = useImage();
 
 const filename = ref('');
 const original_filename = ref('');
-
 
 const open_svg = () => {
   open_file_dialog();
@@ -200,35 +156,7 @@ const handle_file_change = (file: File) => {
   }
 };
 
-const current_timestamp = () => {
-  const now = new Date();
 
-  return `${now.getFullYear()}${now.getMonth()}${now.getDate()}${now.getHours()}${now.getMinutes()}${now.getSeconds()}`;
-};
-
-const capture_clipboard = async () => {
-  tool_store.set('');
-  try {
-    const _data: ImageAndDimensions = await getDataUrlFromClipboard();
-
-    image_store.replace(_data);
-
-    filename.value = `clipboard_${current_timestamp()}.svg`;
-    document.title = filename.value;
-    target_file.value = null;
-    wipe();
-
-    const image_cloned: ImageAndDimensions = {
-      ..._data,
-      id: gen_id()
-    };
-
-    let new_image_index: number = image_map_manager.push(image_cloned);
-    commit(new_image_index);
-  } catch {
-    alert('PrintScreenができていません');
-  }
-};
 
 const can_overwrite = computed(() => {
   if (target_file.value && target_file.value.name) {
@@ -251,7 +179,6 @@ const overwrite_file = async () => {
 
 const close_file = async () => {
   target_file.value = null;
-  // text_content.value = '';
   filename.value = '';
 };
 
@@ -292,7 +219,6 @@ const generate_svg_text_to_save = async ($svg_original: HTMLElement): Promise<st
 
       // 収集した属性を削除
       attributesToRemove.forEach(attr => {
-        console.log(attr);
         $elem.removeAttribute(attr);
       });
     };
@@ -411,6 +337,15 @@ const wipe_handle = () => {
     wipe();
   }
 };
+
+const capture_clipboard_handle = async () => {
+  capture_clipboard().then((_filename: string) => {
+    document.title = _filename;
+    target_file.value = null;
+  }).catch(() => {
+    alert('PrintScreenができていません');
+  });
+}
 </script>
 
 <template lang="pug">
@@ -421,7 +356,7 @@ const wipe_handle = () => {
       a.button(href="#" @click.prevent="open_svg" draggable="false")
         img.tool_icon(src="/open.svg" draggable="false")
         span 画像を開く
-      a.button(href="#" @click.prevent="capture_clipboard" draggable="false")
+      a.button(href="#" @click.prevent="capture_clipboard_handle" draggable="false")
         img.tool_icon(src="/paste.svg" draggable="false")
         span 新規貼り付け
       a.button(href="#" @click.prevent="wipe_handle" draggable="false")
