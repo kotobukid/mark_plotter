@@ -24,13 +24,11 @@ const set_option = (option: 'draw_full' | 'draw_half') => {
 <style scoped lang="less">
 .tool_options {
   img.tool_option {
-
     margin-right: 5px;
 
     &:last-child {
       margin-right: 0;
     }
-  ;
 
     cursor: pointer;
     width: 40px;
