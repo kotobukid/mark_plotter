@@ -49,6 +49,22 @@ export const useSnapshot = () => {
         }
     };
 
+    const wipe_available = computed(() => {
+        if (circle_store.circles.length > 0) {
+            return true;
+        } else if (rect_store.rects.length > 0) {
+            return true;
+        } else if (ellipse_store.ellipses.length > 0) {
+            return true;
+        } else if (line_store.lines.length > 0) {
+            return true;
+        } else if (text_store.texts.length > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    });
+
     const wipe = () => {
         snapshot_store.wipe();
 
@@ -70,6 +86,7 @@ export const useSnapshot = () => {
         commit,
         wipe,
         pop_last,
-        undo_available
+        undo_available,
+        wipe_available
     };
 };

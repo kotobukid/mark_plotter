@@ -13,7 +13,7 @@ import {useFileSystem} from "./composables/fileSystem.ts";
 const image_store = useImageStore();
 
 const tool_store = useToolStore();
-const {commit, undo_available, pop_last, wipe} = useSnapshot();
+const {commit, undo_available, pop_last, wipe, wipe_available} = useSnapshot();
 
 
 const _gen_id = (() => {
@@ -78,9 +78,11 @@ const apply_last_snapshot = () => {
 };
 
 const wipe_handle = () => {
-  const do_wipe = confirm("画像以外の全要素を削除しますか？");
-  if (do_wipe) {
-    wipe();
+  if (wipe_available.value) {
+    const do_wipe = confirm("画像以外の全要素を削除しますか？");
+    if (do_wipe) {
+      wipe();
+    }
   }
 };
 
@@ -110,7 +112,7 @@ const save_as_handler = () => {
       a.button(href="#" @click.prevent="capture_clipboard_handle" draggable="false")
         img.tool_icon(src="/paste.svg" draggable="false")
         span 新規貼り付け
-      a.button(href="#" @click.prevent="wipe_handle" draggable="false")
+      a.button(href="#" @click.prevent="wipe_handle" draggable="false" :class="wipe_available ? '' : 'disabled'")
         img.tool_icon(src="/wipe_all.svg" draggable="false")
         span 全消去
       a.button.sub(href="#" @click.prevent="switch_tool('erase')" :data-active="tool_store.current === 'erase'" draggable="false")
