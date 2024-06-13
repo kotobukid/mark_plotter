@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 64 64 " xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <defs/>
+  <rect x="4.784" y="4.784" width="54.432" height="54.432" style="stroke: rgb(255, 126, 126); fill: rgb(255, 93, 93);"/>
+  <circle style="stroke: rgb(255, 126, 126); fill: rgb(255, 255, 255);" cx="32" cy="32" r="27.216"/>
+  <path d="M 13.415 -1.821 H 58.099 L 50.823 -9.652 L 76.939 4.785 L 50.823 19.221 L 58.099 11.39 H 13.415 V -1.821 Z" style="fill: rgb(255, 0, 0);" transform="matrix(0.707107, 0.707107, -0.707107, 0.707107, 4.687061, -1.884503)" bx:shape="arrow 13.415 -9.652 63.524 28.873 13.211 26.116 7.276 1@6576ad8e"/>
+  <circle style="" cx="10.604" cy="10.664" r="2.816"/>
+  <circle style="" cx="55.235" cy="55.112" r="2.816"/>
+</svg>

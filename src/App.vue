@@ -47,6 +47,7 @@ const {
 
 import type {Tool} from "./types.ts";
 import TextToolOption from "./components/TextToolOption.vue";
+import CircleToolOption from "./components/CircleToolOption.vue";
 
 const open_svg_handle = () => {
   open_file_dialog().then(() => {
@@ -110,6 +111,7 @@ const save_as_handler = () => {
 
 <template lang="pug">
   .tool_options#tool_option
+    circle-tool-option
     crop-tool-option
     text-tool-option
   .container(:style="container_style")

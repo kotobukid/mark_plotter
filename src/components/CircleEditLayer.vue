@@ -4,7 +4,7 @@ import {useToolStore} from "../stores/tool.ts";
 import {useSnapshot} from "../composables/snapshot.ts";
 import {usePlots} from "../composables/plots.ts";
 import type {Point2D} from "../types.ts";
-import {inject, ref} from "vue";
+import {computed, inject, ref} from "vue";
 
 const store = useCircleStore();
 const tool_store = useToolStore();
@@ -12,6 +12,7 @@ const gen_id = inject('gen-id') as () => number;
 const {commit} = useSnapshot();
 
 const layer_offset: Point2D = inject('layer-offset');
+const circle_tool_option = computed(() => tool_store.circle_tool_option);
 
 const {
   start_plot,
@@ -23,7 +24,28 @@ const {
   move_end
 } = usePlots(layer_offset);
 
-const end_plot_circle = (e: PointerEvent) => {
+const _start_plot = (e: PointerEvent) => {
+  if (circle_tool_option.value === 'draw_full') {
+    start_plot(e);
+  } else {
+
+    show_preview.value = true;
+    plotting.value = true;
+
+    // draw_half
+    circle_r.value = 0;
+    circle_center.value = {
+      x: e.offsetX,
+      y: e.offsetY
+    };
+    start.value = {
+      x: e.offsetX,
+      y: e.offsetY
+    };
+  }
+};
+
+const complete_plot_circle = (e: PointerEvent) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
   tool_store.set('');
 
@@ -43,17 +65,27 @@ const end_plot_circle = (e: PointerEvent) => {
 
 const move_end_circle = (e: PointerEvent) => {
   if (plotting.value) {
+
     end.value = {
       x: e.offsetX - layer_offset.x,
       y: e.offsetY - layer_offset.y
     };
 
-    const bb_edge: number = Math.max(Math.abs(start.value.x - end.value.x), Math.abs(start.value.y - end.value.y));
-    circle_center.value = {
-      x: (start.value.x + end.value.x) / 2,
-      y: (start.value.y + end.value.y) / 2,
-    };
-    circle_r.value = bb_edge / 2;
+    if (circle_tool_option.value === 'draw_full') {
+
+      const bb_edge: number = Math.max(Math.abs(start.value.x - end.value.x), Math.abs(start.value.y - end.value.y));
+      circle_center.value = {
+        x: (start.value.x + end.value.x) / 2,
+        y: (start.value.y + end.value.y) / 2,
+      };
+      circle_r.value = bb_edge / 2;
+    } else {
+      // draw_half
+      circle_r.value = Math.sqrt(
+        Math.pow(end.value.x - start.value.x, 2) +
+        Math.pow(end.value.y - start.value.y, 2)
+      );
+    }
 
     show_preview.value = true;
   }
@@ -69,8 +101,8 @@ const circle_r = ref<number>(0);
     v-if="tool_store.current === 'circle'"
   )
     rect(fill="red" opacity="0.1" x="0" y="0" width="1920" height="1080"
-      @pointerdown="start_plot"
-      @pointerup="end_plot_circle"
+      @pointerdown="_start_plot"
+      @pointerup="complete_plot_circle"
       @pointerleave="cancel_plot"
       @pointermove="move_end_circle"
     )
