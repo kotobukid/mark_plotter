@@ -50,6 +50,7 @@ const submit_text = () => {
 
 const cancel_edit = () => {
   store.hide_tool_option();
+  tool_store.set('');
 };
 </script>
 

@@ -26,8 +26,8 @@ const {
 
 const end_plot_text = (e: PointerEvent) => {
   show_preview.value = false;
+  plotting.value = false;
 
-  // show_cursor.value = false;
   store.set_edit_target(-1);
   store.set_buffer('');
   store.show_tool_option();
@@ -36,29 +36,15 @@ const end_plot_text = (e: PointerEvent) => {
     x: e.offsetX - layer_offset.x,
     y: e.offsetY - layer_offset.y,
   });
-  // setTimeout(() => {
-  //   const text: string = (prompt('\\nで改行', '') || '').trim();
-  //   if (text) {
-  //     tool_store.set('');
-  //
-  //     commit(-1);
-  //
-  //     store.create({
-  //       text,
-  //       x: e.offsetX - layer_offset.x,
-  //       y: e.offsetY - layer_offset.y,
-  //       id: gen_id()
-  //     });
-  //   }
-  //   plotting.value = false;
-  // }, 100);
 };
 
 const shift_text_preview = (e: PointerEvent) => {
-  start.value = {
-    x: e.offsetX - layer_offset.x,
-    y: e.offsetY - layer_offset.y
-  };
+  if (plotting.value) {
+    start.value = {
+      x: e.offsetX - layer_offset.x,
+      y: e.offsetY - layer_offset.y
+    };
+  }
 };
 
 </script>
