@@ -418,8 +418,11 @@ a.button {
   display: block;
   width: 190px;
 
+  background-image: none;
+
   &.disabled {
     background-color: grey;
+    background-image: none;
     color: black;
     cursor: not-allowed;
 
@@ -428,8 +431,9 @@ a.button {
       top: 0;
     }
 
-    &:hover {
+    &:hover, &:active {
       background-color: grey;
+      background-image: none;
     }
   }
 
