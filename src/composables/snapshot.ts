@@ -50,19 +50,11 @@ export const useSnapshot = () => {
     };
 
     const wipe_available = computed(() => {
-        if (circle_store.circles.length > 0) {
-            return true;
-        } else if (rect_store.rects.length > 0) {
-            return true;
-        } else if (ellipse_store.ellipses.length > 0) {
-            return true;
-        } else if (line_store.lines.length > 0) {
-            return true;
-        } else if (text_store.texts.length > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return circle_store.circles.length > 0 ||
+            rect_store.rects.length > 0 ||
+            ellipse_store.ellipses.length > 0 ||
+            line_store.lines.length > 0 ||
+            text_store.texts.length > 0;
     });
 
     const wipe = () => {
