@@ -71,29 +71,38 @@ const target_file: Ref<FileSystemFileHandle> = ref(null);
 const target_files: Ref<FileSystemFileHandle[]> = ref([]);
 const writable_handle = ref<FileSystemWritableFileStream>(null);
 
-const open_file_dialog = async () => {
-  const options = {
-    types: [
-      {
-        description: 'Images',
-        accept: {
-          'image/*': ['.svg', '.png', '.jpg'],
-        },
-      },
-    ],
-    excludeAcceptAllOption: true,
-    multiple: true
-  };
-  // @ts-ignore
-  const a: FileSystemFileHandle[] = await window.showOpenFilePicker(options);
-  target_files.value = a;
+interface Window {
+  showOpenFilePicker: any,
+  showSaveFilePicker: any
+};
+declare var window: Window;
 
-  await read_file(a[0]);
+const open_file_dialog = async () => {
+  if (window.showOpenFilePicker) {
+    const options = {
+      types: [
+        {
+          description: 'Images',
+          accept: {
+            'image/*': ['.svg', '.png', '.jpg'],
+          },
+        },
+      ],
+      excludeAcceptAllOption: true,
+      multiple: true
+    };
+
+    const fileSystemFileHandles: FileSystemFileHandle[] = await window.showOpenFilePicker!(options);
+    target_files.value = fileSystemFileHandles;
+
+    await read_file(fileSystemFileHandles[0]);
+  } else {
+    alert('FileSystemAPIに対応したブラウザを使用してください');
+  }
 };
 
 const read_file = async (fileHandle: FileSystemFileHandle) => {
   const file = await fileHandle.getFile();
-  const fileContents = await file.text();
   target_file.value = fileHandle;
   filename.value = file.name;
 
@@ -138,7 +147,6 @@ const handle_file_change = (file: File) => {
           document.title = filename.value;
           original_filename.value = file.name;
 
-
           const image_cloned: ImageAndDimensions = {
             width: result.image.width,
             height: result.image.height,
@@ -155,8 +163,6 @@ const handle_file_change = (file: File) => {
     readFileContent(file);
   }
 };
-
-
 
 const can_overwrite = computed(() => {
   if (target_file.value && target_file.value.name) {
@@ -197,7 +203,6 @@ const save_as = async () => {
     suggestedName: filename.value
   };
 
-  // @ts-ignore
   const fileHandle = await window.showSaveFilePicker(option);
   const writable = await fileHandle.createWritable();
   await writable.write(file_content);
