@@ -8,7 +8,6 @@ import {useClipBoard} from "./composables/clipboard.ts";
 import {useToolStore} from "./stores/tool.ts";
 import {useImageStore} from "./stores/images.ts";
 import {useSnapshot} from "./composables/snapshot.ts";
-import {useImage} from "./composables/image.ts";
 import {useFileSystem} from "./composables/fileSystem.ts";
 
 const image_store = useImageStore();
@@ -40,27 +39,13 @@ const {
   overwrite_file,
   target_file,
   target_files,
-  writable_handle,
   overwrite_available,
   open_file_from_list,
   filename,
   original_filename
 } = useFileSystem(gen_id);
 
-import type {
-  ImageAndDimensions,
-  MyCircle,
-  MyRect,
-  MyLine,
-  MyEllipse,
-  Snapshot,
-  LabelText, Tool,
-} from "./types.ts";
-
-const {
-  push_image
-} = useImage();
-
+import type {Tool} from "./types.ts";
 
 const open_svg_handle = () => {
   open_file_dialog();
@@ -83,7 +68,6 @@ const switch_tool = (_tool: Tool) => {
 const container_style = computed(() => {
   return image_store.container_style(220 + 20);
 });
-
 
 const clear_files = (): void => {
   target_files.value = [];
