@@ -1,26 +1,17 @@
 <script setup lang="ts">
-import {computed, nextTick, provide, ref, type Ref} from "vue";
+import {computed, provide} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
 import CropToolOption from "./components/CropToolOption.vue";
 import {useClipBoard} from "./composables/clipboard.ts";
 import {useToolStore} from "./stores/tool.ts";
-import {useRectStore} from "./stores/rects.ts";
-import {useCircleStore} from "./stores/circles.ts";
-import {useEllipseStore} from "./stores/ellipses.ts";
-import {useLineStore} from "./stores/lines.ts";
-import {useTextStore} from "./stores/texts.ts";
 import {useImageStore} from "./stores/images.ts";
 import {useSnapshot} from "./composables/snapshot.ts";
 import {useImage} from "./composables/image.ts";
+import {useFileSystem} from "./composables/fileSystem.ts";
 
 const image_store = useImageStore();
-const rect_store = useRectStore();
-const circle_store = useCircleStore();
-const ellipse_store = useEllipseStore();
-const line_store = useLineStore();
-const text_store = useTextStore();
 
 const tool_store = useToolStore();
 const {commit, undo_available, pop_last, wipe} = useSnapshot();
@@ -43,6 +34,19 @@ const {
   capture_clipboard,
 } = useClipBoard(gen_id);
 
+const {
+  save_as,
+  open_file_dialog,
+  overwrite_file,
+  target_file,
+  target_files,
+  writable_handle,
+  overwrite_available,
+  open_file_from_list,
+  filename,
+  original_filename
+} = useFileSystem(gen_id);
+
 import type {
   ImageAndDimensions,
   MyCircle,
@@ -53,265 +57,24 @@ import type {
   LabelText, Tool,
 } from "./types.ts";
 import {parse_my_svg, parse_binary_image} from "./file_processing.ts";
-import {useCropStore} from "./stores/crop.ts";
 
 const {
   push_image
 } = useImage();
 
-const filename = ref('');
-const original_filename = ref('');
 
-const open_svg = () => {
+const open_svg_handle = () => {
   open_file_dialog();
   wipe();
 };
 
-const target_file: Ref<FileSystemFileHandle> = ref(null);
-const target_files: Ref<FileSystemFileHandle[]> = ref([]);
-const writable_handle = ref<FileSystemWritableFileStream>(null);
-
-interface Window {
-  showOpenFilePicker: any,
-  showSaveFilePicker: any
-};
-declare var window: Window;
-
-const open_file_dialog = async () => {
-  if (window.showOpenFilePicker) {
-    const options = {
-      types: [
-        {
-          description: 'Images',
-          accept: {
-            'image/*': ['.svg', '.png', '.jpg'],
-          },
-        },
-      ],
-      excludeAcceptAllOption: true,
-      multiple: true
-    };
-
-    const fileSystemFileHandles: FileSystemFileHandle[] = await window.showOpenFilePicker!(options);
-    target_files.value = fileSystemFileHandles;
-
-    await read_file(fileSystemFileHandles[0]);
-  } else {
-    alert('FileSystemAPIに対応したブラウザを使用してください');
-  }
-};
-
-const read_file = async (fileHandle: FileSystemFileHandle) => {
-  const file = await fileHandle.getFile();
-  target_file.value = fileHandle;
-  filename.value = file.name;
-
-  handle_file_change(file);
-};
-
-const handle_file_change = (file: File) => {
-  if (file) {
-    const readFileContent = (file) => {
-      if (file.type === 'image/svg+xml') {
-        parse_my_svg(file, (result) => {
-          image_store.replace(result.image);
-          rect_store.replace(result.rects);
-          text_store.replace(result.texts);
-          circle_store.replace(result.circles);
-          ellipse_store.replace(result.ellipses);
-          line_store.replace(result.lines);
-          filename.value = result.filename;
-          document.title = filename.value;
-          original_filename.value = file.name;
-
-
-          const image_cloned: ImageAndDimensions = {
-            width: result.image.width,
-            height: result.image.height,
-            dataUrl: result.image.dataUrl,
-            id: gen_id()
-          };
-
-          let new_image_index: number = push_image(image_cloned);
-          commit(new_image_index);
-        }, gen_id);
-      } else if (['image/png', 'image/jpg', 'image/jpeg', 'image/bmp'].includes(file.type)) {
-        parse_binary_image(file, (result) => {
-          image_store.replace(result.image);
-          rect_store.replace([]);
-          text_store.replace([]);
-          circle_store.replace([]);
-          ellipse_store.replace([]);
-          line_store.replace([]);
-          filename.value = result.filename;
-          document.title = filename.value;
-          original_filename.value = file.name;
-
-          const image_cloned: ImageAndDimensions = {
-            width: result.image.width,
-            height: result.image.height,
-            dataUrl: result.image.dataUrl,
-            id: gen_id()
-          };
-
-          let new_image_index: number = push_image(image_cloned);
-          commit(new_image_index);
-        }, gen_id);
-      }
-    };
-
-    readFileContent(file);
-  }
-};
-
-const can_overwrite = computed(() => {
-  if (target_file.value && target_file.value.name) {
-    return target_file.value.name.endsWith('.svg');
-  } else {
-    return false;
-  }
-});
-
-const overwrite_file = async () => {
-  if (can_overwrite.value) {
-    const $svg_original = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
-
-    writable_handle.value = await target_file.value.createWritable();
-    const file_content: string = await generate_svg_text_to_save($svg_original);
-    await writable_handle.value.write(file_content);
-    await writable_handle.value.close();
-  }
+const overwrite_handle = () => {
+  overwrite_file();
 };
 
 const close_file = async () => {
   target_file.value = null;
   filename.value = '';
-};
-
-const save_as = async () => {
-  const $svg_original = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
-
-  const file_content: string = await generate_svg_text_to_save($svg_original);
-
-  const option = {
-    types: [
-      {
-        description: "SVGファイル",
-        accept: {"image/svg+xml": [".svg"]},
-      },
-    ],
-    suggestedName: filename.value
-  };
-
-  const fileHandle = await window.showSaveFilePicker(option);
-  const writable = await fileHandle.createWritable();
-  await writable.write(file_content);
-  await writable.close();
-};
-
-const generate_svg_text_to_save = async ($svg_original: HTMLElement): Promise<string> => {
-  return new Promise((resolve => {
-    const $svg = $svg_original.cloneNode(true) as HTMLElement;
-
-    const remove_data_attribute = ($elem: HTMLElement) => {
-      // 最初に、削除する属性を収集
-      const attributesToRemove = [];
-      for (const attr of $elem.attributes) {
-        if (attr.name.startsWith('data-')) {
-          attributesToRemove.push(attr.name);
-        }
-      }
-
-      // 収集した属性を削除
-      attributesToRemove.forEach(attr => {
-        $elem.removeAttribute(attr);
-      });
-    };
-
-    remove_data_attribute($svg);
-
-    const elements = $svg.querySelectorAll('*');
-
-    // 各要素からdata-v-xxx属性を削除
-    elements.forEach((element: HTMLElement) => {
-      remove_data_attribute(element);
-    });
-
-    // @ts-ignore
-    $svg.removeAttribute!('style');
-    // $svg.addAttribute('xmlns:xlink', "http://www.w3.org/1999/xlink")
-
-    const text: string = $svg.outerHTML!;
-    resolve(`<?xml version="1.0" encoding="utf-8" ?>
-${text}`);
-
-//     const download_text_as_file = (text: string) => {
-//       const blob = new Blob([`<?xml version="1.0" encoding="utf-8" ?>
-// ${text}`], {type: 'image/svg+xml'});
-//       const link = document.createElement('a');
-//       link.href = URL.createObjectURL(blob);
-//       link.target = '_blank';
-//       link.download = filename.value || `download.svg`;
-//       link.click();
-//       URL.revokeObjectURL(link.href);
-//       setTimeout(() => {
-//         link.remove();
-//       });
-//     };
-  }));
-};
-
-const save_as_svg = () => {
-  tool_store.set('');
-  nextTick(() => {
-    const $svg = document.getElementById("svg_main").cloneNode(true) as HTMLElement;
-
-    const remove_data_attribute = ($elem: HTMLElement) => {
-      // 最初に、削除する属性を収集
-      const attributesToRemove = [];
-      for (const attr of $elem.attributes) {
-        if (attr.name.startsWith('data-')) {
-          attributesToRemove.push(attr.name);
-        }
-      }
-
-      // 収集した属性を削除
-      attributesToRemove.forEach(attr => {
-        console.log(attr);
-        $elem.removeAttribute(attr);
-      });
-    };
-
-    remove_data_attribute($svg);
-
-    const elements = $svg.querySelectorAll('*');
-
-    // 各要素からdata-v-xxx属性を削除
-    elements.forEach((element: HTMLElement) => {
-      remove_data_attribute(element);
-    });
-
-    // @ts-ignore
-    $svg.removeAttribute!('style');
-    // $svg.addAttribute('xmlns:xlink', "http://www.w3.org/1999/xlink")
-
-    const text: string = $svg.outerHTML!;
-
-    const download_text_as_file = (text: string) => {
-      const blob = new Blob([`<?xml version="1.0" encoding="utf-8" ?>
-${text}`], {type: 'image/svg+xml'});
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.target = '_blank';
-      link.download = filename.value || `download.svg`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-      setTimeout(() => {
-        link.remove();
-      });
-    };
-    download_text_as_file(text);
-  });
 };
 
 const switch_tool = (_tool: Tool) => {
@@ -322,11 +85,6 @@ const container_style = computed(() => {
   return image_store.container_style(220 + 20);
 });
 
-const open_file_from_list = async (f: FileSystemFileHandle) => {
-  const file = await f.getFile();
-  target_file.value = f;
-  handle_file_change(file);
-};
 
 const clear_files = (): void => {
   target_files.value = [];
@@ -350,7 +108,12 @@ const capture_clipboard_handle = async () => {
   }).catch(() => {
     alert('PrintScreenができていません');
   });
-}
+};
+
+const save_as_handler = () => {
+  save_as(filename.value);
+};
+
 </script>
 
 <template lang="pug">
@@ -358,7 +121,7 @@ const capture_clipboard_handle = async () => {
     crop-tool-option
   .container(:style="container_style")
     ToolRibbon(style="margin-right: 16px; width: 200px; height: 600px; float: left;")
-      a.button(href="#" @click.prevent="open_svg" draggable="false")
+      a.button(href="#" @click.prevent="open_svg_handle" draggable="false")
         img.tool_icon(src="/open.svg" draggable="false")
         span 画像を開く
       a.button(href="#" @click.prevent="capture_clipboard_handle" draggable="false")
@@ -394,10 +157,10 @@ const capture_clipboard_handle = async () => {
       a.button.sub(href="#" @click.prevent="switch_tool('edit')" :data-active="tool_store.current === 'edit'" draggable="false")
         img.tool_icon(src="/edit.svg" draggable="false")
         span 再編集ツール
-      a.button(href="#" @click.prevent="save_as" draggable="false")
+      a.button(href="#" @click.prevent="save_as_handler" draggable="false")
         img.tool_icon(src="/save.svg" draggable="false")
         span SVGを新規保存
-      a.button.sub(href="#" @click.prevent="overwrite_file" draggable="false" :class="can_overwrite ? '' : 'disabled'")
+      a.button.sub(href="#" @click.prevent="overwrite_file_handle" draggable="false" :class="overwrite_available ? '' : 'disabled'")
         img.tool_icon(src="/save_overwrite.svg" draggable="false")
         span 上書き保存
     SvgPreview(
