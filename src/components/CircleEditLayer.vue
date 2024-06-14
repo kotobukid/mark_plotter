@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import {useCircleStore} from "../stores/circles.ts";
-import {useToolStore} from "../stores/tool.ts";
 import {useSnapshot} from "../composables/snapshot.ts";
 import {usePlots} from "../composables/plots.ts";
 import type {Point2D} from "../types.ts";
-import {computed, inject, ref} from "vue";
+import {inject, ref} from "vue";
+import {useTool} from "../composables/tool.ts";
 
 const store = useCircleStore();
-const tool_store = useToolStore();
 const gen_id = inject('gen-id') as () => number;
 const {commit} = useSnapshot();
 
 const layer_offset: Point2D = inject('layer-offset');
-const circle_tool_option = computed(() => tool_store.circle_tool_option);
+const {
+  current_tool,
+  set_tool,
+  circle_option
+} = useTool();
 
 const {
   start_plot,
@@ -25,7 +28,7 @@ const {
 } = usePlots(layer_offset);
 
 const _start_plot = (e: PointerEvent) => {
-  if (circle_tool_option.value === 'draw_full') {
+  if (circle_option.value === 'draw_full') {
     start_plot(e);
   } else {
 
@@ -47,7 +50,7 @@ const _start_plot = (e: PointerEvent) => {
 
 const complete_plot_circle = (e: PointerEvent) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
-  tool_store.set('');
+  set_tool('');
 
   commit(-1);
 
@@ -71,7 +74,7 @@ const move_end_circle = (e: PointerEvent) => {
       y: e.offsetY - layer_offset.y
     };
 
-    if (circle_tool_option.value === 'draw_full') {
+    if (circle_option.value === 'draw_full') {
 
       const bb_edge: number = Math.max(Math.abs(start.value.x - end.value.x), Math.abs(start.value.y - end.value.y));
       circle_center.value = {
@@ -98,7 +101,7 @@ const circle_r = ref<number>(0);
 
 <template lang="pug">
   g.circle_plot_layer(
-    v-if="tool_store.current === 'circle'"
+    v-if="current_tool === 'circle'"
   )
     rect(fill="red" opacity="0.1" x="0" y="0" width="1920" height="1080"
       @pointerdown="_start_plot"
