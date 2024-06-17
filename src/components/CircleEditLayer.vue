@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import TransformedEventCatcher from "./TransformedEventCatcher.vue";
 import {useCircleStore} from "../stores/circles.ts";
 import {useSnapshot} from "../composables/snapshot.ts";
 import {usePlots} from "../composables/plots.ts";
-import type {Point2D} from "../types.ts";
+import type {MovementXY, OffsetXY, Point2D} from "../types.ts";
 import {inject, ref} from "vue";
 import {useTool} from "../composables/tool.ts";
 
@@ -27,7 +28,7 @@ const {
   move_end
 } = usePlots(layer_offset);
 
-const _start_plot = (e: PointerEvent) => {
+const _start_plot = (e: OffsetXY) => {
   if (circle_option.value === 'draw_full') {
     start_plot(e);
   } else {
@@ -48,7 +49,7 @@ const _start_plot = (e: PointerEvent) => {
   }
 };
 
-const complete_plot_circle = (e: PointerEvent) => {
+const complete_plot_circle = (e: OffsetXY) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
   set_tool('');
 
@@ -66,7 +67,7 @@ const complete_plot_circle = (e: PointerEvent) => {
 };
 
 
-const move_end_circle = (e: PointerEvent) => {
+const move_end_circle = (e: MovementXY & OffsetXY) => {
   if (plotting.value) {
 
     end.value = {
@@ -103,17 +104,17 @@ const circle_r = ref<number>(0);
   g.circle_plot_layer(
     v-if="current_tool === 'circle'"
   )
-    rect(fill="red" opacity="0.1" x="0" y="0" width="1920" height="1080"
-      @pointerdown="_start_plot"
-      @pointerup="complete_plot_circle"
-      @pointerleave="cancel_plot"
-      @pointermove="move_end_circle"
+    transformed-event-catcher(
+      @pointer-down="_start_plot"
+      @pointer-up="complete_plot_circle"
+      @pointer-leave="cancel_plot"
+      @pointer-move="move_end_circle"
     )
-    g(v-if="show_preview && plotting")
-      circle.preview(:cx="circle_center.x" :cy="circle_center.y" :r="circle_r" fill="transparent" stroke="red" stroke-width="1")
-      circle.preview(:cx="circle_center.x" :cy="circle_center.y" r="3" fill="black" stroke="white" stroke-width="1")
-      circle.preview(:cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
-      circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+      g(v-if="show_preview && plotting")
+        circle.preview(:cx="circle_center.x" :cy="circle_center.y" :r="circle_r" fill="transparent" stroke="red" stroke-width="1")
+        circle.preview(:cx="circle_center.x" :cy="circle_center.y" r="3" fill="black" stroke="white" stroke-width="1")
+        circle.preview(:cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+        circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
 </template>
 
 <style scoped lang="less">

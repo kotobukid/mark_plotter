@@ -1,5 +1,5 @@
 export type ElementType = 'rect' | 'circle' | 'ellipse' | 'line' | 'text';
-export type Tool = "" | "erase" | "circle" | "rect" | "line" | "ellipse" | "crop" | 'text' | 'edit';
+export type Tool = "" | "erase" | "circle" | "rect" | "line" | "ellipse" | "crop" | 'text' | 'edit' | 'pan';
 
 export type ImageAndDimensions = {
     dataUrl: string,
@@ -69,3 +69,14 @@ export type ApplicationImage = {
     texts: LabelText[],
     filename: string
 };
+
+export type OffsetXY = {
+    offsetX: number,
+    offsetY: number
+};
+
+export type MovementXY = {
+    movementX: number,
+    movementY: number
+};
+

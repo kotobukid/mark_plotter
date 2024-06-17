@@ -6,11 +6,13 @@ import FileList from "./components/FileList.vue";
 import CropToolOption from "./components/CropToolOption.vue";
 import {useClipBoard} from "./composables/clipboard.ts";
 import {useToolStore} from "./stores/tool.ts";
+import {useTransformStore} from "./stores/transform.ts";
 import {useImageStore} from "./stores/images.ts";
 import {useSnapshot} from "./composables/snapshot.ts";
 import {useFileSystem} from "./composables/fileSystem.ts";
 
 const image_store = useImageStore();
+const {reset_transform} = useTransformStore();
 
 const tool_store = useToolStore();
 const {commit, undo_available, pop_last, wipe, wipe_available} = useSnapshot();
@@ -71,6 +73,9 @@ const close_file = async () => {
 
 const switch_tool = (_tool: Tool) => {
   tool_store.set(_tool);
+  if (_tool === 'crop') {
+    reset_transform();
+  }
 };
 
 const container_style = computed(() => {
@@ -131,6 +136,9 @@ const save_as_handler = () => {
       a.button(href="#" @click.prevent="apply_last_snapshot" draggable="false" :class="undo_available ? '' : 'disabled'")
         img.tool_icon(src="/undo.svg" draggable="false")
         span 元に戻す
+      a.button(href="#" @click.prevent="switch_tool('pan')" :data-active="tool_store.current === 'pan'" draggable="false")
+        img.tool_icon(src="/pan.svg" draggable="false")
+        span パン
       a.button(href="#" @click.prevent="switch_tool('crop')" :data-active="tool_store.current === 'crop'" draggable="false")
         img.tool_icon(src="/crop.svg" draggable="false")
         span 切り抜きツール

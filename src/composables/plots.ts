@@ -1,5 +1,5 @@
 import {computed, nextTick, ref} from "vue";
-import type {Point2D} from "../types.ts";
+import type {OffsetXY, Point2D} from "../types.ts";
 
 export const usePlots = (layer_offset: Point2D) => {
     const tr_x = layer_offset.x;
@@ -10,7 +10,7 @@ export const usePlots = (layer_offset: Point2D) => {
 
     const show_preview = ref<boolean>(false);
     const plotting = ref<boolean>(false);
-    const start_plot = (e: PointerEvent) => {
+    const start_plot = (e: OffsetXY) => {
         start.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
         end.value = {x: e.offsetX - tr_x, y: e.offsetY - tr_y};
         nextTick(() => {

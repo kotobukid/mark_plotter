@@ -23,8 +23,12 @@ import CircleEditLayer from "./CircleEditLayer.vue";
 import EllipseEditLayer from "./EllipseEditLayer.vue";
 import LineEditLayer from "./LineEditLayer.vue";
 import TextEditLayer from "./TextEditLayer.vue";
+import PanLayer from "./PanLayer.vue";
+import {useTransformStore} from "../stores/transform.ts";
+import {useTool} from "../composables/tool.ts";
 
 const image_store = useImageStore();
+const transform_store = useTransformStore();
 
 const layer_offset: Point2D = {
   x: 5,
@@ -47,6 +51,8 @@ const viewBox = computed(() => {
 
 const cursor_pos = ref<Point2D>({x: -1, y: -1});
 
+const {current_tool} = useTool();
+
 const cursor_move = (e: PointerEvent) => {
   cursor_pos.value = {
     x: e.offsetX,
@@ -68,6 +74,16 @@ const global_layer_offset = computed(() => {
   return `transform: translate(${layer_offset.x}px, ${layer_offset.y}px);`;
 });
 
+const show_sight = computed(() => {
+  return show_cursor && [
+    'circle',
+    'rect',
+    'ellipse',
+    'text',
+    'line',
+    'crop'
+  ].includes(current_tool.value)
+})
 </script>
 
 <template lang="pug">
@@ -92,26 +108,28 @@ const global_layer_offset = computed(() => {
           feMergeNode
           feMergeNode(in="SourceGraphic")
     defs#additional_defs
-    g(:style="global_layer_offset")
-      image.main_image(
-        :xlink:href="image_store.image.dataUrl" :width="image_store.image.width" :height="image_store.image.height"
-        style="filter: url(#box-shadow1);"
-        :key="image_store.image.id"
-      )
-      rect-layer
-      circle-layer
-      ellipse-layer
-      line-layer
-      text-layer
+    g(:style="transform_store.transform_style")
+      g(:style="global_layer_offset")
+        image.main_image(
+          :xlink:href="image_store.image.dataUrl" :width="image_store.image.width" :height="image_store.image.height"
+          style="filter: url(#box-shadow1);"
+          :key="image_store.image.id"
+        )
+        rect-layer
+        circle-layer
+        ellipse-layer
+        line-layer
+        text-layer
 
-      rect-edit-layer
-      circle-edit-layer
-      ellipse-edit-layer
-      line-edit-layer
-      text-edit-layer
+        rect-edit-layer
+        circle-edit-layer
+        ellipse-edit-layer
+        line-edit-layer
+        text-edit-layer
 
-      crop-tool-layer
-    g.cursor_pos(:style="cursor_transform" v-if="show_cursor")
+        crop-tool-layer
+    pan-layer
+    g.cursor_pos(:style="cursor_transform" v-if="show_sight")
       line(x1="0" y1="30" x2="0" y2="15")
       line(x1="0" y1="-30" x2="0" y2="-15")
       line(x1="30" y1="0" x2="15" y2="0")
@@ -122,6 +140,7 @@ const global_layer_offset = computed(() => {
 svg {
   outline: 1px solid grey;
   user-select: none;
+  cursor: none;
 }
 
 .preview {
