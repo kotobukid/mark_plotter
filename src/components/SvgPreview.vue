@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, ref, provide} from "vue";
+import {computed, ref, inject} from "vue";
 import {
   type MyRect,
   type MyCircle,
@@ -33,12 +33,7 @@ import VoidLayer from "./VoidLayer.vue";
 const image_store = useImageStore();
 const transform_store = useTransformStore();
 
-const layer_offset: Point2D = {
-  x: 5,
-  y: 5
-};
-
-provide('layer-offset', layer_offset);
+const layer_offset = inject('layer-offset') as Point2D;
 
 const emits = defineEmits<{
   (e: 'commit-crop', value: MyRect): void,

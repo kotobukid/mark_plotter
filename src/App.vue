@@ -52,7 +52,7 @@ const {
   original_filename
 } = useFileSystem(gen_id);
 
-import type {Tool} from "./types.ts";
+import type {Point2D, Tool} from "./types.ts";
 import TextToolOption from "./components/TextToolOption.vue";
 import CircleToolOption from "./components/CircleToolOption.vue";
 
@@ -63,6 +63,13 @@ const open_svg_handle = () => {
     alert('FileSystemAPIに対応したブラウザを使用してください');
   });
 };
+
+const layer_offset: Point2D = {
+  x: 5,
+  y: 5
+};
+
+provide('layer-offset', layer_offset);
 
 const overwrite_handle = () => {
   tool_store.set('');
@@ -121,7 +128,11 @@ const copy_as_png_handler = () => {
   switch_tool('');
   transformStore.reset_transform();
   nextTick(async () => {
-    const data: Blob = await rasterize('#svg_main', image_store.image.width, image_store.image.height);
+    const data: Blob = await rasterize(
+      '#svg_main',
+      image_store.image.width + layer_offset.x * 2,
+      image_store.image.height + layer_offset.y * 2
+    );
     await copy_as_blob(data);
     alert('クリップボードにコピーしました');
   });
