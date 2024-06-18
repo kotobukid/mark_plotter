@@ -45,7 +45,7 @@ const move_end = (e: PointerEvent) => {
 
 <template lang="pug">
   g.transformed_event_emitter
-    rect.event_catcher(
+    rect.event_emitter(
       x="-100" y="-200" width="4000" height="4000"
       @pointerdown="start_plot"
       @pointerup="complete_plot"
