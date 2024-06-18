@@ -1,4 +1,5 @@
 import {nextTick} from "vue";
+import vkbeautify from 'vkbeautify';
 import type {ApplicationImage, ImageAndDimensions, LabelText, MyCircle, MyEllipse, MyLine, MyRect} from "../types.ts";
 
 export const useSVG = () => {
@@ -35,8 +36,9 @@ export const useSVG = () => {
             // $svg.addAttribute('xmlns:xlink', "http://www.w3.org/1999/xlink")
 
             const text: string = $svg.outerHTML!;
+            const pretty_text = vkbeautify.xml(text, 2);
             resolve(`<?xml version="1.0" encoding="utf-8" ?>
-${text}`);
+${pretty_text}`);
             //     const download_text_as_file = (text: string) => {
 //       const blob = new Blob([`<?xml version="1.0" encoding="utf-8" ?>
 // ${text}`], {type: 'image/svg+xml'});
