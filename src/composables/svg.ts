@@ -334,6 +334,10 @@ ${text}`], {type: 'image/svg+xml'});
         reader.readAsDataURL(file);
     };
 
+    const utoa = (str: string) => {
+        return window.btoa(unescape(encodeURIComponent(str)));
+    };
+
     const rasterize = async (element_id: string, width: number, height: number) => {
         return new Promise<Blob>((resolve: (value: Blob) => void) => {
             const $svg = document.querySelector(element_id)! as SVGElement;
@@ -341,7 +345,8 @@ ${text}`], {type: 'image/svg+xml'});
             const xml = new XMLSerializer().serializeToString($svg);
             const b64Start: string = "data:image/svg+xml;base64,";
 
-            const image64 = b64Start + btoa(xml);
+            const image64 = b64Start + utoa(xml);
+            // const image64 = b64Start + base64EncodeUnicode(xml);
 
             $img.onload = () => {
                 const sx = 0;
