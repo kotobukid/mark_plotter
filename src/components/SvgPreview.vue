@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref, inject} from "vue";
+import {computed, ref, inject, provide} from "vue";
 import {
   type MyRect,
   type MyCircle,
@@ -50,7 +50,7 @@ const viewBox = computed(() => {
 
 const cursor_pos = ref<Point2D>({x: -1, y: -1});
 
-const {current_tool} = useTool();
+const {current_tool, override} = useTool();
 
 const cursor_move = (e: PointerEvent) => {
   cursor_pos.value = {
@@ -87,11 +87,29 @@ const show_sight = computed(() => {
 const wheeled = (e: WheelEvent) => {
   transform_store.zoom_in(e);
 };
+
+const panning = ref(false);
+provide('panning', panning);
+
+const pointer_down = (e: PointerEvent) => {
+  if (e.button === 1) { // ホイール
+    override('pan');
+    panning.value = true;
+  }
+};
+const pointer_up = (e: PointerEvent) => {
+  if (e.button === 1) {
+    panning.value = false;
+    override('');
+  }
+}
 </script>
 
 <template lang="pug">
   svg#svg_main(xmlns="http://www.w3.org/2000/svg" v-if="image_store.image.dataUrl" :viewBox="viewBox" :width="image_store.image.width + 10" :height="image_store.image.height + 10"
     xmlns:xlink="http://www.w3.org/1999/xlink"
+    @pointerdown="pointer_down"
+    @pointerup="pointer_up"
     @pointermove="cursor_move"
     @pointerleave="hide_cursor(true)"
     @pointerenter="hide_cursor(false)"

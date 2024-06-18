@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useTool} from "../composables/tool.ts";
 import {useTransformStore} from "../stores/transform.ts";
-import {ref} from "vue";
+import {type Ref, ref, inject} from "vue";
 
 const emits = defineEmits<{
   (e: 'wheeled', value: WheelEvent): void
@@ -10,7 +10,7 @@ const emits = defineEmits<{
 const {move_transform} = useTransformStore();
 const {current_tool} = useTool();
 
-const panning = ref(false);
+const panning = inject('panning') as Ref<boolean>;
 
 const start_pan = () => {
   panning.value = true;
