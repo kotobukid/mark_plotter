@@ -1,6 +1,10 @@
 import {defineStore} from "pinia";
 import {MovementXY, OffsetXY, Point2D} from "../types.ts";
 
+const scaled = (value: number, origin: number, scale: number): number => {
+    return (value - origin) * scale + origin;
+};
+
 export const useTransformStore = defineStore('transform', {
     state() {
         return {
@@ -49,10 +53,26 @@ export const useTransformStore = defineStore('transform', {
                 offsetY: offsetY - this.y,
             };
         },
+        zoom_in({deltaY, offsetX, offsetY}: WheelEvent) {
+            const up = deltaY < 0;
+
+            const zoom_current = this.zoom * 1;
+            const zoom_next = this.zoom + (up ? 0.1 : - 0.1);
+
+            const scale_ratio = zoom_next / zoom_current;
+            console.log(scale_ratio);
+
+            const _x = (this.x - offsetX) * scale_ratio + offsetX;
+            const _y = (this.y - offsetY) * scale_ratio + offsetY;
+
+            this.zoom = zoom_next;
+            this.x = scaled(this.x, offsetX, scale_ratio);
+            this.y = scaled(this.y, offsetY, scale_ratio);
+        }
     },
     getters: {
         transform_style(state): string {
-            return `transform: translate(${state.x}px, ${state.y}px);`;
+            return `transform: translate(${state.x}px, ${state.y}px) scale(${state.zoom});`;
         }
     }
 });

@@ -4,7 +4,8 @@ import {useTransformStore} from "../stores/transform.ts";
 
 const {
   transformed_offset,
-  transformed_offset_movement
+  transformed_offset_movement,
+  zoom_in
 } = useTransformStore();
 
 const emits = defineEmits<{
@@ -41,6 +42,9 @@ const move_end = (e: PointerEvent) => {
   }));
 };
 
+const wheeled = (e: WheelEvent) => {
+  zoom_in(e);
+};
 </script>
 
 <template lang="pug">
@@ -51,6 +55,8 @@ const move_end = (e: PointerEvent) => {
       @pointerup="complete_plot"
       @pointerleave="cancel_plot"
       @pointermove="move_end"
+
+      @wheel="wheeled"
     )
     slot
 </template>

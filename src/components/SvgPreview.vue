@@ -24,8 +24,11 @@ import EllipseEditLayer from "./EllipseEditLayer.vue";
 import LineEditLayer from "./LineEditLayer.vue";
 import TextEditLayer from "./TextEditLayer.vue";
 import PanLayer from "./PanLayer.vue";
+import ScaleEventCatcher from "./VoidLayer.vue";
+
 import {useTransformStore} from "../stores/transform.ts";
 import {useTool} from "../composables/tool.ts";
+import VoidLayer from "./VoidLayer.vue";
 
 const image_store = useImageStore();
 const transform_store = useTransformStore();
@@ -83,7 +86,12 @@ const show_sight = computed(() => {
     'line',
     'crop'
   ].includes(current_tool.value)
-})
+});
+
+const wheeled = (e: WheelEvent) => {
+  console.log(e);
+  transform_store.zoom_in(e);
+};
 </script>
 
 <template lang="pug">
@@ -115,6 +123,8 @@ const show_sight = computed(() => {
           style="filter: url(#box-shadow1);"
           :key="image_store.image.id"
         )
+        void-layer
+
         rect-layer
         circle-layer
         ellipse-layer
@@ -128,7 +138,7 @@ const show_sight = computed(() => {
         text-edit-layer
 
         crop-tool-layer
-    pan-layer
+    pan-layer(@wheeled="wheeled")
     g.cursor_pos(:style="cursor_transform" v-if="show_sight")
       line(x1="0" y1="30" x2="0" y2="15")
       line(x1="0" y1="-30" x2="0" y2="-15")
