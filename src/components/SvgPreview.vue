@@ -29,6 +29,7 @@ import ScaleEventCatcher from "./VoidLayer.vue";
 import {useTransformStore} from "../stores/transform.ts";
 import {useTool} from "../composables/tool.ts";
 import VoidLayer from "./VoidLayer.vue";
+import OmitOnSave from "./OmitOnSave.vue";
 
 const image_store = useImageStore();
 const transform_store = useTransformStore();
@@ -117,7 +118,8 @@ const wheeled = (e: WheelEvent) => {
           style="filter: url(#box-shadow1);"
           :key="image_store.image.id"
         )
-        void-layer
+        OmitOnSave
+          void-layer
 
         rect-layer
         circle-layer
@@ -125,19 +127,21 @@ const wheeled = (e: WheelEvent) => {
         line-layer
         text-layer
 
-        rect-edit-layer
-        circle-edit-layer
-        ellipse-edit-layer
-        line-edit-layer
-        text-edit-layer
+        OmitOnSave
+          rect-edit-layer
+          circle-edit-layer
+          ellipse-edit-layer
+          line-edit-layer
+          text-edit-layer
 
-        crop-tool-layer
-    pan-layer(@wheeled="wheeled")
-    g.cursor_pos(:style="cursor_transform" v-if="show_sight")
-      line(x1="0" y1="30" x2="0" y2="15")
-      line(x1="0" y1="-30" x2="0" y2="-15")
-      line(x1="30" y1="0" x2="15" y2="0")
-      line(x1="-30" y1="0" x2="-15" y2="0")
+          crop-tool-layer
+    OmitOnSave
+      pan-layer(@wheeled="wheeled")
+      g.cursor_pos(:style="cursor_transform" v-if="show_sight")
+        line(x1="0" y1="30" x2="0" y2="15")
+        line(x1="0" y1="-30" x2="0" y2="-15")
+        line(x1="30" y1="0" x2="15" y2="0")
+        line(x1="-30" y1="0" x2="-15" y2="0")
 </template>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, nextTick, provide} from "vue";
+import {computed, nextTick, provide, ref} from "vue";
 import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
@@ -22,7 +22,6 @@ const tool_store = useToolStore();
 const {commit, undo_available, pop_last, wipe, wipe_available} = useSnapshot();
 const {rasterize} = useSVG();
 
-
 const _gen_id = (() => {
   let id: number = 0;
   return () => {
@@ -34,6 +33,9 @@ const _gen_id = (() => {
 const gen_id = _gen_id();
 
 provide('gen-id', gen_id);
+
+const saving = ref(false);
+provide('saving', saving);
 
 const {
   capture_clipboard,
@@ -58,6 +60,9 @@ import CircleToolOption from "./components/CircleToolOption.vue";
 
 const open_svg_handle = () => {
   open_file_dialog().then(() => {
+    tool_store.set('');
+    transformStore.reset_transform();
+
     wipe();
   }).catch(() => {
     alert('FileSystemAPIに対応したブラウザを使用してください');
@@ -73,8 +78,12 @@ provide('layer-offset', layer_offset);
 
 const overwrite_handle = () => {
   tool_store.set('');
+  saving.value = true;
+  transformStore.reset_transform();
+
   nextTick(() => {
     overwrite_file();
+    saving.value = false;
   });
 };
 
@@ -106,6 +115,9 @@ const wipe_handle = () => {
   if (wipe_available.value) {
     const do_wipe = confirm("画像以外の全要素を削除しますか？");
     if (do_wipe) {
+      switch_tool('');
+      transformStore.reset_transform();
+
       wipe();
     }
   }
@@ -113,6 +125,9 @@ const wipe_handle = () => {
 
 const capture_clipboard_handle = async () => {
   capture_clipboard().then((_filename: string) => {
+    switch_tool('');
+    transformStore.reset_transform();
+
     document.title = _filename;
     target_file.value = null;
   }).catch(() => {
@@ -121,12 +136,21 @@ const capture_clipboard_handle = async () => {
 };
 
 const save_as_handler = () => {
-  save_as(filename.value);
+  switch_tool('');
+  saving.value = true;
+  transformStore.reset_transform();
+
+  nextTick(() => {
+    save_as(filename.value);
+    saving.value = false;
+  });
 };
 
 const copy_as_png_handler = () => {
   switch_tool('');
+  saving.value = true;
   transformStore.reset_transform();
+
   nextTick(async () => {
     const data: Blob = await rasterize(
       '#svg_main',
@@ -135,6 +159,7 @@ const copy_as_png_handler = () => {
     );
     await copy_as_blob(data);
     alert('クリップボードにコピーしました');
+    saving.value = false;
   });
 };
 </script>
