@@ -70,8 +70,13 @@ const useClipBoard = (gen_id: () => number) => {
         });
     };
 
+    const copy_as_blob = async (content: Blob) => {
+        return await navigator.clipboard.write([new ClipboardItem({'image/png': content})]);
+    };
+
     return {
         capture_clipboard,
+        copy_as_blob
     };
 };
 

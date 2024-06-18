@@ -334,9 +334,52 @@ ${text}`], {type: 'image/svg+xml'});
         reader.readAsDataURL(file);
     };
 
+    const rasterize = async (element_id: string, width: number, height: number) => {
+        return new Promise<Blob>((resolve: (value: Blob) => void) => {
+            const $svg = document.querySelector(element_id)! as SVGElement;
+            const $img: HTMLImageElement = new Image();
+            const xml = new XMLSerializer().serializeToString($svg);
+            const b64Start: string = "data:image/svg+xml;base64,";
+
+            const image64 = b64Start + btoa(xml);
+
+            $img.onload = () => {
+                const sx = 0;
+                // const sx = crop.start.x;
+                const sy = 0;
+                // const sy = crop.start.y;
+                const sw = width;
+                // const sw = crop.end.x - crop.start.x;
+                const sh = height;
+                // const sh = crop.end.y - crop.start.y;
+                const dx = 0;
+                const dy = 0;
+                const dw = sw;
+                const dh = sh;
+
+                const canvas: HTMLCanvasElement = document.createElement('canvas');
+                // const canvas: HTMLCanvasElement = document.getElementById("canvas")! as HTMLCanvasElement;
+                canvas.width = dw;
+                canvas.height = dh;
+                const ctx = canvas.getContext!("2d")!;
+
+                // ctx.fillStyle = 'black';
+                // ctx.fillRect(0, 0, dw, dh);
+                ctx.drawImage($img, sx, sy, sw, sh, dx, dy, dw, dh);
+                // state.show_canvas = true;
+                // const source: string = canvas.toDataURL('image/png');
+                canvas.toBlob(blob => {
+                    resolve(blob);
+                }, 'image/png');
+            }
+            $img.src = image64;
+        });
+    };
+
     return {
         parse_my_svg,
         parse_binary_image,
-        generate_svg_text_to_save
+        generate_svg_text_to_save,
+        rasterize
     };
 };

@@ -17,15 +17,15 @@ const wheeled = (e: WheelEvent) => {
       y="-40000"
       width="80000"
       height="80000"
+      fill="transparent"
+      stroke-width="0"
+      stroke="transparent"
       @wheel="wheeled"
     )
 </template>
 
 <style scoped lang="less">
 .void {
-  fill: transparent;
-  stroke: transparent;
-  stroke-width: 0;
   opacity: 0;
 }
 </style>

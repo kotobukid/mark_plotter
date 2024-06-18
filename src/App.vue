@@ -11,6 +11,7 @@ import {useTransformStore} from "./stores/transform.ts";
 import {useImageStore} from "./stores/images.ts";
 import {useSnapshot} from "./composables/snapshot.ts";
 import {useFileSystem} from "./composables/fileSystem.ts";
+import {useSVG} from "./composables/svg.ts";
 
 const image_store = useImageStore();
 const transformStore = useTransformStore();
@@ -19,6 +20,7 @@ transformStore.init_zoom_level([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 
 
 const tool_store = useToolStore();
 const {commit, undo_available, pop_last, wipe, wipe_available} = useSnapshot();
+const {rasterize} = useSVG();
 
 
 const _gen_id = (() => {
@@ -35,6 +37,7 @@ provide('gen-id', gen_id);
 
 const {
   capture_clipboard,
+  copy_as_blob
 } = useClipBoard(gen_id);
 
 const {
@@ -114,6 +117,15 @@ const save_as_handler = () => {
   save_as(filename.value);
 };
 
+const copy_as_png_handler = () => {
+  switch_tool('');
+  transformStore.reset_transform();
+  nextTick(async () => {
+    const data: Blob = await rasterize('#svg_main', image_store.image.width, image_store.image.height);
+    await copy_as_blob(data);
+    alert('クリップボードにコピーしました');
+  });
+};
 </script>
 
 <template lang="pug">
@@ -166,6 +178,9 @@ const save_as_handler = () => {
       a.button(href="#" @click.prevent="save_as_handler" draggable="false")
         img.tool_icon(src="/save.svg" draggable="false")
         span SVGを新規保存
+      a.button(href="#" @click.prevent="copy_as_png_handler" draggable="false")
+        img.tool_icon(src="/save.svg" draggable="false")
+        span PNGをコピー
       a.button.sub(href="#" @click.prevent="overwrite_handle" draggable="false" :class="overwrite_available ? '' : 'disabled'")
         img.tool_icon(src="/save_overwrite.svg" draggable="false")
         span 上書き保存
