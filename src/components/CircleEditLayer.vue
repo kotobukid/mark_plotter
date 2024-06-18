@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import TransformedEventCatcher from "./TransformedEventCatcher.vue";
+import TransformedEventEmitter from "./TransformedEventEmitter.vue";
 import {useCircleStore} from "../stores/circles.ts";
 import {useSnapshot} from "../composables/snapshot.ts";
 import {usePlots} from "../composables/plots.ts";
@@ -104,7 +104,7 @@ const circle_r = ref<number>(0);
   g.circle_plot_layer(
     v-if="current_tool === 'circle'"
   )
-    transformed-event-catcher(
+    transformed-event-emitter(
       @pointer-down="_start_plot"
       @pointer-up="complete_plot_circle"
       @pointer-leave="cancel_plot"

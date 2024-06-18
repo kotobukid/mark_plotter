@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import TransformedEventCatcher from "./TransformedEventCatcher.vue";
+import TransformedEventEmitter from "./TransformedEventEmitter.vue";
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
 import {usePlots} from "../composables/plots.ts";
@@ -57,7 +57,7 @@ const cancel_plot_handler = () => {
   g.rect_edit_layer(
     v-if="tool_store.current === 'rect'"
   )
-    transformed-event-catcher(
+    transformed-event-emitter(
       @pointer-down="start_plot"
       @pointer-up="end_plot_rect"
       @pointer-leave="cancel_plot_handler"

@@ -44,7 +44,7 @@ const move_end = (e: PointerEvent) => {
 </script>
 
 <template lang="pug">
-  g.transformed_event_catcher
+  g.transformed_event_emitter
     rect.event_catcher(
       x="-100" y="-200" width="4000" height="4000"
       @pointerdown="start_plot"
@@ -56,7 +56,7 @@ const move_end = (e: PointerEvent) => {
 </template>
 
 <style scoped lang="less">
-rect.event_catcher {
+rect.event_emitter {
   fill: pink;
   opacity: 0.1;
   stroke: white;
