@@ -20,7 +20,7 @@ const wheeled = (e: WheelEvent) => {
       fill="transparent"
       stroke-width="0"
       stroke="transparent"
-      @wheel="wheeled"
+      @wheel.prevent="wheeled"
     )
 </template>
 

@@ -32,7 +32,7 @@ const w = (e: WheelEvent) => {
 </script>
 
 <template lang="pug">
-  g.gpan(@wheel="w")
+  g.gpan(@wheel.prevent="w")
     g.pan_layer(v-if="current_tool === 'pan'")
       rect.pan(
         x="-10"

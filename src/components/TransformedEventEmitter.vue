@@ -56,7 +56,7 @@ const wheeled = (e: WheelEvent) => {
       @pointerleave="cancel_plot"
       @pointermove="move_end"
 
-      @wheel="wheeled"
+      @wheel.prevent="wheeled"
     )
     slot
 </template>
