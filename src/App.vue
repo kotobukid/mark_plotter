@@ -63,6 +63,8 @@ const open_svg_handle = () => {
     tool_store.set('');
     transformStore.reset_transform();
 
+    commit(1);
+
     wipe();
   }).catch(() => {
     alert('FileSystemAPIに対応したブラウザを使用してください');
