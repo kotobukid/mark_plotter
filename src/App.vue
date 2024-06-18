@@ -12,7 +12,9 @@ import {useSnapshot} from "./composables/snapshot.ts";
 import {useFileSystem} from "./composables/fileSystem.ts";
 
 const image_store = useImageStore();
-const {reset_transform} = useTransformStore();
+const transformStore = useTransformStore();
+
+transformStore.init_zoom_level([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2], 9);
 
 const tool_store = useToolStore();
 const {commit, undo_available, pop_last, wipe, wipe_available} = useSnapshot();
@@ -74,7 +76,7 @@ const close_file = async () => {
 const switch_tool = (_tool: Tool) => {
   tool_store.set(_tool);
   if (_tool === 'crop') {
-    reset_transform();
+    transformStore.reset_transform();
   }
 };
 
