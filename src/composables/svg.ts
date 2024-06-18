@@ -70,7 +70,6 @@ ${text}`);
 
                 // 収集した属性を削除
                 attributesToRemove.forEach(attr => {
-                    console.log(attr);
                     $elem.removeAttribute(attr);
                 });
             };

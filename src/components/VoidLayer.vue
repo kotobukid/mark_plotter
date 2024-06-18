@@ -6,7 +6,6 @@ const {zoom_in} = useTransformStore();
 const {current_tool} = useTool();
 
 const wheeled = (e: WheelEvent) => {
-  console.log(e);
   zoom_in(e);
 };
 </script>

@@ -27,7 +27,6 @@ const move_pan = (e: PointerEvent) => {
 };
 
 const w = (e: WheelEvent) => {
-  console.log(e);
   emits('wheeled', e);
 };
 </script>

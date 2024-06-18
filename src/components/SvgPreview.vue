@@ -89,7 +89,6 @@ const show_sight = computed(() => {
 });
 
 const wheeled = (e: WheelEvent) => {
-  console.log(e);
   transform_store.zoom_in(e);
 };
 </script>
