@@ -4,6 +4,7 @@ import SvgPreview from "./components/SvgPreview.vue";
 import ToolRibbon from "./components/ToolRibbon.vue";
 import FileList from "./components/FileList.vue";
 import CropToolOption from "./components/CropToolOption.vue";
+import ViewPortOption from "./components/ViewPortOption.vue";
 import {useClipBoard} from "./composables/clipboard.ts";
 import {useToolStore} from "./stores/tool.ts";
 import {useTransformStore} from "./stores/transform.ts";
@@ -120,6 +121,7 @@ const save_as_handler = () => {
     circle-tool-option
     crop-tool-option
     text-tool-option
+    view-port-option
   .container(:style="container_style")
     ToolRibbon(style="margin-right: 16px; width: 200px; height: 600px; float: left;")
       a.button(href="#" @click.prevent="open_svg_handle" draggable="false")
