@@ -29,28 +29,28 @@ export const useTransformStore = defineStore('transform', {
         },
         transformed(point: Point2D): Point2D {
             return {
-                x: point.x - this.x,
-                y: point.y - this.y,
+                x: (point.x - this.x) / this.zoom,
+                y: (point.y - this.y) / this.zoom
             };
         },
         transformed_offset({offsetX, offsetY}: OffsetXY): OffsetXY {
             return {
-                offsetX: offsetX - this.x,
-                offsetY: offsetY - this.y,
+                offsetX: (offsetX - this.x) / this.zoom,
+                offsetY: (offsetY - this.y) / this.zoom
             };
         },
         transformed_movement({movementX, movementY}: MovementXY): MovementXY {
             return {
-                movementX: movementX - this.x,
-                movementY: movementY - this.y,
+                movementX: (movementX - this.x) / this.zoom,
+                movementY: (movementY - this.y) / this.zoom
             };
         },
         transformed_offset_movement({movementX, movementY, offsetX, offsetY}: MovementXY & OffsetXY): MovementXY & OffsetXY {
             return {
-                movementX: movementX - this.x,
-                movementY: movementY - this.y,
-                offsetX: offsetX - this.x,
-                offsetY: offsetY - this.y,
+                movementX: (movementX - this.x) / this.zoom,
+                movementY: (movementY - this.y) / this.zoom,
+                offsetX: (offsetX - this.x) / this.zoom,
+                offsetY: (offsetY - this.y) / this.zoom,
             };
         },
         zoom_in({deltaY, offsetX, offsetY}: WheelEvent) {
