@@ -178,12 +178,12 @@ const copy_as_png_handler = () => {
       a.button(href="#" @click.prevent="save_as_handler" draggable="false")
         img.tool_icon(src="/save.svg" draggable="false")
         span SVGを新規保存
-      a.button(href="#" @click.prevent="copy_as_png_handler" draggable="false")
-        img.tool_icon(src="/save.svg" draggable="false")
-        span PNGをコピー
       a.button.sub(href="#" @click.prevent="overwrite_handle" draggable="false" :class="overwrite_available ? '' : 'disabled'")
         img.tool_icon(src="/save_overwrite.svg" draggable="false")
         span 上書き保存
+      a.button(href="#" @click.prevent="copy_as_png_handler" draggable="false")
+        img.tool_icon(src="/copy.svg" draggable="false")
+        span PNGをコピー
     SvgPreview(
       style="float: left;"
     )

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
-  <defs/>
-  <path d="M -48.882 9.083 L -36 37.453 L -61.764 37.453 L -48.882 9.083 Z" style="transform-box: fill-box; transform-origin: 50% 50%;" transform="matrix(-1, 0, 0, -1, 0, 0)" bx:shape="triangle -61.764 9.083 25.764 28.37 0.5 0 1@6281476d"/>
-  <rect x="24.396" y="8.132" width="31.988" height="37.439" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-width: 8px;"/>
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="127.103" y1="-29.323" x2="127.103" y2="7.161" id="gradient-0" gradientTransform="matrix(-0.027399, 0.999625, -0.644862, -0.017675, 110.696732, -138.3694)">
+      <stop offset="0" style="stop-color: rgb(100% 100% 100%)"/>
+      <stop offset="1" style="stop-color: rgb(56.687% 56.687% 56.687%)"/>
+    </linearGradient>
+  </defs>
   <rect x="7.615" y="18.429" width="31.988" height="37.439" style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-width: 8px;"/>
+  <path d="M 102.662 -20.241 H 127.287 L 127.287 -29.323 L 151.543 -11.081 L 127.287 7.161 L 127.287 -1.921 H 102.662 V -20.241 Z" style="stroke-width: 5px; stroke: rgb(0, 0, 0); fill: url('#gradient-0');" transform="matrix(-0.74758, 0.664172, -0.664172, -0.74758, 124.650711, -63.842381)" bx:shape="arrow 102.662 -29.323 48.881 36.484 18.32 24.256 0 1@112bb6f1"/>
 </svg>
