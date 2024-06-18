@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TransformedEventEmitter from "./TransformedEventEmitter.vue";
 import {useToolStore} from "../stores/tool.ts";
 import {useEllipseStore} from "../stores/ellipses.ts";
 import {usePlots} from "../composables/plots.ts";
@@ -67,17 +68,17 @@ const ellipse_preview = computed(() => {
   g.ellipse_edit_layer(
     v-if="tool_store.current === 'ellipse'"
   )
-    rect(fill="orange" opacity="0.1" x="0" y="0" width="1920" height="1080"
-      @pointerdown="start_plot"
-      @pointerup="end_plot_ellipse"
-      @pointerleave="cancel_plot"
-      @pointermove="move_end"
+    transformed-event-emitter(
+      @pointer-down="start_plot"
+      @pointer-up="end_plot_ellipse"
+      @pointer-leave="cancel_plot"
+      @pointer-move="move_end"
     )
-    g(v-if="show_preview && plotting")
-      ellipse.preview(:cx="ellipse_preview.cx" :cy="ellipse_preview.cy" :rx="ellipse_preview.rx" :ry="ellipse_preview.ry" fill="transparent" stroke="red" stroke-width="1")
-      circle.preview(:cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
-      circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
-      circle.preview(:cx="(end.x + start.x) / 2" :cy="(end.y + start.y) / 2" fill="black" stroke-width="1" stroke="white" r="3")
+      g(v-if="show_preview && plotting")
+        ellipse.preview(:cx="ellipse_preview.cx" :cy="ellipse_preview.cy" :rx="ellipse_preview.rx" :ry="ellipse_preview.ry" fill="transparent" stroke="red" stroke-width="1")
+        circle.preview(:cx="start.x" :cy="start.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+        circle.preview(:cx="end.x" :cy="end.y" fill="black" stroke-width="0" stroke="transparent" r="2")
+        circle.preview(:cx="(end.x + start.x) / 2" :cy="(end.y + start.y) / 2" fill="black" stroke-width="1" stroke="white" r="3")
 
 </template>
 

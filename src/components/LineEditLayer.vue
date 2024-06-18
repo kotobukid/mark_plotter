@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TransformedEventEmitter from "./TransformedEventEmitter.vue";
 import {inject} from "vue";
 import {useToolStore} from "../stores/tool.ts";
 import {useLineStore} from "../stores/lines.ts";
@@ -47,14 +48,13 @@ const end_plot_line = (e: PointerEvent) => {
   g.line_plot_layer(
     v-if="tool_store.current === 'line'"
   )
-    rect(fill="green" opacity="0.1" x="0" y="0" width="1920" height="1080"
-      @pointerdown="start_plot"
-      @pointerup="end_plot_line"
-      @pointerleave="cancel_plot"
-      @pointermove="move_end"
+    transformed-event-emitter(
+      @pointer-down="start_plot"
+      @pointer-up="end_plot_line"
+      @pointer-leave="cancel_plot"
+      @pointer-move="move_end"
     )
-    line.preview(v-if="show_preview && plotting" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
-
+      line.preview(v-if="show_preview && plotting" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
 </template>
 
 <style scoped lang="less">

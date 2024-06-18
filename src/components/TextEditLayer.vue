@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TransformedEventEmitter from "./TransformedEventEmitter.vue";
 import {useToolStore} from "../stores/tool.ts";
 import {useTextStore} from "../stores/texts.ts";
 import {usePlots} from "../composables/plots.ts";
@@ -53,13 +54,13 @@ const shift_text_preview = (e: PointerEvent) => {
   g.text_plot_layer(
     v-if="tool_store.current === 'text'"
   )
-    rect(fill="orange" opacity="0.1" x="0" y="0" width="1920" height="1080"
-      @pointerdown="start_plot"
-      @pointerup="end_plot_text"
-      @pointerleave="cancel_plot"
-      @pointermove="shift_text_preview"
+    transformed-event-emitter(
+      @pointer-down="start_plot"
+      @pointer-up="end_plot_text"
+      @pointer-leave="cancel_plot"
+      @pointer-move="shift_text_preview"
     )
-    rect.preview(:x="start.x - 10" :y="start.y - 33" width="120" height="42" stroke="red" stroke-width="1" fill="white" opacity="0.5")
+      rect.preview(:x="start.x - 10" :y="start.y - 33" width="120" height="42" stroke="red" stroke-width="1" fill="white" opacity="0.5")
 </template>
 
 <style scoped lang="less">
