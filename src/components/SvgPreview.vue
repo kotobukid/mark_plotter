@@ -148,7 +148,6 @@ const wheeled = (e: WheelEvent) => {
 svg {
   outline: 1px solid grey;
   user-select: none;
-  cursor: none;
 }
 
 .preview {
