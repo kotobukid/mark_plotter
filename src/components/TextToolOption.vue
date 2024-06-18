@@ -55,7 +55,7 @@ const cancel_edit = () => {
 </script>
 
 <template lang="pug">
-  .text_tool_option(v-if="store.show_option")
+  .text_tool_option(v-if="tool_store.current === 'text' && store.show_option")
     .block
       textarea(v-auto-focus :value="text" @change="text_changed")
       button.submit(@click="submit_text") OK
