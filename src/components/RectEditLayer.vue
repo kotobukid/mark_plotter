@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import TransformedEventCatcher from "./TransformedEventCatcher.vue";
 import {useToolStore} from "../stores/tool.ts";
 import {useRectStore} from "../stores/rects.ts";
 import {usePlots} from "../composables/plots.ts";
@@ -56,15 +57,15 @@ const cancel_plot_handler = () => {
   g.rect_edit_layer(
     v-if="tool_store.current === 'rect'"
   )
-    rect(fill="blue" opacity="0.1" x="-10" y="-10" width="3840" height="2160"
-      @pointerdown="start_plot"
-      @pointerup="end_plot_rect"
-      @pointerleave="cancel_plot_handler"
-      @pointermove="move_end"
+    transformed-event-catcher(
+      @pointer-down="start_plot"
+      @pointer-up="end_plot_rect"
+      @pointer-leave="cancel_plot_handler"
+      @pointer-move="move_end"
     )
-    g(v-if="show_preview && plotting")
-      rect.preview(:x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
-      circle.preview(:cx="rect_preview.x + rect_preview.width / 2" :cy="rect_preview.y + rect_preview.height / 2" r="3" fill="black" stroke="white" stroke-width="1")
+      g(v-if="show_preview && plotting")
+        rect.preview(:x="rect_preview.x" :y="rect_preview.y" :width="rect_preview.width" :height="rect_preview.height" fill="transparent" stroke="red" stroke-width="1")
+        circle.preview(:cx="rect_preview.x + rect_preview.width / 2" :cy="rect_preview.y + rect_preview.height / 2" r="3" fill="black" stroke="white" stroke-width="1")
 
 </template>
 
