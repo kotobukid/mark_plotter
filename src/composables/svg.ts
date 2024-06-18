@@ -22,6 +22,22 @@ export const useSVG = () => {
                 });
             };
 
+            const remove_comments = ($elem: Node) => {
+                const commentsToRemove: ChildNode[] = []
+                for (const node of $elem.childNodes) {
+                    if (node.nodeType === Node.COMMENT_NODE) {
+                        commentsToRemove.push(node);
+                    } else {
+                        remove_comments(node);
+                    }
+                }
+
+                commentsToRemove.forEach(node => {
+                    $elem.removeChild(node);
+                });
+            };
+
+            remove_comments($svg);
             remove_data_attribute($svg);
 
             const elements = $svg.querySelectorAll('*');
