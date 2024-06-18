@@ -13,7 +13,7 @@ const reset = () => {
 <template lang="pug">
   .viewport_option(v-if="['pan', ''].includes(current_tool)")
     .block
-      button.submit(@click="reset") Reset Viewport
+      button.submit(@click="reset") ビューポートのリセット
 </template>
 
 <style scoped lang="less">
