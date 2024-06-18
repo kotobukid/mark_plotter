@@ -11,4 +11,5 @@ export default defineConfig({
             cert: fs.readFileSync('./localhost.pem'),
         }
     },
+    base: '/mark_plotter/'
 })
