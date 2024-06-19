@@ -20,7 +20,7 @@ const rect_clicked = (id: number) => {
 
 <template lang="pug">
   g.rects
-    rect(v-for="r in rects" :key="r.id" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
+    rect(v-for="r in rects" :key="r.id" :x="r.x" :y="r.y" :width="r.width" :height="r.height" fill="transparent" stroke="red" stroke-width="2"
       @click="rect_clicked(r.id)"
     )
 </template>

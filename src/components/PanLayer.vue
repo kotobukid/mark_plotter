@@ -35,10 +35,10 @@ const w = (e: WheelEvent) => {
   g.gpan(@wheel.prevent="w")
     g.pan_layer(v-if="current_tool === 'pan'")
       rect.pan(
-        x="-10"
-        y="-10"
-        width="4000"
-        height="4000"
+        x="-4000"
+        y="-4000"
+        width="8000"
+        height="8000"
         @pointerdown="start_pan"
         @pointerup="complete_pan"
         @pointerleave="complete_pan"

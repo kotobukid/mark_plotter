@@ -13,10 +13,10 @@ const wheeled = (e: WheelEvent) => {
 <template lang="pug">
   g.void_layer(v-if="current_tool === ''")
     rect.void(
-      x="-40000"
-      y="-40000"
-      width="80000"
-      height="80000"
+      x="-4000"
+      y="-4000"
+      width="8000"
+      height="8000"
       fill="transparent"
       stroke-width="0"
       stroke="transparent"

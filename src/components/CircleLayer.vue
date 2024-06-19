@@ -26,7 +26,7 @@ const circle_clicked = (id: number) => {
 
 <template lang="pug">
   g.circles
-    circle(v-for="c in circles" :key="c.id" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="2" style="fill: transparent;"
+    circle(v-for="c in circles" :key="c.id" :cx="c.cx" :cy="c.cy" :r="c.r" fill="transparent" stroke="red" stroke-width="2"
       @click="circle_clicked(c.id)"
     )
 

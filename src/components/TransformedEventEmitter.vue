@@ -50,7 +50,7 @@ const wheeled = (e: WheelEvent) => {
 <template lang="pug">
   g.transformed_event_emitter
     rect.event_emitter(
-      x="-100" y="-200" width="4000" height="4000"
+      x="-4000" y="-4000" width="8000" height="8000"
       @pointerdown="start_plot"
       @pointerup="complete_plot"
       @pointerleave="cancel_plot"
