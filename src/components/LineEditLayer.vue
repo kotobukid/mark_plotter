@@ -67,25 +67,30 @@ const get_directed = (start: Point2D, end: Point2D): Point2D => {
   let angle = Math.atan2(end.y - start.y, end.x - start.x);
   angle = (angle + (2 * Math.PI)) % (2 * Math.PI);
 
+  //  y downになっているが結果には問題はない
   if (angle >= (7 * Math.PI / 4) || angle < Math.PI / 4) {
     // right
     return {
-      x: end.x, y: start.y
+      x: end.x,
+      y: start.y
     };
   } else if (angle >= Math.PI / 4 && angle < (3 * Math.PI / 4)) {
     // up
     return {
-      x: start.x, y: end.y
+      x: start.x,
+      y: end.y
     };
   } else if (angle >= (3 * Math.PI / 4) && angle < (5 * Math.PI / 4)) {
     // left
     return {
-      x: end.x, y: start.y
+      x: end.x,
+      y: start.y
     };
   } else {
     // down
     return {
-      x: start.x, y: start.y
+      x: start.x,
+      y: end.y
     };
   }
 };
