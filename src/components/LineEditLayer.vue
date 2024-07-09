@@ -25,7 +25,12 @@ const {
 } = usePlots(layer_offset);
 
 const end_plot_line = (e: PointerEvent) => {
-  end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
+
+  const _end = get_directed(start.value, {
+    x: e.offsetX - layer_offset.x,
+    y: e.offsetY - layer_offset.y,
+  });
+
   tool_store.set('');
 
   const arrow_direction = tool_store.arrow_direction;
@@ -35,8 +40,8 @@ const end_plot_line = (e: PointerEvent) => {
   store.create({
     x1: start.value.x,
     y1: start.value.y,
-    x2: end.value.x,
-    y2: end.value.y,
+    x2: _end.x,
+    y2: _end.y,
     arrow: arrow_direction,
     id: gen_id()
   });
@@ -55,6 +60,53 @@ const arrow_direction = computed(() => {
   }
 });
 
+const get_directed = (start: Point2D, end: Point2D): Point2D => {
+  let angle = Math.atan2(end.y - start.y, end.x - start.x);
+  angle = (angle + (2 * Math.PI)) % (2 * Math.PI);
+
+  if (angle >= (7 * Math.PI / 4) || angle < Math.PI / 4) {
+    // right
+    return {
+      x: end.x, y: start.y
+    };
+  } else if (angle >= Math.PI / 4 && angle < (3 * Math.PI / 4)) {
+    // up
+    return {
+      x: start.x, y: end.y
+    };
+  } else if (angle >= (3 * Math.PI / 4) && angle < (5 * Math.PI / 4)) {
+    // left
+    return {
+      x: end.x, y: start.y
+    };
+  } else {
+    // down
+    return {
+      x: start.x, y: start.y
+    };
+  }
+};
+
+const move_end_custom = (e: PointerEvent) => {
+  if (plotting.value) {
+    const restrict: boolean = tool_store.restrict_direction;
+    if (!restrict) {
+      move_end(e);
+    } else {
+      const _end = get_directed(start.value, {
+        x: e.offsetX - layer_offset.x,
+        y: e.offsetY - layer_offset.y,
+      });
+
+      // @ts-ignore
+      move_end({
+        offsetX: _end.x + layer_offset.x,
+        offsetY: _end.y + layer_offset.y,
+      });
+    }
+  }
+};
+
 </script>
 
 <template lang="pug">
@@ -65,7 +117,7 @@ const arrow_direction = computed(() => {
       @pointer-down="start_plot"
       @pointer-up="end_plot_line"
       @pointer-leave="cancel_plot"
-      @pointer-move="move_end"
+      @pointer-move="move_end_custom"
     )
       line.preview(v-if="show_preview && plotting" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  :style="arrow_direction")
 </template>

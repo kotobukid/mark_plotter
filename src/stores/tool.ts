@@ -7,7 +7,8 @@ type ToolState = {
     current: Tool,
     circle_tool_option: CircleToolOption,
     tool_override: Tool,
-    arrow_direction: ArrowDirection
+    arrow_direction: ArrowDirection,
+    restrict_direction: boolean
 };
 
 type ToolActions = {
@@ -15,7 +16,8 @@ type ToolActions = {
     set_circle_tool: (option: CircleToolOption) => void,
     override: (tool: Tool) => void,
     release_override: () => void,
-    set_arrow_direction: (direction: ArrowDirection) => void
+    set_arrow_direction: (direction: ArrowDirection) => void,
+    set_restrict_direction: (value: 'yes' | 'no') => void,
 };
 
 type ToolGetters = {
@@ -28,12 +30,16 @@ export const useToolStore = defineStore<'tool', ToolState, ToolGetters, ToolActi
             current: '' as Tool,
             circle_tool_option: 'draw_full',
             tool_override: '' as Tool,
-            arrow_direction: 'forward'
+            arrow_direction: 'forward',
+            restrict_direction: false
         }
     },
     actions: {
         set(tool: Tool) {
             this.current = tool;
+        },
+        set_restrict_direction(value: 'yes' | 'no') {
+            this.restrict_direction = value === 'yes';
         },
         set_circle_tool(option: CircleToolOption) {
             this.circle_tool_option = option;

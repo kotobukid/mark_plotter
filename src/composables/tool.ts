@@ -10,6 +10,7 @@ export const useTool = () => {
 
     const set_circle_tool = tool_store.set_circle_tool;
     const set_arrow_direction = tool_store.set_arrow_direction;
+    const set_restrict_direction = tool_store.set_restrict_direction;
     const circle_option = computed(() => tool_store.circle_tool_option);
 
     return {
@@ -18,6 +19,7 @@ export const useTool = () => {
         current_tool,
         circle_option,
         set_circle_tool,
-        set_arrow_direction
+        set_arrow_direction,
+        set_restrict_direction
     };
 };
