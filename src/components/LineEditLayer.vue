@@ -25,11 +25,16 @@ const {
 } = usePlots(layer_offset);
 
 const end_plot_line = (e: PointerEvent) => {
+  const restrict: boolean = tool_store.restrict_direction;
 
-  const _end = get_directed(start.value, {
-    x: e.offsetX - layer_offset.x,
-    y: e.offsetY - layer_offset.y,
-  });
+  if (!restrict) {
+    end.value = {x: e.offsetX, y: e.offsetY};
+  } else {
+    end.value = get_directed(start.value, {
+      x: e.offsetX - layer_offset.x,
+      y: e.offsetY - layer_offset.y,
+    });
+  }
 
   tool_store.set('');
 
@@ -40,8 +45,8 @@ const end_plot_line = (e: PointerEvent) => {
   store.create({
     x1: start.value.x,
     y1: start.value.y,
-    x2: _end.x,
-    y2: _end.y,
+    x2: end.value.x,
+    y2: end.value.y,
     arrow: arrow_direction,
     id: gen_id()
   });
