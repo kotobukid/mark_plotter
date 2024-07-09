@@ -4,6 +4,7 @@ import {computed, inject} from "vue";
 import {useCropStore} from "../stores/crop.ts";
 import {useToolStore} from "../stores/tool.ts";
 import {usePlots} from "../composables/plots.ts";
+import TransformedEventEmitter from "./TransformedEventEmitter.vue";
 
 const layer_offset: Point2D = inject('layer-offset');
 
@@ -22,6 +23,7 @@ const {
 } = usePlots(layer_offset);
 
 const cancel_plot = () => {
+console.log('!')
   // do nothing(not auto release tool to keep preview)
 };
 
@@ -63,30 +65,31 @@ const crop_preview = computed(() => {
     </mask>
   </defs>
   <g class="crop_layer" v-if="tool_store.current === 'crop'">
-    <rect fill="black" opacity="0.1" x="-4000" y="-4000" width="8000" height="8000"
-          @pointerdown="start_plot"
-          @pointerup="end_crop"
-          @pointerleave="cancel_plot"
-          @pointermove="move_end"
-    ></rect>
-    <rect class="preview"
-          v-if="show_preview"
-          x="-4000"
-          y="-4000"
-          width="8000px"
-          height="8000px"
-          fill="black"
-          opacity="0.2"
-          mask="url('#masking')"
-          stroke="none" stroke-width="0"
-    ></rect>
-    <rect class="preview"
-          v-if="show_preview"
-          :x="crop_preview.x" :y="crop_preview.y" :width="crop_preview.width" :height="crop_preview.height"
-          fill="transparent"
-          stroke="lightgreen"
-          stroke-width="1"
-    ></rect>
+    <transformed-event-emitter
+      @pointer-down="start_plot"
+      @pointer-up="end_crop"
+      @pointer-leave="cancel_plot"
+      @pointer-move="move_end"
+    >
+      <rect class="preview"
+            v-if="show_preview"
+            x="-4000"
+            y="-4000"
+            width="8000px"
+            height="8000px"
+            fill="black"
+            opacity="0.2"
+            mask="url('#masking')"
+            stroke="none" stroke-width="0"
+      ></rect>
+      <rect class="preview"
+            v-if="show_preview"
+            :x="crop_preview.x" :y="crop_preview.y" :width="crop_preview.width" :height="crop_preview.height"
+            fill="transparent"
+            stroke="lightgreen"
+            stroke-width="1"
+      ></rect>
+    </transformed-event-emitter>
   </g>
 </template>
 

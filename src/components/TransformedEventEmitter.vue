@@ -12,7 +12,7 @@ const emits = defineEmits<{
   (e: 'pointer-down', value: OffsetXY): void,
   (e: 'pointer-up', value: OffsetXY): void,
   (e: 'pointer-move', value: MovementXY & OffsetXY): void,
-  (e: 'pointer-leave'): void,
+  (e: 'pointer-leave', value: OffsetXY): void,
 }>();
 
 const start_plot = (e: PointerEvent) => {
@@ -30,7 +30,10 @@ const complete_plot = (e: PointerEvent) => {
 };
 
 const cancel_plot = (e: PointerEvent) => {
-  emits('pointer-leave');
+  emits('pointer-leave', {
+    offsetX: e.offsetX,
+    offsetY: e.offsetY,
+  });
 };
 
 const move_end = (e: PointerEvent) => {

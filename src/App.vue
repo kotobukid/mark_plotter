@@ -97,9 +97,6 @@ const close_file = async () => {
 
 const switch_tool = (_tool: Tool) => {
   tool_store.set(_tool);
-  if (_tool === 'crop') {
-    transformStore.reset_transform();
-  }
 };
 
 const container_style = computed(() => {

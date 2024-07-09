@@ -10,6 +10,7 @@ import {useLineStore} from "../stores/lines.ts";
 import {useTextStore} from "../stores/texts.ts";
 import {useImage} from "../composables/image.ts";
 import {useSnapshot} from "../composables/snapshot.ts";
+import {useTransformStore} from "../stores/transform.ts";
 
 import type {ImageAndDimensions, MyRect} from "../types.ts";
 import {inject} from "vue";
@@ -22,6 +23,8 @@ const ellipse_store = useEllipseStore();
 const line_store = useLineStore();
 const text_store = useTextStore();
 const tool_store = useToolStore();
+const transform_store = useTransformStore();
+
 const gen_id = inject('gen-id') as () => number;
 
 const {commit} = useSnapshot();
@@ -30,6 +33,7 @@ const {push_image, get_current_image_index} = useImage();
 const submit = () => {
   const crop_rect: MyRect = crop_store.commit();
   commit_crop(crop_rect);
+  transform_store.reset_transform();
 };
 
 const reset = () => {
