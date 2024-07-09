@@ -14,7 +14,6 @@ const {commit} = useSnapshot();
 const layer_offset: Point2D = inject('layer-offset');
 const {
   current_tool,
-  set_tool,
   circle_option
 } = useTool();
 
@@ -51,7 +50,6 @@ const _start_plot = (e: OffsetXY) => {
 
 const complete_plot_circle = (e: OffsetXY) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
-  set_tool('');
 
   commit(-1);
 

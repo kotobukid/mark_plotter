@@ -28,7 +28,7 @@ const {
 
 const end_plot_rect = (e: PointerEvent) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
-  tool_store.set('');
+
   const s_gte_x: boolean = start.value.x - end.value.x > 0;
   const s_gte_y: boolean = start.value.y - end.value.y > 0;
 
@@ -48,7 +48,6 @@ const end_plot_rect = (e: PointerEvent) => {
 
 const cancel_plot_handler = () => {
   cancel_plot();
-  tool_store.set('');
 };
 
 </script>

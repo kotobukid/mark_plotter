@@ -27,8 +27,6 @@ const submit_text = () => {
   const _text: string = text.value.trim();
 
   if (_text) {
-    tool_store.set('');
-
     commit(-1);
 
     const pos: Point2D = store.locate_to_create;
@@ -50,7 +48,6 @@ const submit_text = () => {
 
 const cancel_edit = () => {
   store.hide_tool_option();
-  tool_store.set('');
 };
 </script>
 

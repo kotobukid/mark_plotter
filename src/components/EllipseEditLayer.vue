@@ -28,7 +28,6 @@ const {
 
 const end_plot_ellipse = (e: PointerEvent) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
-  tool_store.set('');
 
   const cx = (start.value.x + end.value.x) / 2;
   const cy = (start.value.y + end.value.y) / 2;

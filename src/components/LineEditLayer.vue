@@ -36,8 +36,6 @@ const end_plot_line = (e: PointerEvent) => {
     });
   }
 
-  tool_store.set('');
-
   const arrow_direction = tool_store.arrow_direction;
 
   commit(-1);
