@@ -1,6 +1,15 @@
 import {nextTick} from "vue";
 import vkbeautify from 'vkbeautify';
-import type {ApplicationImage, ImageAndDimensions, LabelText, MyCircle, MyEllipse, MyLine, MyRect} from "../types.ts";
+import type {
+    ApplicationImage,
+    ArrowDirection,
+    ImageAndDimensions,
+    LabelText,
+    MyCircle,
+    MyEllipse,
+    MyLine,
+    MyRect
+} from "../types.ts";
 
 export const useSVG = () => {
     const generate_svg_text_to_save = async ($svg_original: HTMLElement): Promise<string> => {
@@ -256,11 +265,17 @@ ${text}`], {type: 'image/svg+xml'});
                 if (g_lines) {
                     const _lines = g_lines.querySelectorAll('line');
                     lines = Array.from(_lines).map((line: SVGLineElement) => {
+                        const has_start_marker = !!line.style["marker-start"];
+                        const has_end_marker = !!line.style["marker-end"];
+
+                        const arrow: ArrowDirection = (has_start_marker && has_end_marker) ? 'both' : (has_start_marker ? 'forward' : 'none');
+
                         return {
                             x1: Number(line.getAttribute('x1')),
                             y1: Number(line.getAttribute('y1')),
                             x2: Number(line.getAttribute('x2')),
                             y2: Number(line.getAttribute('y2')),
+                            arrow,
                             id: gen_id()
                         };
                     });

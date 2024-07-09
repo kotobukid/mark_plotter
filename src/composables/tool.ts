@@ -9,6 +9,7 @@ export const useTool = () => {
     const current_tool = computed(() => tool_store.active_tool_overridden);
 
     const set_circle_tool = tool_store.set_circle_tool;
+    const set_arrow_direction = tool_store.set_arrow_direction;
     const circle_option = computed(() => tool_store.circle_tool_option);
 
     return {
@@ -16,6 +17,7 @@ export const useTool = () => {
         override,
         current_tool,
         circle_option,
-        set_circle_tool
+        set_circle_tool,
+        set_arrow_direction
     };
 };

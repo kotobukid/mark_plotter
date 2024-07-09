@@ -76,6 +76,7 @@ const commit_crop = (rect: MyRect) => {
         y1: l.y1 - rect.y,
         x2: l.x2 - rect.x,
         y2: l.y2 - rect.y,
+        arrow: l.arrow,
         id: gen_id()
       };
     }));

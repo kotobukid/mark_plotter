@@ -1,12 +1,13 @@
 import {defineStore} from "pinia";
-import {Tool} from "../types.ts";
+import {Tool, type ArrowDirection} from "../types.ts";
 
 type CircleToolOption = 'draw_full' | 'draw_half';
 
 type ToolState = {
     current: Tool,
     circle_tool_option: CircleToolOption,
-    tool_override: Tool
+    tool_override: Tool,
+    arrow_direction: ArrowDirection
 };
 
 type ToolActions = {
@@ -14,6 +15,7 @@ type ToolActions = {
     set_circle_tool: (option: CircleToolOption) => void,
     override: (tool: Tool) => void,
     release_override: () => void,
+    set_arrow_direction: (direction: ArrowDirection) => void
 };
 
 type ToolGetters = {
@@ -25,7 +27,8 @@ export const useToolStore = defineStore<'tool', ToolState, ToolGetters, ToolActi
         return {
             current: '' as Tool,
             circle_tool_option: 'draw_full',
-            tool_override: '' as Tool
+            tool_override: '' as Tool,
+            arrow_direction: 'forward'
         }
     },
     actions: {
@@ -34,6 +37,9 @@ export const useToolStore = defineStore<'tool', ToolState, ToolGetters, ToolActi
         },
         set_circle_tool(option: CircleToolOption) {
             this.circle_tool_option = option;
+        },
+        set_arrow_direction(direction: ArrowDirection) {
+            this.arrow_direction = direction;
         },
         override(tool: Tool) {
             this.tool_override = tool;

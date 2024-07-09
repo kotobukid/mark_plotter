@@ -38,11 +38,14 @@ export type LabelText = {
     id: number
 };
 
+export type ArrowDirection = 'forward' | 'both' | 'none';
+
 export type MyLine = {
     x1: number,
     y1: number
     x2: number,
     y2: number,
+    arrow: ArrowDirection,
     id: number
 };
 

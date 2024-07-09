@@ -57,6 +57,7 @@ const {
 import type {Point2D, Tool} from "./types.ts";
 import TextToolOption from "./components/TextToolOption.vue";
 import CircleToolOption from "./components/CircleToolOption.vue";
+import LineToolOption from "./components/LineToolOption.vue";
 
 const open_svg_handle = () => {
   open_file_dialog().then(() => {
@@ -171,6 +172,7 @@ const copy_as_png_handler = () => {
     circle-tool-option
     crop-tool-option
     text-tool-option
+    line-tool-option
     view-port-option
   .container(:style="container_style")
     ToolRibbon(style="margin-right: 16px; width: 200px; height: 600px; float: left;")

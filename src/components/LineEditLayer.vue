@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TransformedEventEmitter from "./TransformedEventEmitter.vue";
-import {inject} from "vue";
+import {computed, inject} from "vue";
 import {useToolStore} from "../stores/tool.ts";
 import {useLineStore} from "../stores/lines.ts";
 import {usePlots} from "../composables/plots.ts";
@@ -28,6 +28,8 @@ const end_plot_line = (e: PointerEvent) => {
   end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
   tool_store.set('');
 
+  const arrow_direction = tool_store.arrow_direction;
+
   commit(-1);
 
   store.create({
@@ -35,12 +37,23 @@ const end_plot_line = (e: PointerEvent) => {
     y1: start.value.y,
     x2: end.value.x,
     y2: end.value.y,
+    arrow: arrow_direction,
     id: gen_id()
   });
 
   show_preview.value = false;
   plotting.value = false;
 };
+
+const arrow_direction = computed(() => {
+  if (tool_store.arrow_direction === 'forward') {
+    return 'marker-start: url(\"#marker-1\");'
+  } else if (tool_store.arrow_direction === 'both') {
+    return 'marker-start: url(\"#marker-1\"); marker-end: url(\"#marker-2\");'
+  } else {
+    return '';
+  }
+});
 
 </script>
 
@@ -54,7 +67,7 @@ const end_plot_line = (e: PointerEvent) => {
       @pointer-leave="cancel_plot"
       @pointer-move="move_end"
     )
-      line.preview(v-if="show_preview && plotting" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  style="marker-start: url(\"#marker-1\");")
+      line.preview(v-if="show_preview && plotting" :x1="start.x" :y1="start.y" :x2="end.x" :y2="end.y" stroke="red" stroke-width="2" fill="none"  :style="arrow_direction")
 </template>
 
 <style scoped lang="less">
