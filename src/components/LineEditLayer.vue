@@ -28,7 +28,7 @@ const end_plot_line = (e: PointerEvent) => {
   const restrict: boolean = tool_store.restrict_direction;
 
   if (!restrict) {
-    end.value = {x: e.offsetX, y: e.offsetY};
+    end.value = {x: e.offsetX - layer_offset.x, y: e.offsetY - layer_offset.y};
   } else {
     end.value = get_directed(start.value, {
       x: e.offsetX - layer_offset.x,
