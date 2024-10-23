@@ -4,6 +4,7 @@ import type {ApplicationImage, ImageAndDimensions} from "../types.ts";
 import {useCircleStore} from "../stores/circles.ts";
 import {useImageStore} from "../stores/images.ts";
 import {useRectStore} from "../stores/rects.ts";
+import {useMaskStore} from "../stores/masks.ts";
 import {useEllipseStore} from "../stores/ellipses.ts";
 import {useLineStore} from "../stores/lines.ts";
 import {useTextStore} from "../stores/texts.ts";
@@ -27,6 +28,7 @@ export const useFileSystem = (gen_id: () => number) => {
     const image_store = useImageStore();
     const circle_store = useCircleStore();
     const rect_store = useRectStore();
+    const mask_store = useMaskStore();
     const ellipse_store = useEllipseStore();
     const line_store = useLineStore();
     const text_store = useTextStore();
@@ -54,6 +56,7 @@ export const useFileSystem = (gen_id: () => number) => {
                     parse_my_svg(file, (result: ApplicationImage) => {
                         image_store.replace(result.image);
                         rect_store.replace(result.rects);
+                        mask_store.replace(result.masks);
                         text_store.replace(result.texts);
                         circle_store.replace(result.circles);
                         ellipse_store.replace(result.ellipses);
@@ -76,6 +79,7 @@ export const useFileSystem = (gen_id: () => number) => {
                     parse_binary_image(file, (result) => {
                         image_store.replace(result.image);
                         rect_store.replace([]);
+                        mask_store.replace([]);
                         text_store.replace([]);
                         circle_store.replace([]);
                         ellipse_store.replace([]);

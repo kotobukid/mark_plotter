@@ -8,7 +8,8 @@ import type {
     MyCircle,
     MyEllipse,
     MyLine,
-    MyRect
+    MyRect,
+    Mask
 } from "../types.ts";
 
 export const useSVG = () => {
@@ -181,6 +182,23 @@ ${text}`], {type: 'image/svg+xml'});
                     });
                 }
 
+                let masks: Mask[] = [];
+
+                // Mask
+                const g_masks = doc.querySelector('g.masks');
+                if (g_masks) {
+                    const _masks = g_masks.querySelectorAll('rect');
+                    masks = Array.from(_masks).map(rect => {
+                        return {
+                            x: Number(rect.getAttribute('x')),
+                            y: Number(rect.getAttribute('y')),
+                            width: Number(rect.getAttribute('width')),
+                            height: Number(rect.getAttribute('height')),
+                            id: gen_id()
+                        };
+                    });
+                }
+
                 let texts: LabelText[] = [];
 
                 // LabelText
@@ -286,6 +304,7 @@ ${text}`], {type: 'image/svg+xml'});
                 next({
                     image,
                     rects,
+                    masks,
                     texts,
                     circles,
                     ellipses,
@@ -315,6 +334,7 @@ ${text}`], {type: 'image/svg+xml'});
                                 id: gen_id()
                             },
                             rects: [],
+                            masks: [],
                             texts: [],
                             circles: [],
                             ellipses: [],
@@ -337,7 +357,7 @@ ${text}`], {type: 'image/svg+xml'});
         reader.readAsText(file);
     };
 
-    const parse_binary_image = (file: File, next: (data: Omit<ApplicationImage, "rects" | "circles" | "ellipses" | "texts" | "lines">) => void, gen_id: () => number) => {
+    const parse_binary_image = (file: File, next: (data: Omit<ApplicationImage, "rects" | "masks" | "circles" | "ellipses" | "texts" | "lines">) => void, gen_id: () => number) => {
         const parseImageContent = (dataUrl: string) => {
             const $img: HTMLImageElement = new Image();
             $img.onload = () => {

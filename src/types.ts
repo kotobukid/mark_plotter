@@ -1,5 +1,5 @@
-export type ElementType = 'rect' | 'circle' | 'ellipse' | 'line' | 'text';
-export type Tool = "" | "erase" | "circle" | "rect" | "line" | "ellipse" | "crop" | 'text' | 'edit' | 'pan';
+export type ElementType = 'mask' | 'rect' | 'circle' | 'ellipse' | 'line' | 'text';
+export type Tool = "" | "erase" | "circle" | "rect" | "mask" | "line" | "ellipse" | "crop" | 'text' | 'edit' | 'pan';
 
 export type ImageAndDimensions = {
     dataUrl: string,
@@ -24,6 +24,14 @@ export type MyEllipse = {
 };
 
 export type MyRect = {
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    id: number
+};
+
+export type Mask = {
     x: number,
     y: number,
     width: number,
@@ -56,6 +64,7 @@ export type Point2D = {
 
 export type Snapshot = {
     rects: MyRect[],
+    masks: Mask[],
     circles: MyCircle[],
     ellipses: MyEllipse[],
     lines: MyLine[]
@@ -67,6 +76,7 @@ export type ApplicationImage = {
     image: ImageAndDimensions,
     circles: MyCircle[],
     rects: MyRect[],
+    masks: Mask[],
     ellipses: MyEllipse[],
     lines: MyLine[],
     texts: LabelText[],

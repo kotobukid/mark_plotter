@@ -19,6 +19,8 @@ import LineLayer from "./LineLayer.vue";
 import TextLayer from "./TextLayer.vue";
 import RectLayer from "./RectLayer.vue";
 import RectEditLayer from "./RectEditLayer.vue";
+import MaskLayer from "./MaskLayer.vue";
+import MaskEditLayer from "./MaskEditLayer.vue";
 import CircleEditLayer from "./CircleEditLayer.vue";
 import EllipseEditLayer from "./EllipseEditLayer.vue";
 import LineEditLayer from "./LineEditLayer.vue";
@@ -77,6 +79,7 @@ const show_sight = computed(() => {
   return show_cursor && [
     'circle',
     'rect',
+    'mask',
     'ellipse',
     'text',
     'line',
@@ -141,6 +144,7 @@ const pointer_up = (e: PointerEvent) => {
         OmitOnSave
           void-layer
 
+        mask-layer
         rect-layer
         circle-layer
         ellipse-layer
@@ -148,6 +152,7 @@ const pointer_up = (e: PointerEvent) => {
         text-layer
 
         OmitOnSave
+          mask-edit-layer
           rect-edit-layer
           circle-edit-layer
           ellipse-edit-layer

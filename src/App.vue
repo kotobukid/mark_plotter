@@ -197,6 +197,9 @@ const copy_as_png_handler = () => {
       a.button(href="#" @click.prevent="switch_tool('rect')" :data-active="tool_store.current === 'rect'" draggable="false")
         img.tool_icon(src="/rect.svg" draggable="false")
         span 矩形ツール
+      a.button(href="#" @click.prevent="switch_tool('mask')" :data-active="tool_store.current === 'mask'" draggable="false")
+        img.tool_icon(src="/mask.svg" draggable="false")
+        span 海苔ツール
       a.button(href="#" @click.prevent="switch_tool('circle')" :data-active="tool_store.current === 'circle'" draggable="false")
         img.tool_icon(src="/circle.svg" draggable="false")
         span 円ツール

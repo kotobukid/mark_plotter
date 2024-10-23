@@ -1,6 +1,7 @@
 import {useSnapshotStore} from "../stores/snapshot.ts";
 import {useCircleStore} from "../stores/circles.ts";
 import {useRectStore} from "../stores/rects.ts";
+import {useMaskStore} from "../stores/masks.ts";
 import {useEllipseStore} from "../stores/ellipses.ts";
 import {useTextStore} from "../stores/texts.ts";
 import {useLineStore} from "../stores/lines.ts";
@@ -13,6 +14,7 @@ export const useSnapshot = () => {
     const snapshot_store = useSnapshotStore();
     const circle_store = useCircleStore();
     const rect_store = useRectStore();
+    const mask_store = useMaskStore();
     const ellipse_store = useEllipseStore();
     const text_store = useTextStore();
     const line_store = useLineStore();
@@ -23,6 +25,7 @@ export const useSnapshot = () => {
         snapshot_store.commit(image_index,
             circle_store.circles,
             rect_store.rects,
+            mask_store.masks,
             ellipse_store.ellipses,
             line_store.lines,
             text_store.texts
@@ -36,6 +39,7 @@ export const useSnapshot = () => {
         if (ss) {
             circle_store.replace(ss.circles);
             rect_store.replace(ss.rects);
+            mask_store.replace(ss.masks);
             ellipse_store.replace(ss.ellipses);
             line_store.replace(ss.lines);
             text_store.replace(ss.texts);
@@ -52,6 +56,7 @@ export const useSnapshot = () => {
     const wipe_available = computed(() => {
         return circle_store.circles.length > 0 ||
             rect_store.rects.length > 0 ||
+            mask_store.masks.length > 0 ||
             ellipse_store.ellipses.length > 0 ||
             line_store.lines.length > 0 ||
             text_store.texts.length > 0;
@@ -62,6 +67,7 @@ export const useSnapshot = () => {
 
         circle_store.replace([]);
         rect_store.replace([]);
+        mask_store.replace([]);
         ellipse_store.replace([]);
         line_store.replace([]);
         text_store.replace([]);

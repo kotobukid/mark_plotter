@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import type {LabelText, MyCircle, MyEllipse, MyLine, MyRect, Snapshot} from "../types.ts";
+import type {LabelText, MyCircle, MyEllipse, MyLine, MyRect, Mask, Snapshot} from "../types.ts";
 
 export const useSnapshotStore = defineStore('snapshot', {
     state() {
@@ -14,6 +14,7 @@ export const useSnapshotStore = defineStore('snapshot', {
         commit(image_changed: number | -1,
                circles: MyCircle[],
                rects: MyRect[],
+               masks: Mask[],
                ellipses: MyEllipse[],
                lines: MyLine[],
                texts: LabelText[],
@@ -21,6 +22,7 @@ export const useSnapshotStore = defineStore('snapshot', {
             const ss: Snapshot = {
                 circles: [...circles],
                 rects: [...rects],
+                masks: [...masks],
                 ellipses: [...ellipses],
                 lines: [...lines],
                 texts: [...texts],
