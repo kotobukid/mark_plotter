@@ -23,7 +23,6 @@ const {
 } = usePlots(layer_offset);
 
 const cancel_plot = () => {
-console.log('!')
   // do nothing(not auto release tool to keep preview)
 };
 
