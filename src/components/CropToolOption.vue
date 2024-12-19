@@ -14,6 +14,7 @@ import {useTransformStore} from "../stores/transform.ts";
 
 import type {ImageAndDimensions, MyRect} from "../types.ts";
 import {inject} from "vue";
+import {useMaskStore} from "../stores/masks.ts";
 
 const crop_store = useCropStore();
 const image_store = useImageStore();
@@ -22,6 +23,7 @@ const circle_store = useCircleStore();
 const ellipse_store = useEllipseStore();
 const line_store = useLineStore();
 const text_store = useTextStore();
+const mask_store = useMaskStore();
 const tool_store = useToolStore();
 const transform_store = useTransformStore();
 
@@ -90,6 +92,16 @@ const commit_crop = (rect: MyRect) => {
         x: t.x - rect.x,
         y: t.y - rect.y,
         text: t.text,
+        id: gen_id()
+      };
+    }));
+
+    mask_store.replace(mask_store.masks.map(m => {
+      return {
+        x: m.x - rect.x,
+        y: m.y - rect.y,
+        width: m.width,
+        height: m.height,
         id: gen_id()
       };
     }));
